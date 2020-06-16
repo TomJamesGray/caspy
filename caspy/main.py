@@ -12,12 +12,12 @@ logging_config = {
         "f_parsing": {
             "class": "logging.StreamHandler",
             "formatter": "main",
-            "level": logging.INFO}
+            "level": logging.DEBUG}
     },
     "loggers": {
         "":{
             "handlers":["f_parsing"],
-            "level":logging.INFO
+            "level":logging.DEBUG
         },
     }
 }
@@ -25,8 +25,11 @@ logging_config = {
 logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
 
+defined_vars = {}
+
+
 def main():
-    parser_cls = parser.Parser()
+    parser_cls = parser.Parser(output="ASCII")
 
     while True:
         line = input(">> ")

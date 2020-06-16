@@ -1,6 +1,8 @@
-?start: sum
-    | NAME "~" sum -> tilde
-    | NAME "=" sum -> var_def
+?start:expr
+    | NAME ":=" expr -> def_expr
+
+?expr: sum
+    | expr "=" sum -> equality
 
 ?sum: product
     | sum "+" product -> add
@@ -19,9 +21,7 @@
     | "-" atom -> neg
     | "(" sum ")"
     | /("([^"]|"")*")+/ -> string
-    | "True" -> bool_t
-    | "False" -> bool_f
-    | NAME -> get_var
+    | NAME -> sym
 
 
 
