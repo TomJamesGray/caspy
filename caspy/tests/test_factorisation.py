@@ -1,5 +1,5 @@
 from caspy.factorise import factoriseNum
-from hypothesis import given, settings
+from hypothesis import given
 import hypothesis.strategies as st
 
 
