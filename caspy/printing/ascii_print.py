@@ -19,6 +19,7 @@ class ASCIIPrint(Transformer):
         return "{} + {}".format(x,y)
 
     def div(self,x,y):
+        # logger.info("x = {},y = {}".format(x,y))
         return "({})/({})".format(x,y)
 
     def sub(self,x,y):
