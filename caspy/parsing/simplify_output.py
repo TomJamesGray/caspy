@@ -1,6 +1,7 @@
 import logging
 from lark import v_args
 from lark import Transformer
+from caspy.numeric.numeric import Numeric
 
 logger = logging.getLogger(__name__)
 
@@ -10,15 +11,12 @@ class SimplifyOutput(Transformer):
     Transformer that applies some basic simplification to lark AST to be used
     before outputting
     """
-    number = float
+    def number(self,x: str) -> Numeric:
+        return Numeric(x,"number")
 
-    # def __init__(self, *args, **kwargs):
-    #     super(SimplifyOutput, self).__init__(*args, **kwargs)
+    def sym(self,x: str) -> Numeric:
+        return Numeric(x,"sym")
 
-    # def number(self,tree):
-    #     logger.info("Number tree = {}".format(tree))
-    #     return 23.4
-
-    def div(self,x,y):
-        logger.info("Simplifier: x = {} y = {}".format(x,y))
-        # return None
+    def add(self,x: Numeric,y: Numeric) -> Numeric:
+        logger.info("adding x = {}, y = {}".format(x,y))
+        return x.add(y)

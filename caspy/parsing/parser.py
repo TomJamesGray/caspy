@@ -20,7 +20,7 @@ class Parser:
 
     def parse(self, line: str):
         tree = self.parser.parse(line)
-        logger.debug("Tree = {}".format(tree))
+        logger.debug("Tree = \n{}\n--".format(tree.pretty()))
         simped = self.simplifier_transformer.transform(tree)
         return simped
         return self.outputTrans.transform(simped)
