@@ -23,6 +23,22 @@ class Numeric(Generic[Num]):
     def __repr__(self):
         return "<Numeric class {}>".format(self.val)
 
+    def __add__(self, other):
+        if type(other) == Numeric:
+            return self.add(other)
+
+    def __mul__(self, other):
+        if type(other) == Numeric:
+            return self.mul(other)
+
+    def __sub__(self, other):
+        if type(other) == Numeric:
+            return self.add(other.neg())
+
+    def __truediv__(self, other):
+        if type(other) == Numeric:
+            return self.mul(other.recip())
+
     def sym_in(self,key):
         for key_x in self.val:
             if key_x == key:
@@ -70,13 +86,17 @@ class Numeric(Generic[Num]):
         :param x: Numeric object
         :return: self
         """
-        # Make a copy of this object for later use
-        pre_exp = copy.copy(self)
-        # Redefine this object as a list of length 1 with the previous
-        # info stored as a symbol type and raise that to the power x
-        self.val = [Symbol(pre_exp, Fraction(1, 1))]
-        self.val[0].val[pre_exp] = x
-        return self
+        if len(self.val) == 1:
+            self.val[0] = self.val[0].pow(x)
+            return self
+        else:
+            # Make a copy of this object for later use
+            pre_exp = copy.copy(self)
+            # Redefine this object as a list of length 1 with the previous
+            # info stored as a symbol type and raise that to the power x
+            self.val = [Symbol(pre_exp, Fraction(1, 1))]
+            self.val[0].val[pre_exp] = x
+            return self
 
     def mul(self, x: Num) -> Num:
         """

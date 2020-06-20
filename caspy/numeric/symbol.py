@@ -20,7 +20,7 @@ class Symbol:
                 self.val[key] += y.val[key]
             else:
                 self.val[key] = y.val[key]
-
+        self.coeff *= y.coeff
         return self
 
     def add_coeff(self, x: Frac) -> None:
@@ -29,6 +29,19 @@ class Symbol:
     def neg(self):
         """Negates this symbol"""
         self.coeff *= -1
+
+    def pow(self,x):
+        """Raises this symbol to the power x"""
+        logger.info("{} to the power {}".format(self,x))
+        for key in self.val:
+            if type(self.val[key]) == num.Numeric:
+                self.val[key] = self.val[key].mul(x)
+            else:
+                self.val[key] = x.mul(num.Numeric(self.val[key],"number"))
+
+        self.coeff = self.coeff.recip()
+
+        return self
 
     def recip(self):
         """Makes this symbol the reciprocal of itself"""
