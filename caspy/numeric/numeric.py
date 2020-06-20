@@ -58,10 +58,30 @@ class Numeric(Generic[Num]):
     def pow(self,x: Num) -> Num:
         """
         Raises this number to the power x
-        :param x:
+        :param x: Numeric object
         :return: self
         """
+        # Make a copy of this object for later use
         pre_exp = copy.copy(self)
+        # Redefine this object as a list of length 1 with the previous
+        # info stored as a symbol type and raise that to the power x
         self.val = [Symbol(pre_exp, Fraction(1, 1))]
         self.val[0].val[pre_exp] = x
+        return self
+
+    def mul(self,x: Num) -> Num:
+        """
+        Multiplies this number by x. If this number or x is made up
+        of a linear combination of terms, eg (1+x) then we don't
+        expand the product
+        :param x: Numeric object
+        :return: self
+        """
+        if len(self.val) > 1 or len(x.val) > 1:
+            pre_self = copy.copy(self)
+            pre_x = copy.copy(x)
+            self.val = [Symbol(pre_self, Fraction(1, 1))]
+            self.val[0].val[pre_x] = Numeric(1,"number")
+        else:
+            self.val[0].mul(x.val[0])
         return self
