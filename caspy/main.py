@@ -2,6 +2,7 @@ import logging
 import logging.config
 from caspy.parsing import parser
 from caspy.printing.ascii_numeric import ascii_numeric_str
+from caspy.printing.latex_numeric import latex_numeric_str
 
 logging_config = {
     "version":1,
@@ -36,5 +37,7 @@ def main():
         line = input(">> ")
         out = parser_cls.parse(line)
         print("Parser output = {}".format(out))
-        print("---\nSymbols:")
+        print("ASCII:")
         print(ascii_numeric_str(out))
+        print("\nLaTeX:")
+        print(latex_numeric_str(out))

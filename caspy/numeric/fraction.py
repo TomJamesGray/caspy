@@ -26,6 +26,9 @@ class Fraction(Generic[Frac]):
 
         return self
 
+    def to_real(self) -> float:
+        return self.num / self.den
+
     def recip(self) -> Frac:
         self.num, self.den = self.den, self.num
         return self
