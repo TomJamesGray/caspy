@@ -1,4 +1,4 @@
-from caspy.numeric.numeric import Num
+from caspy.numeric.numeric import Num,Numeric
 
 
 def ascii_numeric_str(x: Num):
@@ -7,7 +7,10 @@ def ascii_numeric_str(x: Num):
         out += "({}) ".format(sym.coeff)
         for key in sym.val:
             if key != 1:
-                out += "* {} ^ (".format(key)
+                if type(key) == Numeric:
+                    out += "* ({}) ^ (".format(ascii_numeric_str(key))
+                else:
+                    out += "* {} ^ (".format(key)
                 out += ascii_numeric_str(sym.val[key])
                 out += ")"
         out += " + "

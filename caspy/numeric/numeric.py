@@ -1,3 +1,4 @@
+import copy
 from caspy.numeric.symbol import Symbol
 from caspy.numeric.fraction import Fraction
 from typing import TypeVar, Generic
@@ -42,7 +43,6 @@ class Numeric(Generic[Num]):
             else:
                 self.val.append(sym_y)
 
-
         return self
 
     def neg(self) -> Num:
@@ -53,4 +53,15 @@ class Numeric(Generic[Num]):
         for key in self.val:
             self.val[key] *= -1
 
+        return self
+
+    def pow(self,x: Num) -> Num:
+        """
+        Raises this number to the power x
+        :param x:
+        :return: self
+        """
+        pre_exp = copy.copy(self)
+        self.val = [Symbol(pre_exp, Fraction(1, 1))]
+        self.val[0].val[pre_exp] = x
         return self

@@ -1,6 +1,8 @@
-from caspy.numeric.fraction import Frac
+import logging
 import caspy.numeric.numeric as num
+from caspy.numeric.fraction import Frac
 
+logger = logging.getLogger(__name__)
 
 class Symbol:
     """Represents a product of symbols and their powers"""

@@ -12,7 +12,10 @@ class Fraction(Generic[Frac]):
         self.den = den
 
     def __repr__(self):
-        return "{}/{}".format(self.num, self.den)
+        if self.den == 1:
+            return str(self.num)
+        else:
+            return "{}/{}".format(self.num, self.den)
 
     def __add__(self, other) -> Frac:
         if type(other) != Fraction:
