@@ -1,35 +1,51 @@
 from caspy.numeric.symbol import Symbol
+from caspy.numeric.fraction import Fraction
+from typing import TypeVar, Generic
 
-class Numeric:
+Num = TypeVar("Num")
+
+
+class Numeric(Generic[Num]):
     """Represents a linear combination of numbers and symobols"""
-    def __init__(self,val: str,type: str):
+
+    def __init__(self, val: str, typ: str):
         """Initialises a numeric class with a single value"""
-        self.val = {}
-        if type == "sym":
+        self.val = []
+        if typ == "sym":
             # val represents the letter of the symbol, such as x,y,..
-            self.val[Symbol(val)] = 1
-        elif type == "number":
+            self.val.append(Symbol(val, Fraction(1, 1)))
+        elif typ == "number":
             # in this case the 1 represents that this value is just a number
-            self.val["1"] = float(val)
+            self.val.append(Symbol("1", Fraction(float(val), 1)))
 
     def __repr__(self):
         return "<Numeric class {}>".format(self.val)
 
-    def add(self,y):
+    def sym_in(self,key):
+        for key_x in self.val:
+            if key_x == key:
+                return key_x
+        return False
+
+    def add(self, y: Num) -> Num:
         """
         Adds y to this number
         :param y: Another numeric class
         :return: self
         """
-        for key in y.val:
-            if key in self.val:
-                self.val[key] += y.val[key]
+        for sym_y in y.val:
+            lookup = self.sym_in(sym_y)
+            if lookup:
+                # A term with the same symbols already exists in this numeric expression
+                # so just add coeffs
+                lookup.add_coeff(sym_y.coeff)
             else:
-                self.val[key] = y.val[key]
+                self.val.append(sym_y)
+
 
         return self
 
-    def neg(self):
+    def neg(self) -> Num:
         """
         Negates this number
         :return: self
@@ -38,24 +54,3 @@ class Numeric:
             self.val[key] *= -1
 
         return self
-
-    def mul(self,y):
-        """
-        Multiplies this  number by y
-        :param y: Numeric object
-        :return: self
-        """
-        for key_y in y.val:
-            if key_y == "1":
-                for key_s in self.val:
-                    self.val[key_s] *= y.val[key_y]
-
-        return self
-
-    # def pow(self,y):
-    #     """
-    #     Raises this number to the power y
-    #     :param y: Numeric object
-    #     :return: self
-    #     """
-    #     for key_y
