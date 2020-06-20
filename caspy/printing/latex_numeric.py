@@ -30,12 +30,17 @@ def latex_numeric_str(x: Num):
                     out += "\\cdot"
                     need_dot = False
                 if type(key) == Numeric:
-                    out += " ({})".format(latex_numeric_str(key))
+                    power = latex_numeric_str(key)
+                    if power != "" and power != "1":
+                        out += "({})".format(power)
+
                 else:
                     out += " {}".format(key)
                 power = latex_numeric_str(sym.val[key])
                 if power != "" and power != "1":
                     out += "^ {{{}}}".format(power)
+            elif type(sym.val[key]) == Numeric:
+                out += "^ {{{}}}".format(latex_numeric_str(sym.val[key]))
 
         out += "+"
     return out[:-1]
