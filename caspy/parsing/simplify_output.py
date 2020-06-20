@@ -32,5 +32,8 @@ class SimplifyOutput(Transformer):
     def mul(self, x: Numeric, y: Numeric) -> Numeric:
         return x.mul(y)
 
+    def div(self, x: Numeric, y: Numeric) -> Numeric:
+        return x.div(y)
+
     def pow(self, x: Numeric, y: Numeric) -> Numeric:
         return x.pow(y)

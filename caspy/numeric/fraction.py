@@ -26,6 +26,10 @@ class Fraction(Generic[Frac]):
 
         return self
 
+    def recip(self) -> Frac:
+        self.num, self.den = self.den, self.num
+        return self
+
     def __mul__(self, other) -> Frac:
         if type(other) != Fraction:
             other = Fraction(float(other), 1)

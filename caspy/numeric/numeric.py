@@ -1,10 +1,11 @@
 import copy
+import logging
 from caspy.numeric.symbol import Symbol
 from caspy.numeric.fraction import Fraction
 from typing import TypeVar, Generic
 
 Num = TypeVar("Num")
-
+logger = logging.getLogger(__name__)
 
 class Numeric(Generic[Num]):
     """Represents a linear combination of numbers and symbols"""
@@ -50,10 +51,18 @@ class Numeric(Generic[Num]):
         Negates this number
         :return: self
         """
-        for key in self.val:
-            self.val[key] *= -1
+        for sym in self.val:
+            sym.neg()
 
         return self
+
+    def recip(self) -> Num:
+        if len(self.val) == 1:
+            self.val[0] = self.val[0].recip()
+            return self
+        else:
+            return self.pow(Numeric(-1,"number"))
+
 
     def pow(self,x: Num) -> Num:
         """
@@ -69,7 +78,7 @@ class Numeric(Generic[Num]):
         self.val[0].val[pre_exp] = x
         return self
 
-    def mul(self,x: Num) -> Num:
+    def mul(self, x: Num) -> Num:
         """
         Multiplies this number by x. If this number or x is made up
         of a linear combination of terms, eg (1+x) then we don't
@@ -85,3 +94,11 @@ class Numeric(Generic[Num]):
         else:
             self.val[0].mul(x.val[0])
         return self
+
+    def div(self,x: Num) -> Num:
+        """
+        Divides this number by x
+        :param x: Numeric object
+        :return: self
+        """
+        return self.mul(x.recip())

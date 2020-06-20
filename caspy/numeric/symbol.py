@@ -26,6 +26,22 @@ class Symbol:
     def add_coeff(self, x: Frac) -> None:
         self.coeff = self.coeff + x
 
+    def neg(self):
+        """Negates this symbol"""
+        self.coeff *= -1
+
+    def recip(self):
+        """Makes this symbol the reciprocal of itself"""
+        for key in self.val:
+            if type(self.val[key]) == num.Numeric:
+                self.val[key] = self.val[key].neg()
+            else:
+                self.val[key] = - self.val.key()
+
+        self.coeff = self.coeff.recip()
+
+        return self
+
     def __repr__(self):
         return "<Symbol {},{}>".format(self.coeff,self.val)
 
