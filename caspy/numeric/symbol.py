@@ -1,11 +1,16 @@
 from caspy.numeric.fraction import Frac
+import caspy.numeric.numeric as num
 
 
 class Symbol:
     """Represents a product of symbols and their powers"""
-    def __init__(self, val: str, coeff: Frac):
-        self.val = {val: 1}
-        self.coeff = coeff
+    def __init__(self, val, coeff: Frac):
+        if val == 1:
+            self.val = {val: 1}
+            self.coeff = coeff
+        else:
+            self.val = {val: num.Numeric(1,"number")}
+            self.coeff = coeff
 
     def mul(self, y):
         for key in y.val:

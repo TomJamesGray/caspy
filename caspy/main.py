@@ -1,6 +1,7 @@
 import logging
 import logging.config
 from caspy.parsing import parser
+from caspy.printing.ascii_numeric import ascii_numeric_str
 
 logging_config = {
     "version":1,
@@ -33,4 +34,7 @@ def main():
 
     while True:
         line = input(">> ")
-        print(parser_cls.parse(line))
+        out = parser_cls.parse(line)
+        print("Parser output = {}".format(out))
+        print("---\nSymbols:")
+        print(ascii_numeric_str(out))

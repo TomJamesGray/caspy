@@ -6,7 +6,7 @@ Num = TypeVar("Num")
 
 
 class Numeric(Generic[Num]):
-    """Represents a linear combination of numbers and symobols"""
+    """Represents a linear combination of numbers and symbols"""
 
     def __init__(self, val: str, typ: str):
         """Initialises a numeric class with a single value"""
@@ -16,7 +16,7 @@ class Numeric(Generic[Num]):
             self.val.append(Symbol(val, Fraction(1, 1)))
         elif typ == "number":
             # in this case the 1 represents that this value is just a number
-            self.val.append(Symbol("1", Fraction(float(val), 1)))
+            self.val.append(Symbol(1, Fraction(float(val), 1)))
 
     def __repr__(self):
         return "<Numeric class {}>".format(self.val)
