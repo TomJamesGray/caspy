@@ -13,5 +13,7 @@ def ascii_numeric_str(x: Num):
                     out += "* {} ^ (".format(key)
                 out += ascii_numeric_str(sym.val[key])
                 out += ")"
+            elif type(sym.val[key]) == Numeric:
+                out += "^ ({})".format(ascii_numeric_str(sym.val[key]))
         out += " + "
     return out[:-3]

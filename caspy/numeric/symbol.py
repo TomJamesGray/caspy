@@ -37,10 +37,9 @@ class Symbol:
             if type(self.val[key]) == num.Numeric:
                 self.val[key] = self.val[key].mul(x)
             else:
-                print("{} mul {}".format(x,num.Numeric(self.val[key],"number")))
                 self.val[key] = x.mul(num.Numeric(self.val[key],"number"))
 
-        self.coeff = self.coeff.recip()
+        # self.coeff = self.coeff.recip()
 
         return self
 
