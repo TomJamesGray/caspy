@@ -43,10 +43,35 @@ class Numeric(Generic[Num]):
             return self.mul(other.recip())
 
     def sym_in(self,key):
+        """
+        Checks if a symbol such as 'x' already exists in this. Used
+        for multiplication of terms like x and x^2
+        :param key: symbol such as x
+        :return: False if not found, otherwise returns coresponding
+        key for this object
+        """
         for key_x in self.val:
             if key_x == key:
                 return key_x
         return False
+
+    def sym_and_pow_match(self,sym):
+        """
+        Checks if a s
+        :param key: symbol object
+        :return:
+        """
+        for sym_self in self.val:
+            if sym_self == sym:
+                print("MATCH symbols")
+                print("Comp {} ≠ {}".format(sym_self.val, sym.val))
+                if sym_self.val == sym.val:
+                    print("MATCH VAL")
+                    return sym_self
+                else:
+                    print("NO MATCH VAL {} ≠ {}".format(sym_self.val,sym.val))
+                    return False
+        print("NO")
 
     def add(self, y: Num) -> Num:
         """
@@ -55,10 +80,12 @@ class Numeric(Generic[Num]):
         :return: self
         """
         for sym_y in y.val:
-            lookup = self.sym_in(sym_y)
+            lookup = self.sym_and_pow_match(sym_y)
+            print(lookup)
             if lookup:
                 # A term with the same symbols already exists in this numeric expression
                 # so just add coeffs
+                print(self.sym_and_pow_match(sym_y))
                 lookup.add_coeff(sym_y.coeff)
             else:
                 self.val.append(sym_y)
@@ -125,3 +152,19 @@ class Numeric(Generic[Num]):
         :return: self
         """
         return self.mul(x.recip())
+
+    def __hash__(self):
+        return hash(str(self.val))
+
+    def __eq__(self, other):
+        if type(other) == Numeric:
+            # for sym in self.val:
+            #     if sym.val != self
+            for sym in self.val:
+                fnd = False
+                for sym_o in other.val:
+                    if sym_o.val == sym.val and sym_o.coeff == sym.coeff:
+                        fnd = True
+                if not fnd:
+                    return False
+            return True

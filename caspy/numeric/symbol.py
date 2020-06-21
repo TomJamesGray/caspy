@@ -4,6 +4,7 @@ from caspy.numeric.fraction import Frac
 
 logger = logging.getLogger(__name__)
 
+
 class Symbol:
     """Represents a product of symbols and their powers"""
     def __init__(self, val, coeff: Frac):
