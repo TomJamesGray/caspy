@@ -16,11 +16,13 @@ class Symbol:
 
     def mul(self, y):
         for key in y.val:
-            if key in self.val:
+            if key in self.val and key != 1:
                 self.val[key] += y.val[key]
-            else:
+            elif not(key == 1 and y.coeff == 1.0):
+                # Check that this part of the value isn't '1'
                 self.val[key] = y.val[key]
         self.coeff *= y.coeff
+
         return self
 
     def add_coeff(self, x: Frac) -> None:
@@ -31,15 +33,20 @@ class Symbol:
         self.coeff *= -1
 
     def pow(self,x):
-        """Raises this symbol to the power x"""
+        """
+        Raises this symbol to the power x
+        :param x: Numeric object
+        :return: self
+        """
         logger.info("{} to the power {}".format(self,x))
         for key in self.val:
             if type(self.val[key]) == num.Numeric:
                 self.val[key] = self.val[key].mul(x)
             else:
+                logger.info("{} mul {}".format(x,num.Numeric(self.val[key],"number")))
                 self.val[key] = x.mul(num.Numeric(self.val[key],"number"))
-
-        # self.coeff = self.coeff.recip()
+                logger.info("Yielding {}".format(self.val[key]))
+        logger.info("Result {}\n".format(self))
 
         return self
 

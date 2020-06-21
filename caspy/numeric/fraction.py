@@ -26,6 +26,12 @@ class Fraction(Generic[Frac]):
 
         return self
 
+    def __eq__(self, other):
+        if type(other) == Fraction:
+            return self.num == other.num and self.den == other.den
+        else:
+            return self.num / self.den == other
+
     def to_real(self) -> float:
         return self.num / self.den
 

@@ -7,6 +7,7 @@ from typing import TypeVar, Generic
 Num = TypeVar("Num")
 logger = logging.getLogger(__name__)
 
+
 class Numeric(Generic[Num]):
     """Represents a linear combination of numbers and symbols"""
 
@@ -26,6 +27,8 @@ class Numeric(Generic[Num]):
     def __add__(self, other):
         if type(other) == Numeric:
             return self.add(other)
+        elif type(other) in (int,float):
+            return self.add(Numeric(other, "number"))
 
     def __mul__(self, other):
         if type(other) == Numeric:
