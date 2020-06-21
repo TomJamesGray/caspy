@@ -38,15 +38,12 @@ class Symbol:
         :param x: Numeric object
         :return: self
         """
-        logger.info("{} to the power {}".format(self,x))
+        logger.debug("{} to the power {}".format(self,x))
         for key in self.val:
             if type(self.val[key]) == num.Numeric:
                 self.val[key] = self.val[key].mul(x)
             else:
-                logger.info("{} mul {}".format(x,num.Numeric(self.val[key],"number")))
                 self.val[key] = x.mul(num.Numeric(self.val[key],"number"))
-                logger.info("Yielding {}".format(self.val[key]))
-        logger.info("Result {}\n".format(self))
 
         return self
 
