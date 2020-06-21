@@ -30,3 +30,11 @@ def test_repeat_exp():
 
 def test_polyn():
     assert latex_eval("x^2+x") == "x^{2}+x"
+
+
+def test_exp():
+    assert latex_eval("(1+x)^(y+z)") == "(1+x)^{y+z}"
+
+
+def test_exp2():
+    assert latex_eval("x^(2+x^z)") == "x^{(2+x^{z})}"
