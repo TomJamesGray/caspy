@@ -35,7 +35,7 @@ def latex_numeric_str(x: Num):
                     if power != "" and power != "1":
                         out += "({})".format(power)
                 elif isinstance(key, Function1Arg):
-                    out += "{}({}) ".format(key.fname,latex_numeric_str(key.arg))
+                    out += "{}({}) ".format(key.latex_fname,latex_numeric_str(key.arg))
                 else:
                     out += " {}".format(key)
                 power = latex_numeric_str(sym.val[key])

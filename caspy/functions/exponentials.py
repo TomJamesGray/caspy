@@ -6,6 +6,7 @@ from caspy.functions.function import Function,Function1Arg
 
 class Ln(Function,Function1Arg):
     fname = "ln"
+    latex_fname = "\\ln"
 
     def __init__(self,x):
         self.arg = x
