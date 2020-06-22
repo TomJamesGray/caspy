@@ -20,6 +20,8 @@ class Numeric(Generic[Num]):
         elif typ == "number":
             # in this case the 1 represents that this value is just a number
             self.val.append(Symbol(1, Fraction(float(val), 1)))
+        elif typ == "sym_obj":
+            self.val.append(val)
 
     def __repr__(self):
         return "<Numeric class {}>".format(self.val)
@@ -63,15 +65,10 @@ class Numeric(Generic[Num]):
         """
         for sym_self in self.val:
             if sym_self == sym:
-                print("MATCH symbols")
-                print("Comp {} ≠ {}".format(sym_self.val, sym.val))
                 if sym_self.val == sym.val:
-                    print("MATCH VAL")
                     return sym_self
                 else:
-                    print("NO MATCH VAL {} ≠ {}".format(sym_self.val,sym.val))
                     return False
-        print("NO")
 
     def add(self, y: Num) -> Num:
         """
@@ -81,7 +78,6 @@ class Numeric(Generic[Num]):
         """
         for sym_y in y.val:
             lookup = self.sym_and_pow_match(sym_y)
-            print(lookup)
             if lookup:
                 # A term with the same symbols already exists in this numeric expression
                 # so just add coeffs

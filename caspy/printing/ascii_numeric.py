@@ -1,4 +1,5 @@
 from caspy.numeric.numeric import Num,Numeric
+from caspy.functions.function import Function1Arg
 
 
 def ascii_numeric_str(x: Num):
@@ -9,6 +10,8 @@ def ascii_numeric_str(x: Num):
             if key != 1:
                 if type(key) == Numeric:
                     out += "* ({}) ^ (".format(ascii_numeric_str(key))
+                elif isinstance(key,Function1Arg):
+                    out += "* {}({}) ^ (".format(key.fname,ascii_numeric_str(key.arg))
                 else:
                     out += "* {} ^ (".format(key)
                 out += ascii_numeric_str(sym.val[key])

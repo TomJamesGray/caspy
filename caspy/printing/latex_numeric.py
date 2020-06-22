@@ -1,4 +1,5 @@
 from caspy.numeric.numeric import Num,Numeric
+from caspy.functions.function import Function1Arg
 
 
 def to_int(x: float):
@@ -33,7 +34,8 @@ def latex_numeric_str(x: Num):
                     power = latex_numeric_str(key)
                     if power != "" and power != "1":
                         out += "({})".format(power)
-
+                elif isinstance(key, Function1Arg):
+                    out += "{}({}) ".format(key.fname,latex_numeric_str(key.arg))
                 else:
                     out += " {}".format(key)
                 power = latex_numeric_str(sym.val[key])

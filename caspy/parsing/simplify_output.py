@@ -2,13 +2,15 @@ import logging
 from lark import v_args
 from lark import Transformer
 from caspy.numeric.numeric import Numeric
+from caspy.helpers import lark_transformer
+from caspy.functions import exponentials
 
 logger = logging.getLogger(__name__)
 
 
 # noinspection PyMethodMayBeStatic
 @v_args(inline=True)
-class SimplifyOutput(Transformer):
+class SimplifyOutput(Transformer,lark_transformer.LarkTransformerHelper):
     """
     Transformer that applies some basic simplification to lark AST to be used
     before outputting
@@ -37,3 +39,13 @@ class SimplifyOutput(Transformer):
 
     def pow(self, x: Numeric, y: Numeric) -> Numeric:
         return x.pow(y)
+
+    def func_call(self, fname, *args):
+        # Unpack arguments into a list
+        unpacked = []
+        for val in self.unpack_args(args):
+            unpacked.append(val)
+
+        if fname == "ln":
+            func = exponentials.Ln(unpacked[0])
+            return func.eval()
