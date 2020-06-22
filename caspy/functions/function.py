@@ -6,5 +6,6 @@ class Function:
     def __hash__(self):
         return hash("{}({})".format(self.fname,self.arg))
 
-class Function1Arg:
+
+class Function1Arg(Function):
     pass

@@ -4,7 +4,7 @@ from caspy.numeric.fraction import Fraction
 from caspy.functions.function import Function,Function1Arg
 
 
-class Ln(Function,Function1Arg):
+class Ln(Function1Arg):
     fname = "ln"
     latex_fname = "\\ln"
 
