@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class Numeric(Generic[Num]):
     """Represents a linear combination of numbers and symbols"""
 
-    def __init__(self, val: str, typ: str):
+    def __init__(self, val, typ: str):
         """Initialises a numeric class with a single value"""
         self.val = []
         if typ == "sym":
