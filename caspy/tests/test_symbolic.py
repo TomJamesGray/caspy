@@ -20,6 +20,14 @@ def test_x_x_add():
     assert latex_eval("x+x") == "2\\cdotx"
 
 
+def test_xx_x_add():
+    assert latex_eval("2*x+x") == "3\\cdotx"
+
+
+def test_xsq_add():
+    assert latex_eval("x*x + x ^ 2") == "2\\cdotx^{2}"
+
+
 def test_x_sq():
     assert latex_eval("x^2") == "x^{2}"
 
