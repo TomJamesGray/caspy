@@ -9,22 +9,58 @@ class Symbol:
     """Represents a product of symbols and their powers"""
     def __init__(self, val, coeff: Frac):
         if val == 1:
-            self.val = {val: 1}
+            # Store value as a list of pair lists, ie
+            # [[value1,power1],[value2,power2]] so x^2*y would be
+            # [['x',Numeric(2)],['y',Numeric(1)]]
+            # The value part can be a string like 'x' or a Numeric object
+            # like (1+x)
+            self.val = [[val, 1]]
             self.coeff = coeff
         else:
-            self.val = {val: num.Numeric(1,"number")}
+            self.val = [[val, num.Numeric(1,"number")]]
             self.coeff = coeff
 
-    def mul(self, y):
-        for key in y.val:
-            if key in self.val and key != 1:
-                self.val[key] += y.val[key]
-            elif not(key == 1 and y.coeff == 1.0):
-                # Check that this part of the value isn't '1'
-                self.val[key] = y.val[key]
-        self.coeff *= y.coeff
+    def __mul__(self, other):
+        if type(other) == Symbol:
+            for j in range(0,len(other.val)):
+                sym_added = False
+                for i in range(0, len(self.val)):
+                    if self.val[i][0] == other.val[j][0] and self.val[i][0] != 1:
+                        # Symbols match so increment the powers
+                        self.val[i][1] += other.val[j][1]
+                        sym_added = True
+                        # Leave this loop
+                        break
+                if not sym_added:
+                    self.val.append(other.val[j])
 
-        return self
+            self.coeff *= other.coeff
+            return self
+
+    def __pow__(self, power):
+        """
+        Raises this symbol to the power x
+        :param power: Numeric object
+        :return: self
+        """
+        if type(power) == num.Numeric:
+            for i in range(0,len(self.val)):
+                if type(self.val[i][1]) == num.Numeric:
+                    self.val[i][1] = self.val[i][1].mul(power)
+                else:
+                    self.val[i][1] = power.mul(num.Numeric(self.val[i][1],"number"))
+            return self
+
+    def mul(self, y):
+        return self * y
+
+    def pow(self,x):
+        """
+        Raises this symbol to the power x
+        :param x: Numeric object
+        :return: self
+        """
+        return self ** x
 
     def add_coeff(self, x: Frac) -> None:
         self.coeff = self.coeff + x
@@ -33,31 +69,14 @@ class Symbol:
         """Negates this symbol"""
         self.coeff *= -1
 
-    def pow(self,x):
-        """
-        Raises this symbol to the power x
-        :param x: Numeric object
-        :return: self
-        """
-        logger.debug("{} to the power {}".format(self,x))
-        for key in self.val:
-            if type(self.val[key]) == num.Numeric:
-                self.val[key] = self.val[key].mul(x)
-            else:
-                self.val[key] = x.mul(num.Numeric(self.val[key],"number"))
-
-        return self
-
     def recip(self):
         """Makes this symbol the reciprocal of itself"""
-        for key in self.val:
-            if type(self.val[key]) == num.Numeric:
-                self.val[key] = self.val[key].neg()
+        for i in range(0,len(self.val)):
+            if type(self.val[i][1]) == num.Numeric:
+                self.val[i][1] = self.val[i][1].neg()
             else:
-                self.val[key] = - self.val[key]
-
+                self.val[i][1] = - self.val[i][1]
         self.coeff = self.coeff.recip()
-
         return self
 
     def __repr__(self):
@@ -65,15 +84,21 @@ class Symbol:
 
     def __eq__(self, other):
         """
-        Defines 2 symbols as being equal if they have the same keys
-        in the value dictionary
-        :param other: Thing being compared
-        :return: Boolean
+        Defines equality for the symbol class. The order of the terms
+        in the value property doesn't matter. Ignores the coefficient
+        property
         """
         if type(other) == Symbol:
-            return self.val.keys() == other.val.keys()
+            for (sym_name,pow) in self.val:
+                eq = False
+                for (sym_name_o,pow_o) in other.val:
+                    if sym_name == sym_name_o and pow == pow_o:
+                        eq = True
+                        break
+
+                if not eq:
+                    return False
+
+            return True
         else:
             return False
-
-    # def __mul__(self, x):
-

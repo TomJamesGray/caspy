@@ -65,11 +65,9 @@ class Numeric(Generic[Num]):
         """
         for sym_self in self.val:
             if sym_self == sym:
-                if sym_self.val == sym.val:
-                    return sym_self
-                else:
-                    return False
+                return sym_self
 
+        return False
     def add(self, y: Num) -> Num:
         """
         Adds y to this number
@@ -105,7 +103,6 @@ class Numeric(Generic[Num]):
         else:
             return self.pow(Numeric(-1,"number"))
 
-
     def pow(self,x: Num) -> Num:
         """
         Raises this number to the power x
@@ -121,7 +118,7 @@ class Numeric(Generic[Num]):
             # Redefine this object as a list of length 1 with the previous
             # info stored as a symbol type and raise that to the power x
             self.val = [Symbol(pre_exp, Fraction(1, 1))]
-            self.val[0].val[pre_exp] = x
+            self.val[0].val[0][1] = x
             return self
 
     def mul(self, x: Num) -> Num:
@@ -135,8 +132,10 @@ class Numeric(Generic[Num]):
         if len(self.val) > 1 or len(x.val) > 1:
             pre_self = copy.copy(self)
             pre_x = copy.copy(x)
+            # Redefine this numeric object as having just one symbol
+            # that is the product of it's prior self and x
             self.val = [Symbol(pre_self, Fraction(1, 1))]
-            self.val[0].val[pre_x] = Numeric(1,"number")
+            self.val[0].val.append([pre_x, Numeric(1, "number")])
         else:
             self.val[0].mul(x.val[0])
         return self
