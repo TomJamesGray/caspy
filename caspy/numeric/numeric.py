@@ -103,7 +103,6 @@ class Numeric(Generic[Num]):
         else:
             return self.pow(Numeric(-1,"number"))
 
-
     def pow(self,x: Num) -> Num:
         """
         Raises this number to the power x
@@ -133,8 +132,10 @@ class Numeric(Generic[Num]):
         if len(self.val) > 1 or len(x.val) > 1:
             pre_self = copy.copy(self)
             pre_x = copy.copy(x)
+            # Redefine this numeric object as having just one symbol
+            # that is the product of it's prior self and x
             self.val = [Symbol(pre_self, Fraction(1, 1))]
-            self.val[0].val[pre_x] = Numeric(1,"number")
+            self.val[0].val.append([pre_x, Numeric(1, "number")])
         else:
             self.val[0].mul(x.val[0])
         return self

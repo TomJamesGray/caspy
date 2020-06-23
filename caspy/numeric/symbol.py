@@ -51,8 +51,6 @@ class Symbol:
                     self.val[i][1] = power.mul(num.Numeric(self.val[i][1],"number"))
             return self
 
-
-
     def mul(self, y):
         return self * y
 

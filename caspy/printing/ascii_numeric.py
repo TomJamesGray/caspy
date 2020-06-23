@@ -17,6 +17,6 @@ def ascii_numeric_str(x: Num):
                 out += ascii_numeric_str(pow)
                 out += ")"
             elif type(pow) == Numeric:
-                out += "^ ({})".format(ascii_numeric_str(sym.val[sym_name]))
+                out += "^ ({})".format(ascii_numeric_str(pow))
         out += " + "
     return out[:-3]

@@ -21,7 +21,7 @@ def latex_numeric_str(x: Num):
                 out += "{}".format(to_int(sym.coeff.num))
             else:
                 out += "\\frac{{{}}}{{{}}}".format(to_int(sym.coeff.num), to_int(sym.coeff.den))
-        elif sym.val == {1: 1}:
+        elif sym.val == [[1, 1]]:
             # Handles case when the symbol is just the number '1' on it's own
             out += "{}".format(to_int(sym.coeff.num))
 
@@ -42,7 +42,7 @@ def latex_numeric_str(x: Num):
                 if power != "" and power != "1":
                     out += "^ {{{}}}".format(power)
             elif type(pow) == Numeric:
-                out += "^ {{{}}}".format(latex_numeric_str(sym.val[sym_name]))
+                out += "^ {{{}}}".format(latex_numeric_str(pow))
 
         out += "+"
     return out[:-1]
