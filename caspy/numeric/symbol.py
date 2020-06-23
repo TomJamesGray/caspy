@@ -37,17 +37,24 @@ class Symbol:
             self.coeff *= other.coeff
             return self
 
+    def __pow__(self, power):
+        """
+        Raises this symbol to the power x
+        :param power: Numeric object
+        :return: self
+        """
+        if type(power) == num.Numeric:
+            for i in range(0,len(self.val)):
+                if type(self.val[i][1]) == num.Numeric:
+                    self.val[i][1] = self.val[i][1].mul(power)
+                else:
+                    self.val[i][1] = power.mul(num.Numeric(self.val[i][1],"number"))
+            return self
+
 
 
     def mul(self, y):
         return self * y
-
-    def add_coeff(self, x: Frac) -> None:
-        self.coeff = self.coeff + x
-
-    def neg(self):
-        """Negates this symbol"""
-        self.coeff *= -1
 
     def pow(self,x):
         """
@@ -55,14 +62,14 @@ class Symbol:
         :param x: Numeric object
         :return: self
         """
-        logger.debug("{} to the power {}".format(self,x))
-        for key in self.val:
-            if type(self.val[key]) == num.Numeric:
-                self.val[key] = self.val[key].mul(x)
-            else:
-                self.val[key] = x.mul(num.Numeric(self.val[key],"number"))
+        return self ** x
 
-        return self
+    def add_coeff(self, x: Frac) -> None:
+        self.coeff = self.coeff + x
+
+    def neg(self):
+        """Negates this symbol"""
+        self.coeff *= -1
 
     def recip(self):
         """Makes this symbol the reciprocal of itself"""
