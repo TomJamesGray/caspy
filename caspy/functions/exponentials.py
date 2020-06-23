@@ -7,13 +7,19 @@ from caspy.functions.function import Function1Arg
 class Ln(Function1Arg):
     fname = "ln"
     latex_fname = "\\ln"
+    set_points = [
+        ["e","1"],
+        ["e^2","2"]
+    ]
 
     def __init__(self,x):
         self.arg = x
+        super().__init__()
 
     def eval(self):
-        if self.arg == Numeric("e","sym"):
-            return Numeric(1,"number")
-        else:
-            # return Numeric(Symbol(self,Fraction(1,1)),"sym_obj")
-            return Numeric(Symbol(self,Fraction(1,1)),"sym_obj")
+        print(self.evaled_set_points)
+        for i,pair in enumerate(self.evaled_set_points):
+            if pair[0] == self.arg:
+                return pair[1]
+
+        return Numeric(Symbol(self,Fraction(1,1)),"sym_obj")
