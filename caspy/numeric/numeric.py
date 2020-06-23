@@ -119,7 +119,7 @@ class Numeric(Generic[Num]):
             # Redefine this object as a list of length 1 with the previous
             # info stored as a symbol type and raise that to the power x
             self.val = [Symbol(pre_exp, Fraction(1, 1))]
-            self.val[0].val[pre_exp] = x
+            self.val[0].val[0][1] = x
             return self
 
     def mul(self, x: Num) -> Num:

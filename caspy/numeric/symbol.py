@@ -66,14 +66,12 @@ class Symbol:
 
     def recip(self):
         """Makes this symbol the reciprocal of itself"""
-        for key in self.val:
-            if type(self.val[key]) == num.Numeric:
-                self.val[key] = self.val[key].neg()
+        for i in range(0,len(self.val)):
+            if type(self.val[i][1]) == num.Numeric:
+                self.val[i][1] = self.val[i][1].neg()
             else:
-                self.val[key] = - self.val[key]
-
+                self.val[i][1] = - self.val[i][1]
         self.coeff = self.coeff.recip()
-
         return self
 
     def __repr__(self):
