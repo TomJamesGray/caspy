@@ -81,15 +81,21 @@ class Symbol:
 
     def __eq__(self, other):
         """
-        Defines 2 symbols as being equal if they have the same keys
-        in the value dictionary
-        :param other: Thing being compared
-        :return: Boolean
+        Defines equality for the symbol class. The order of the terms
+        in the value property doesn't matter. Ignores the coefficient
+        property
         """
         if type(other) == Symbol:
-            return self.val.keys() == other.val.keys()
+            for (sym_name,pow) in self.val:
+                eq = False
+                for (sym_name_o,pow_o) in other.val:
+                    if sym_name == sym_name_o and pow == pow_o:
+                        eq = True
+                        break
+
+                if not eq:
+                    return False
+
+            return True
         else:
             return False
-
-    # def __mul__(self, x):
-

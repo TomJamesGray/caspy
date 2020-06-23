@@ -65,11 +65,9 @@ class Numeric(Generic[Num]):
         """
         for sym_self in self.val:
             if sym_self == sym:
-                if sym_self.val == sym.val:
-                    return sym_self
-                else:
-                    return False
+                return sym_self
 
+        return False
     def add(self, y: Num) -> Num:
         """
         Adds y to this number
