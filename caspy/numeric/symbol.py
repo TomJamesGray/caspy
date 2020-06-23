@@ -9,22 +9,38 @@ class Symbol:
     """Represents a product of symbols and their powers"""
     def __init__(self, val, coeff: Frac):
         if val == 1:
-            self.val = {val: 1}
+            # Store value as a list of pair lists, ie
+            # [[value1,power1],[value2,power2]] so x^2*y would be
+            # [['x',Numeric(2)],['y',Numeric(1)]]
+            # The value part can be a string like 'x' or a Numeric object
+            # like (1+x)
+            self.val = [[val, 1]]
             self.coeff = coeff
         else:
-            self.val = {val: num.Numeric(1,"number")}
+            self.val = [[val, num.Numeric(1,"number")]]
             self.coeff = coeff
 
-    def mul(self, y):
-        for key in y.val:
-            if key in self.val and key != 1:
-                self.val[key] += y.val[key]
-            elif not(key == 1 and y.coeff == 1.0):
-                # Check that this part of the value isn't '1'
-                self.val[key] = y.val[key]
-        self.coeff *= y.coeff
+    def __mul__(self, other):
+        if type(other) == Symbol:
+            for j in range(0,len(other.val)):
+                sym_added = False
+                for i in range(0, len(self.val)):
+                    if self.val[i][0] == other.val[j][0] and self.val[i][0] != 1:
+                        # Symbols match so increment the powers
+                        self.val[i][1] += other.val[j][1]
+                        sym_added = True
+                        # Leave this loop
+                        break
+                if not sym_added:
+                    self.val.append(other.val[j])
 
-        return self
+            self.coeff *= other.coeff
+            return self
+
+
+
+    def mul(self, y):
+        return self * y
 
     def add_coeff(self, x: Frac) -> None:
         self.coeff = self.coeff + x

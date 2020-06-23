@@ -25,24 +25,24 @@ def latex_numeric_str(x: Num):
             # Handles case when the symbol is just the number '1' on it's own
             out += "{}".format(to_int(sym.coeff.num))
 
-        for key in sym.val:
-            if key != 1:
+        for (sym_name,pow) in sym.val:
+            if sym_name != 1:
                 if need_dot:
                     out += "\\cdot"
                     need_dot = False
-                if type(key) == Numeric:
-                    power = latex_numeric_str(key)
+                if type(sym_name) == Numeric:
+                    power = latex_numeric_str(sym_name)
                     if power != "" and power != "1":
                         out += "({})".format(power)
-                elif isinstance(key, Function1Arg):
-                    out += "{}({}) ".format(key.latex_fname,latex_numeric_str(key.arg))
+                elif isinstance(sym_name, Function1Arg):
+                    out += "{}({}) ".format(sym_name.latex_fname,latex_numeric_str(sym_name.arg))
                 else:
-                    out += " {}".format(key)
-                power = latex_numeric_str(sym.val[key])
+                    out += " {}".format(sym_name)
+                power = latex_numeric_str(pow)
                 if power != "" and power != "1":
                     out += "^ {{{}}}".format(power)
-            elif type(sym.val[key]) == Numeric:
-                out += "^ {{{}}}".format(latex_numeric_str(sym.val[key]))
+            elif type(pow) == Numeric:
+                out += "^ {{{}}}".format(latex_numeric_str(sym.val[sym_name]))
 
         out += "+"
     return out[:-1]

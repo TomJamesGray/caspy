@@ -1,7 +1,7 @@
 from caspy.numeric.numeric import Numeric
 from caspy.numeric.symbol import Symbol
 from caspy.numeric.fraction import Fraction
-from caspy.functions.function import Function,Function1Arg
+from caspy.functions.function import Function1Arg
 
 
 class Ln(Function1Arg):
