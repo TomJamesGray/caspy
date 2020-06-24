@@ -1,13 +1,6 @@
 from caspy.numeric.numeric import Num,Numeric
 from caspy.functions.function import Function1Arg
-
-
-def to_int(x: float):
-    """Casts x to integer if it doesn't change the value"""
-    if x == int(x):
-        return int(x)
-    else:
-        return x
+from caspy.numeric.fraction import to_int
 
 
 def latex_numeric_str(x: Num):
