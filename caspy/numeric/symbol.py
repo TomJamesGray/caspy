@@ -22,17 +22,21 @@ class Symbol:
 
     def __mul__(self, other):
         if type(other) == Symbol:
-            for j in range(0,len(other.val)):
-                sym_added = False
-                for i in range(0, len(self.val)):
-                    if self.val[i][0] == other.val[j][0] and self.val[i][0] != 1:
-                        # Symbols match so increment the powers
-                        self.val[i][1] += other.val[j][1]
-                        sym_added = True
-                        # Leave this loop
-                        break
-                if not sym_added:
-                    self.val.append(other.val[j])
+            if self.val == [[1,1]]:
+                logger.debug("current sym val is [[1,1]] so ignore it completely")
+                self.val = other.val
+            else:
+                for j in range(0,len(other.val)):
+                    sym_added = False
+                    for i in range(0, len(self.val)):
+                        if self.val[i][0] == other.val[j][0] and self.val[i][0] != 1:
+                            # Symbols match so increment the powers
+                            self.val[i][1] += other.val[j][1]
+                            sym_added = True
+                            # Leave this loop
+                            break
+                    if not sym_added and other.val[j] != [1, 1]:
+                        self.val.append(other.val[j])
 
             self.coeff *= other.coeff
             return self
