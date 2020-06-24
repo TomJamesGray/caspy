@@ -29,6 +29,7 @@ class Fraction(Generic[Frac]):
     def __init__(self,num: float, den: float):
         self.num = num
         self.den = den
+        self.simplify()
 
     def __repr__(self):
         if self.den == 1:
@@ -58,7 +59,7 @@ class Fraction(Generic[Frac]):
         self.num, self.den = self.den, self.num
         return self
 
-    def simplify(self) -> Frac:
+    def simplify(self) -> None:
         if self.num == 0:
             # Fraction is zero so don't try and simplify
             return

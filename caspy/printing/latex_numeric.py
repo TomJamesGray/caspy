@@ -10,7 +10,11 @@ def latex_numeric_str(x: Num):
         if not(sym.coeff.num == 1 and sym.coeff.den == 1):
             need_dot = True
             # Print the coefficient as a fraction only if necessary
-            if sym.coeff.den == 1:
+            if sym.coeff.num == 0:
+                # Include the '+' so it doesn't get chopped off by return out[:-1]
+                out += "0+"
+                continue
+            elif sym.coeff.den == 1:
                 out += "{}".format(to_int(sym.coeff.num))
             else:
                 out += "\\frac{{{}}}{{{}}}".format(to_int(sym.coeff.num), to_int(sym.coeff.den))
