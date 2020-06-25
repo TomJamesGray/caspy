@@ -1,6 +1,6 @@
 import logging
 import caspy.numeric.numeric as num
-from caspy.numeric.fraction import Frac
+from caspy.numeric.fraction import Frac,Fraction
 
 logger = logging.getLogger(__name__)
 
@@ -8,21 +8,20 @@ logger = logging.getLogger(__name__)
 class Symbol:
     """Represents a product of symbols and their powers"""
     def __init__(self, val, coeff: Frac):
+        # Store value as a list of pair lists, ie
+        # [[value1,power1],[value2,power2]] so x^2*y would be
+        # [['x',Numeric(2)],['y',Numeric(1)]]
+        # The value part can be a string like 'x' or a Numeric object
+        # like (1+x)
         if val == 1:
-            # Store value as a list of pair lists, ie
-            # [[value1,power1],[value2,power2]] so x^2*y would be
-            # [['x',Numeric(2)],['y',Numeric(1)]]
-            # The value part can be a string like 'x' or a Numeric object
-            # like (1+x)
-            self.val = [[val, 1]]
-            self.coeff = coeff
+            self.val = [[coeff, 1]]
+            self.coeff = 1
         else:
-            self.val = [[val, num.Numeric(1,"number")]]
-            self.coeff = coeff
+            self.val = [[val, num.Numeric(1,"number")],[coeff, 1]]
+            self.coeff = 1
 
     def __mul__(self, other):
         if type(other) == Symbol:
-            mul_coeffs = True
             if self.val == [[1,1]]:
                 logger.debug("current sym val is [[1,1]] so ignore it completely")
                 self.val = other.val
@@ -38,21 +37,10 @@ class Symbol:
                             sym_added = True
                             # Leave this loop
                             break
-                        elif self.val[i][0] == 1 and other.val[j][0] == 1:
-                            # Deals with coefficients, so things like 2^3*3^5
-                            if self.coeff == other.coeff:
-                                # Case something like 2^a * 2^b so just add powers
-                                self.val[i][1] += other.val[j][1]
-                                sym_added = True
-                                mul_coeffs = False
-                                # leave this loop
-                                break
-
                     if not sym_added and other.val[j] != [1, 1]:
                         self.val.append(other.val[j])
 
-            if mul_coeffs:
-                self.coeff *= other.coeff
+            self.coeff *= other.coeff
             return self
 
     def __pow__(self, power):
@@ -81,7 +69,12 @@ class Symbol:
         return self ** x
 
     def add_coeff(self, x: Frac) -> None:
-        self.coeff = self.coeff + x
+        for i in range(0,len(self.val)):
+            if type(self.val[i][0]) == Fraction and self.val[i][1] == 1:
+                # We have found the coefficient part of this symbol so
+                # increment it
+                self.val[i][0] += x
+
 
     def neg(self):
         """Negates this symbol"""
@@ -109,6 +102,9 @@ class Symbol:
         if type(other) == Symbol:
             for (sym_name,pow) in self.val:
                 eq = False
+                # Ignoring the coefficient 'property'
+                if type(sym_name) == Fraction:
+                    continue
                 for (sym_name_o,pow_o) in other.val:
                     if sym_name == sym_name_o and pow == pow_o:
                         eq = True

@@ -59,7 +59,7 @@ class Numeric(Generic[Num]):
 
     def sym_and_pow_match(self,sym):
         """
-        Checks if a s
+        Checks if a symbol is in this numeric class
         :param key: symbol object
         :return:
         """
