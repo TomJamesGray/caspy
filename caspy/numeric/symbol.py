@@ -68,17 +68,34 @@ class Symbol:
         """
         return self ** x
 
-    def add_coeff(self, x: Frac) -> None:
+    def get_coeff_index(self) -> int:
+        """
+        Finds the index of the coefficient term for this symbol
+        :return: -1 if no such term found, otherwise returns the index
+        """
         for i in range(0,len(self.val)):
             if type(self.val[i][0]) == Fraction and self.val[i][1] == 1:
-                # We have found the coefficient part of this symbol so
-                # increment it
-                self.val[i][0] += x
+                # We have found the index of the coefficient term
+                return i
+        # Probably can't happen?? Don't return False since 0 == False
+        return -1
 
+    def add_coeff(self, x: Frac) -> None:
+        coeff_index = self.get_coeff_index()
+        if coeff_index != -1:
+            # Increment the coefficient by x
+            self.val[coeff_index][0] += x
+        else:
+            logger.warning("No coefficient index found for object {}".format(self))
 
     def neg(self):
         """Negates this symbol"""
-        self.coeff *= -1
+        coeff_index = self.get_coeff_index()
+        if coeff_index != -1:
+            # Increment the coefficient by x
+            self.val[coeff_index][0] *= -1
+        else:
+            logger.warning("No coefficient index found for object {}".format(self))
 
     def recip(self):
         """Makes this symbol the reciprocal of itself"""
