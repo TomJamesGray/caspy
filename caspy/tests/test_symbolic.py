@@ -46,3 +46,11 @@ def test_exp():
 
 def test_exp2():
     assert latex_eval("x^(2+x^z)") == "x^{(2+x^{z})}"
+
+
+def test_exp_div():
+    assert latex_eval("(2^2)/2") == "2"
+
+
+def test_numeric_exp_mul():
+    assert latex_eval("2^2 * 2^2") == "2^{4}"
