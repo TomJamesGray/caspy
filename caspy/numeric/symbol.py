@@ -143,28 +143,21 @@ class Symbol:
         property
         """
         if type(other) == Symbol:
-            fnd_vals = []
-            i = 0
-            ignored_no = 0
             for (sym_name,pow) in self.val:
                 eq = False
                 # Ignoring the coefficient 'property'
                 if type(sym_name) == Fraction and pow == 1:
-                    fnd_vals.append(i)
-                    i += 1
-                    ignored_no += 1
                     continue
                 for (sym_name_o,pow_o) in other.val:
                     if sym_name == sym_name_o and pow == pow_o:
                         eq = True
-                        fnd_vals.append(i)
-                        i += 1
                         break
 
                 if not eq:
                     return False
-            logger.debug("fnd_vals for {} are {}".format(self,fnd_vals))
-            logger.debug("comp {} and {}".format(self.len_no_coeff(),other.len_no_coeff()))
+
+            logger.debug("Length no coeffs self {} and other {}".format(
+                self.len_no_coeff(),other.len_no_coeff()))
             return True and self.len_no_coeff() == other.len_no_coeff()
         else:
             return False

@@ -60,7 +60,7 @@ class Numeric(Generic[Num]):
     def sym_and_pow_match(self,sym):
         """
         Checks if a symbol is in this numeric class
-        :param key: symbol object
+        :param key: symbol object in this class
         :return:
         """
         for sym_self in self.val:
@@ -86,8 +86,9 @@ class Numeric(Generic[Num]):
                 if sym_y_coeff_index != -1:
                     lookup.add_coeff(sym_y.val[sym_y_coeff_index][0])
                 else:
-                    logger.warning("No coefficient index found for object {}. "
-                                   "So not adding coefficients".format(self))
+                    logger.debug("No coefficient for symbol {} so adding '1' as coeff".format(sym_y))
+                    sym_y.val.append([Fraction(1,1),1])
+                    lookup.add_coeff(sym_y.val[sym_y_coeff_index][0])
             else:
                 self.val.append(sym_y)
 
