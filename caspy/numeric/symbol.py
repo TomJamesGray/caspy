@@ -1,5 +1,4 @@
 import logging
-import copy
 import caspy.numeric.numeric as num
 from caspy.numeric.fraction import Frac,Fraction
 
@@ -34,7 +33,15 @@ class Symbol:
                     for i in range(0, len(self.val)):
                         if self.val[i][0] == other.val[j][0] and self.val[i][0] != 1:
                             # Symbols match so increment the powers
-                            self.val[i][1] += other.val[j][1]
+                            if type(self.val[i][1]) == num.Numeric:
+                                # Check it's numeric type, otherwise items like
+                                # 2*2^2 error
+                                self.val[i][1] += other.val[j][1]
+                            else:
+                                self.val[i][1] = num.Numeric(self.val[i][1],"number")
+                                self.val[i][1] += other.val[j][1]
+
+
                             sym_added = True
                             # Leave this loop
                             break
@@ -79,7 +86,8 @@ class Symbol:
         if index != -1:
             return self.val[index][0]
         # This can occur in some cases like 2^2
-        logger.info("No coefficient index found for object {} so treating coeff as 1".format(self))
+        logger.info("No coefficient index found for object {} so treating "
+                    "coeff as 1".format(self))
         return Fraction(1, 1)
 
     def get_coeff_index(self) -> int:
@@ -112,7 +120,8 @@ class Symbol:
             # Multiply the coefficient index by 1
             self.val[coeff_index][0] *= -1
         else:
-            logger.warning("No coefficient index found for object {} so adding one as -1".format(self))
+            logger.warning("No coefficient index found for object {} so "
+                           "adding one as -1".format(self))
             self.val.append([Fraction(-1,1),1])
 
     def recip(self):
