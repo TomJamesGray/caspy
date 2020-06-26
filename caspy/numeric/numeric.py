@@ -197,3 +197,14 @@ class Numeric(Generic[Num]):
             if not sym.is_exclusive_numeric():
                 return False
         return True
+
+    def real_eval(self) -> float:
+        """
+        Attempts to get a floating point representation of this symbol. If this
+        is not possible it raises an exception
+        :return: float
+        """
+        ret = 0
+        for sym in self.val:
+            ret += sym.sym_real_eval()
+        return ret

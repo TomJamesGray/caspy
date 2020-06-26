@@ -204,17 +204,37 @@ class Symbol:
 
         self.val = new_val + [[acc, 1]]
 
-    def is_exclusive_numeric(self):
+    def is_exclusive_numeric(self) -> bool:
         """
         Determines if a numeric object is exclusively numeric, ie doesn't
         contain symbols like 'x'
         :return: Boolean
         """
         for (sym_name, sym_pow) in self.val:
-            if type(sym_name) in (Fraction,float,int):
+            if type(sym_name) == Fraction:
                 if type(sym_pow) == num.Numeric:
                     if not sym_pow.is_exclusive_numeric():
                         return False
             else:
                 return False
         return True
+
+    def sym_real_eval(self) -> float:
+        """
+        Attempts to get a floating point representation of this symbol. If this
+        is not possible it raises an exception
+        :return: float
+        """
+        ret = Fraction(1,1)
+        for (sym_name,sym_pow) in self.val:
+            if type(sym_name) == Fraction:
+                if type(sym_pow) == num.Numeric:
+                    # TODO doesn't work, eg on sqrt(2^2). Implement
+                    # __pow__ method for numeric class
+                    ret *= sym_pow.real_eval() ** sym_pow
+                else:
+                    ret *= sym_name ** sym_pow
+            else:
+                raise Exception("Can't get float representation of {}".format(self))
+
+        return ret.to_real()

@@ -87,3 +87,7 @@ class Fraction(Generic[Frac]):
         self.simplify()
         return self
 
+    def __pow__(self, power, modulo=None):
+        self.num = self.num ** power
+        self.den = self.den ** power
+        return self
