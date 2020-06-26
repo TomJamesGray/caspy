@@ -50,10 +50,14 @@ class Symbol:
         :return: self
         """
         if type(power) == num.Numeric:
+            logger.debug("{} to the power {}".format(self,power))
             for i in range(0,len(self.val)):
                 if type(self.val[i][1]) == num.Numeric:
                     self.val[i][1] = self.val[i][1].mul(power)
-                else:
+                elif self.val[i][0] != 1:
+                    # Check that the first term isn't one. If it is then it's pointless
+                    # raising it's power and will only confusing the formatting
+                    # of the output
                     self.val[i][1] = power.mul(num.Numeric(self.val[i][1],"number"))
             return self
 
@@ -120,7 +124,7 @@ class Symbol:
             for (sym_name,pow) in self.val:
                 eq = False
                 # Ignoring the coefficient 'property'
-                if type(sym_name) == Fraction:
+                if type(sym_name) == Fraction and pow == 1:
                     continue
                 for (sym_name_o,pow_o) in other.val:
                     if sym_name == sym_name_o and pow == pow_o:
@@ -129,7 +133,8 @@ class Symbol:
 
                 if not eq:
                     return False
-
+            # TODO possibly temporary way of ensuring equality is commutative
+            # return True and other == self
             return True
         else:
             return False

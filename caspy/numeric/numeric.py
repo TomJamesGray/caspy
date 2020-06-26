@@ -68,6 +68,7 @@ class Numeric(Generic[Num]):
                 return sym_self
 
         return False
+
     def add(self, y: Num) -> Num:
         """
         Adds y to this number
