@@ -101,6 +101,8 @@ class Symbol:
             self.val[coeff_index][0] += x
         else:
             logger.info("No coefficient index found for object {}".format(self))
+            # Introduce a coefficient term and add x
+            self.val.append([Fraction(1,1) + x,1])
 
     def neg(self):
         """Negates this symbol"""
@@ -125,6 +127,15 @@ class Symbol:
     def __repr__(self):
         return "<Symbol {}>".format(self.val)
 
+    def len_no_coeff(self) -> int:
+        l = 0
+        for (sym_name,pow) in self.val:
+            if type(sym_name) == Fraction and pow == 1:
+                continue
+            else:
+                l += 1
+        return l
+
     def __eq__(self, other):
         """
         Defines equality for the symbol class. The order of the terms
@@ -134,12 +145,14 @@ class Symbol:
         if type(other) == Symbol:
             fnd_vals = []
             i = 0
+            ignored_no = 0
             for (sym_name,pow) in self.val:
                 eq = False
                 # Ignoring the coefficient 'property'
                 if type(sym_name) == Fraction and pow == 1:
                     fnd_vals.append(i)
                     i += 1
+                    ignored_no += 1
                     continue
                 for (sym_name_o,pow_o) in other.val:
                     if sym_name == sym_name_o and pow == pow_o:
@@ -150,9 +163,8 @@ class Symbol:
 
                 if not eq:
                     return False
-            # TODO possibly temporary way of ensuring equality is commutative
-            # return True and other == self
             logger.debug("fnd_vals for {} are {}".format(self,fnd_vals))
-            return True and fnd_vals == list(range(0,len(other.val)))
+            logger.debug("comp {} and {}".format(self.len_no_coeff(),other.len_no_coeff()))
+            return True and self.len_no_coeff() == other.len_no_coeff()
         else:
             return False
