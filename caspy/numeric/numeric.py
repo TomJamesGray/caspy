@@ -186,3 +186,14 @@ class Numeric(Generic[Num]):
         for val in self.val:
             val.simplify()
         return self
+
+    def is_exclusive_numeric(self) -> bool:
+        """
+        Determines if a numeric object is exclusively numeric, ie doesn't
+        contain symbols like 'x'
+        :return: Boolean
+        """
+        for sym in self.val:
+            if not sym.is_exclusive_numeric():
+                return False
+        return True

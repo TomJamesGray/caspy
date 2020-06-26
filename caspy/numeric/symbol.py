@@ -203,3 +203,18 @@ class Symbol:
                 new_val.append(sym_part)
 
         self.val = new_val + [[acc, 1]]
+
+    def is_exclusive_numeric(self):
+        """
+        Determines if a numeric object is exclusively numeric, ie doesn't
+        contain symbols like 'x'
+        :return: Boolean
+        """
+        for (sym_name, sym_pow) in self.val:
+            if type(sym_name) in (Fraction,float,int):
+                if type(sym_pow) == num.Numeric:
+                    if not sym_pow.is_exclusive_numeric():
+                        return False
+            else:
+                return False
+        return True
