@@ -85,6 +85,7 @@ class Symbol:
         return -1
 
     def add_coeff(self, x: Frac) -> None:
+        logger.debug("Adding coefficient {} to {}".format(x,self))
         coeff_index = self.get_coeff_index()
         if coeff_index != -1:
             # Increment the coefficient by x

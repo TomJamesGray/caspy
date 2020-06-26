@@ -80,8 +80,14 @@ class Numeric(Generic[Num]):
             if lookup:
                 # A term with the same symbols already exists in this numeric expression
                 # so just add coeffs
-                print(self.sym_and_pow_match(sym_y))
-                lookup.add_coeff(sym_y.coeff)
+                logger.debug("sym_and_pow match on {} and {}".format(self,sym_y))
+                # Find coefficient for sym_y
+                sym_y_coeff_index = sym_y.get_coeff_index()
+                if sym_y_coeff_index != -1:
+                    lookup.add_coeff(sym_y.val[sym_y_coeff_index][0])
+                else:
+                    logger.warning("No coefficient index found for object {}. "
+                                   "So not adding coefficients".format(self))
             else:
                 self.val.append(sym_y)
 
