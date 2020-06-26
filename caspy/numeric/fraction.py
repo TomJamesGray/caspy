@@ -73,8 +73,10 @@ class Fraction(Generic[Frac]):
             new_num_f = list((Counter(num_f)-Counter(den_f)).elements()) + [1]
             new_den_f = list((Counter(den_f) - Counter(num_f)).elements()) + [1]
 
-        self.num = product(new_num_f)
-        self.den = product(new_den_f)
+            self.num = product(new_num_f)
+            self.den = product(new_den_f)
+        else:
+            return
 
     def __mul__(self, other) -> Frac:
         if type(other) != Fraction:

@@ -3,7 +3,7 @@ from lark import v_args
 from lark import Transformer
 from caspy.numeric.numeric import Numeric
 from caspy.helpers import lark_transformer
-from caspy.functions import exponentials
+from caspy.functions import exponentials,trigonometric
 
 logger = logging.getLogger(__name__)
 
@@ -48,4 +48,7 @@ class SimplifyOutput(Transformer,lark_transformer.LarkTransformerHelper):
 
         if fname == "ln":
             func = exponentials.Ln(unpacked[0])
+            return func.eval()
+        elif fname == "sin":
+            func = trigonometric.Sin(unpacked[0])
             return func.eval()

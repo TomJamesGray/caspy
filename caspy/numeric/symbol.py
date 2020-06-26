@@ -1,4 +1,5 @@
 import logging
+import copy
 import caspy.numeric.numeric as num
 from caspy.numeric.fraction import Frac,Fraction
 
@@ -161,3 +162,32 @@ class Symbol:
             return True and self.len_no_coeff() == other.len_no_coeff()
         else:
             return False
+
+    def simplify(self):
+        """
+        Simplifies this symbol by looking for the simple numeric aspects eg
+        [2,1] and [4,-1] in the value class represents 2 * 4^(-1) which can
+        be simplified to 1/2
+        :return: none
+        """
+        acc = Fraction(1,1)
+        to_remove = []
+        for i in range(0,len(self.val)):
+            if type(self.val[i][0]) == Fraction and self.val[i][1] == 1:
+                # Multiply accumulator by this fraction
+                acc *= self.val[i][0]
+                to_remove.append(i)
+            elif type(self.val[i][0]) == Fraction and self.val[i][1] == -1:
+                # Multiply accumulator by reciprocal of this fraction
+                acc *= self.val[i][0].recip()
+                to_remove.append(i)
+
+        if acc == 1 or to_remove == []:
+            return
+        # Remove the indexes that have been factored into the acc
+        new_val = []
+        for (j,sym_part) in enumerate(self.val):
+            if j not in to_remove:
+                new_val.append(sym_part)
+
+        self.val = new_val + [[acc, 1]]

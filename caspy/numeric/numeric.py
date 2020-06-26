@@ -64,6 +64,7 @@ class Numeric(Generic[Num]):
         :return:
         """
         for sym_self in self.val:
+            sym_self.simplify()
             if sym_self == sym:
                 return sym_self
 
@@ -76,6 +77,7 @@ class Numeric(Generic[Num]):
         :return: self
         """
         for sym_y in y.val:
+            sym_y.simplify()
             lookup = self.sym_and_pow_match(sym_y)
             if lookup:
                 # A term with the same symbols already exists in this numeric expression
@@ -172,3 +174,12 @@ class Numeric(Generic[Num]):
                 if not fnd:
                     return False
             return True
+
+    def simplify(self):
+        """
+        Simplifies all symbol objects stored in self.val
+        :return: self
+        """
+        for val in self.val:
+            val.simplify()
+        return self

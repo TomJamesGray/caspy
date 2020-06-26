@@ -10,7 +10,7 @@ def latex_numeric_str(x: Num):
     out = ""
     for sym in x.val:
         need_dot = False
-
+        sym.simplify()
         if not (sym.coeff.num == 1 and sym.coeff.den == 1):
             need_dot = True
             # Print the coefficient as a fraction only if necessary

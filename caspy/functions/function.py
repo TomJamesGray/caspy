@@ -1,4 +1,8 @@
 from caspy.parsing import parser as P
+from caspy.numeric.numeric import Numeric
+from caspy.numeric.symbol import Symbol
+from caspy.numeric.fraction import Fraction
+
 
 class Function:
     def __eq__(self, other):
@@ -11,7 +15,17 @@ class Function:
 
 class Function1Arg(Function):
     def __init__(self):
-        parser = P.Parser()
+        # TODO somehow use parser from main or otherwise to stop
+        # re-initiallising parser which is probably quiet ineficient
+        self.parser = P.Parser()
         self.evaled_set_points = []
         for (arg_val,f_val) in self.set_points:
-            self.evaled_set_points.append([parser.parse(arg_val),parser.parse(f_val)])
+            self.evaled_set_points.append([self.parser.parse(arg_val),
+                                           self.parser.parse(f_val)])
+
+    def eval(self):
+        for i,pair in enumerate(self.evaled_set_points):
+            if pair[0].simplify() == self.arg:
+                return pair[1]
+
+        return Numeric(Symbol(self,Fraction(1,1)),"sym_obj")
