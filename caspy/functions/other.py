@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class Sqrt(Function1Arg):
+    # TODO define ranges for functions
     fname = "sqrt"
 
     def __init__(self, x):
@@ -32,5 +33,31 @@ class Sqrt(Function1Arg):
                 sym.simplify()
                 sym_val = sym.sym_real_eval()
                 logger.debug("Simplifying argument {}".format(sym_val))
+                factors = factoriseNum(sym_val)
+                f_out = 1
+                surd = 1
+                if factors != []:
+                    for f in set(factors):
+                        # Only looks at each factor once
+                        cnt_f = factors.count(f)
+                        if cnt_f % 2 == 0:
+                            # Even amount of occurences of factors so factor
+                            # them all out
+                            f_out *= f ** (cnt_f//2)
+                        elif cnt_f > 1:
+                            # Must be an odd amount of occurences of factor
+                            f_out *= f ** ((cnt_f - 1)//2)
+                            surd *= f
+                        else:
+                            surd *= f
+                    logger.debug("Simplified to {} * sqrt({})".format(
+                        f_out,surd
+                    ))
+                    self.arg = surd
+                    new_num = Numeric(Symbol(self, Fraction(1, 1)), "sym_obj")
+                    new_num.mul(Numeric(f_out,"number"))
+                    # new_num.val.append(Symbol(Fraction(f_out,1),1))
+                    return new_num
+
 
         return Numeric(Symbol(self, Fraction(1, 1)), "sym_obj")
