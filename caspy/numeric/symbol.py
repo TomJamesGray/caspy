@@ -15,10 +15,10 @@ class Symbol:
         # like (1+x)
         if val == 1:
             self.val = [[coeff, 1]]
-            self.coeff = 1
+            # self.coeff = 1
         else:
             self.val = [[val, num.Numeric(1,"number")],[coeff, 1]]
-            self.coeff = 1
+            # self.coeff = 1
 
     def __mul__(self, other):
         if type(other) == Symbol:
@@ -40,7 +40,7 @@ class Symbol:
                     if not sym_added and other.val[j] != [1, 1]:
                         self.val.append(other.val[j])
 
-            self.coeff *= other.coeff
+            # self.coeff *= other.coeff
             return self
 
     def __pow__(self, power):
@@ -72,6 +72,15 @@ class Symbol:
         """
         return self ** x
 
+    @property
+    def coeff(self) -> Frac:
+        index = self.get_coeff_index()
+        if index != -1:
+            return self.val[index][0]
+        # This can occur in some cases like 2^2
+        logger.info("No coefficient index found for object {} so treating coeff as 1".format(self))
+        return Fraction(1, 1)
+
     def get_coeff_index(self) -> int:
         """
         Finds the index of the coefficient term for this symbol
@@ -81,7 +90,7 @@ class Symbol:
             if type(self.val[i][0]) == Fraction and self.val[i][1] == 1:
                 # We have found the index of the coefficient term
                 return i
-        # Probably can't happen?? Don't return False since 0 == False
+        # Don't return False since 0 == False
         return -1
 
     def add_coeff(self, x: Frac) -> None:
@@ -91,16 +100,17 @@ class Symbol:
             # Increment the coefficient by x
             self.val[coeff_index][0] += x
         else:
-            logger.warning("No coefficient index found for object {}".format(self))
+            logger.info("No coefficient index found for object {}".format(self))
 
     def neg(self):
         """Negates this symbol"""
         coeff_index = self.get_coeff_index()
         if coeff_index != -1:
-            # Increment the coefficient by x
+            # Multiply the coefficient index by 1
             self.val[coeff_index][0] *= -1
         else:
-            logger.warning("No coefficient index found for object {}".format(self))
+            logger.warning("No coefficient index found for object {} so adding one as -1".format(self))
+            self.val.append([Fraction(-1,1),1])
 
     def recip(self):
         """Makes this symbol the reciprocal of itself"""
@@ -113,7 +123,7 @@ class Symbol:
         return self
 
     def __repr__(self):
-        return "<Symbol {},{}>".format(self.coeff,self.val)
+        return "<Symbol {}>".format(self.val)
 
     def __eq__(self, other):
         """
@@ -122,20 +132,27 @@ class Symbol:
         property
         """
         if type(other) == Symbol:
+            fnd_vals = []
+            i = 0
             for (sym_name,pow) in self.val:
                 eq = False
                 # Ignoring the coefficient 'property'
                 if type(sym_name) == Fraction and pow == 1:
+                    fnd_vals.append(i)
+                    i += 1
                     continue
                 for (sym_name_o,pow_o) in other.val:
                     if sym_name == sym_name_o and pow == pow_o:
                         eq = True
+                        fnd_vals.append(i)
+                        i += 1
                         break
 
                 if not eq:
                     return False
             # TODO possibly temporary way of ensuring equality is commutative
             # return True and other == self
-            return True
+            logger.debug("fnd_vals for {} are {}".format(self,fnd_vals))
+            return True and fnd_vals == list(range(0,len(other.val)))
         else:
             return False
