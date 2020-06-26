@@ -8,9 +8,12 @@
     | sum "+" product -> add
     | sum "-" product -> sub
 
-?product:power
+?product:negation
     | product "*" power -> mul
     | product "/" power -> div
+
+?negation:power
+    | "-" power -> neg
 
 ?power:atom
     | power "^" atom -> pow
@@ -18,7 +21,6 @@
 ?atom: NAME "(" paramaters? ")" -> func_call
     | "[" paramaters? "]" -> gen_arr
     | NUMBER -> number
-    | "-" atom -> neg
     | "(" sum ")"
     | /("([^"]|"")*")+/ -> string
     | NAME -> sym
