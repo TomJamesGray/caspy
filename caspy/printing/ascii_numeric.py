@@ -3,6 +3,8 @@ from caspy.functions.function import Function1Arg
 
 
 def ascii_numeric_str(x: Num):
+    if type(x) != Numeric:
+        return str(x)
     out = ""
     for sym in x.val:
         out += "({}) ".format(sym.coeff)

@@ -59,8 +59,8 @@ class Numeric(Generic[Num]):
 
     def sym_and_pow_match(self,sym):
         """
-        Checks if a s
-        :param key: symbol object
+        Checks if a symbol is in this numeric class
+        :param key: symbol object in this class
         :return:
         """
         for sym_self in self.val:
@@ -68,6 +68,7 @@ class Numeric(Generic[Num]):
                 return sym_self
 
         return False
+
     def add(self, y: Num) -> Num:
         """
         Adds y to this number
@@ -79,8 +80,15 @@ class Numeric(Generic[Num]):
             if lookup:
                 # A term with the same symbols already exists in this numeric expression
                 # so just add coeffs
-                print(self.sym_and_pow_match(sym_y))
-                lookup.add_coeff(sym_y.coeff)
+                logger.debug("sym_and_pow match on {} and {}".format(self,sym_y))
+                # Find coefficient for sym_y
+                sym_y_coeff_index = sym_y.get_coeff_index()
+                if sym_y_coeff_index != -1:
+                    lookup.add_coeff(sym_y.val[sym_y_coeff_index][0])
+                else:
+                    logger.debug("No coefficient for symbol {} so adding '1' as coeff".format(sym_y))
+                    sym_y.val.append([Fraction(1,1),1])
+                    lookup.add_coeff(sym_y.val[sym_y_coeff_index][0])
             else:
                 self.val.append(sym_y)
 

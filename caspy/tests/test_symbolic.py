@@ -54,3 +54,11 @@ def test_exp_div():
 
 def test_numeric_exp_mul():
     assert latex_eval("2^2 * 2^2") == "2^{4}"
+
+
+def test_exp_sub():
+    assert latex_eval("2^2 - 2^2") == "0"
+
+
+def test_exp_sub_rev():
+    assert latex_eval("-2^2 + 2^2") == "0"

@@ -1,6 +1,6 @@
 import logging
 import caspy.numeric.numeric as num
-from caspy.numeric.fraction import Frac
+from caspy.numeric.fraction import Frac,Fraction
 
 logger = logging.getLogger(__name__)
 
@@ -8,21 +8,20 @@ logger = logging.getLogger(__name__)
 class Symbol:
     """Represents a product of symbols and their powers"""
     def __init__(self, val, coeff: Frac):
+        # Store value as a list of pair lists, ie
+        # [[value1,power1],[value2,power2]] so x^2*y would be
+        # [['x',Numeric(2)],['y',Numeric(1)]]
+        # The value part can be a string like 'x' or a Numeric object
+        # like (1+x)
         if val == 1:
-            # Store value as a list of pair lists, ie
-            # [[value1,power1],[value2,power2]] so x^2*y would be
-            # [['x',Numeric(2)],['y',Numeric(1)]]
-            # The value part can be a string like 'x' or a Numeric object
-            # like (1+x)
-            self.val = [[val, 1]]
-            self.coeff = coeff
+            self.val = [[coeff, 1]]
+            # self.coeff = 1
         else:
-            self.val = [[val, num.Numeric(1,"number")]]
-            self.coeff = coeff
+            self.val = [[val, num.Numeric(1,"number")],[coeff, 1]]
+            # self.coeff = 1
 
     def __mul__(self, other):
         if type(other) == Symbol:
-            mul_coeffs = True
             if self.val == [[1,1]]:
                 logger.debug("current sym val is [[1,1]] so ignore it completely")
                 self.val = other.val
@@ -38,21 +37,10 @@ class Symbol:
                             sym_added = True
                             # Leave this loop
                             break
-                        elif self.val[i][0] == 1 and other.val[j][0] == 1:
-                            # Deals with coefficients, so things like 2^3*3^5
-                            if self.coeff == other.coeff:
-                                # Case something like 2^a * 2^b so just add powers
-                                self.val[i][1] += other.val[j][1]
-                                sym_added = True
-                                mul_coeffs = False
-                                # leave this loop
-                                break
-
                     if not sym_added and other.val[j] != [1, 1]:
                         self.val.append(other.val[j])
 
-            if mul_coeffs:
-                self.coeff *= other.coeff
+            # self.coeff *= other.coeff
             return self
 
     def __pow__(self, power):
@@ -62,10 +50,14 @@ class Symbol:
         :return: self
         """
         if type(power) == num.Numeric:
+            logger.debug("{} to the power {}".format(self,power))
             for i in range(0,len(self.val)):
                 if type(self.val[i][1]) == num.Numeric:
                     self.val[i][1] = self.val[i][1].mul(power)
-                else:
+                elif self.val[i][0] != 1:
+                    # Check that the first term isn't one. If it is then it's pointless
+                    # raising it's power and will only confusing the formatting
+                    # of the output
                     self.val[i][1] = power.mul(num.Numeric(self.val[i][1],"number"))
             return self
 
@@ -80,12 +72,47 @@ class Symbol:
         """
         return self ** x
 
+    @property
+    def coeff(self) -> Frac:
+        index = self.get_coeff_index()
+        if index != -1:
+            return self.val[index][0]
+        # This can occur in some cases like 2^2
+        logger.info("No coefficient index found for object {} so treating coeff as 1".format(self))
+        return Fraction(1, 1)
+
+    def get_coeff_index(self) -> int:
+        """
+        Finds the index of the coefficient term for this symbol
+        :return: -1 if no such term found, otherwise returns the index
+        """
+        for i in range(0,len(self.val)):
+            if type(self.val[i][0]) == Fraction and self.val[i][1] == 1:
+                # We have found the index of the coefficient term
+                return i
+        # Don't return False since 0 == False
+        return -1
+
     def add_coeff(self, x: Frac) -> None:
-        self.coeff = self.coeff + x
+        logger.debug("Adding coefficient {} to {}".format(x,self))
+        coeff_index = self.get_coeff_index()
+        if coeff_index != -1:
+            # Increment the coefficient by x
+            self.val[coeff_index][0] += x
+        else:
+            logger.info("No coefficient index found for object {}".format(self))
+            # Introduce a coefficient term and add x
+            self.val.append([Fraction(1,1) + x,1])
 
     def neg(self):
         """Negates this symbol"""
-        self.coeff *= -1
+        coeff_index = self.get_coeff_index()
+        if coeff_index != -1:
+            # Multiply the coefficient index by 1
+            self.val[coeff_index][0] *= -1
+        else:
+            logger.warning("No coefficient index found for object {} so adding one as -1".format(self))
+            self.val.append([Fraction(-1,1),1])
 
     def recip(self):
         """Makes this symbol the reciprocal of itself"""
@@ -98,7 +125,16 @@ class Symbol:
         return self
 
     def __repr__(self):
-        return "<Symbol {},{}>".format(self.coeff,self.val)
+        return "<Symbol {}>".format(self.val)
+
+    def len_no_coeff(self) -> int:
+        l = 0
+        for (sym_name,pow) in self.val:
+            if type(sym_name) == Fraction and pow == 1:
+                continue
+            else:
+                l += 1
+        return l
 
     def __eq__(self, other):
         """
@@ -109,6 +145,9 @@ class Symbol:
         if type(other) == Symbol:
             for (sym_name,pow) in self.val:
                 eq = False
+                # Ignoring the coefficient 'property'
+                if type(sym_name) == Fraction and pow == 1:
+                    continue
                 for (sym_name_o,pow_o) in other.val:
                     if sym_name == sym_name_o and pow == pow_o:
                         eq = True
@@ -117,6 +156,8 @@ class Symbol:
                 if not eq:
                     return False
 
-            return True
+            logger.debug("Length no coeffs self {} and other {}".format(
+                self.len_no_coeff(),other.len_no_coeff()))
+            return True and self.len_no_coeff() == other.len_no_coeff()
         else:
             return False
