@@ -1,5 +1,5 @@
 from caspy.numeric.numeric import Num,Numeric
-from caspy.functions.function import Function1Arg
+from caspy.functions import function as fn
 from caspy.numeric.fraction import to_int
 from caspy.numeric.fraction import Fraction
 
@@ -37,8 +37,8 @@ def latex_numeric_str(x: Num):
                     power = latex_numeric_str(sym_name)
                     if power != "" and power != "1":
                         out += "({})".format(power)
-                elif isinstance(sym_name, Function1Arg):
-                    out += "{}({}) ".format(sym_name.latex_fname,latex_numeric_str(sym_name.arg))
+                elif isinstance(sym_name, fn.Function):
+                    out += sym_name.latex_format()
                 else:
                     out += " {}".format(sym_name)
                 power = latex_numeric_str(pow)

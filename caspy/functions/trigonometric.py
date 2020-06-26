@@ -10,7 +10,9 @@ class Sin(TrigFunc):
     latex_fname = "\\sin"
     set_points = [
         ["pi/2","1"],
-        ["pi/4","2^(-1/2)"]
+        ["pi/3", "3^(1/2)/2"],
+        ["pi/4","2^(-1/2)"],
+        ["pi/6","1/2"]
     ]
 
     def __init__(self,x):

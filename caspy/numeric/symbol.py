@@ -38,9 +38,9 @@ class Symbol:
                                 # 2*2^2 error
                                 self.val[i][1] += other.val[j][1]
                             else:
+                                # Make it a numeric type then increment it
                                 self.val[i][1] = num.Numeric(self.val[i][1],"number")
                                 self.val[i][1] += other.val[j][1]
-
 
                             sym_added = True
                             # Leave this loop
@@ -152,7 +152,10 @@ class Symbol:
         in the value property doesn't matter. Ignores the coefficient
         property
         """
+        # Simplify this object and the other value
         if type(other) == Symbol:
+            self.simplify()
+            other.simplify()
             for (sym_name,pow) in self.val:
                 eq = False
                 # Ignoring the coefficient 'property'

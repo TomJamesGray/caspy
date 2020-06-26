@@ -164,6 +164,9 @@ class Numeric(Generic[Num]):
 
     def __eq__(self, other):
         if type(other) == Numeric:
+            # Simplify this object and the other value
+            self.simplify()
+            other.simplify()
             # for sym in self.val:
             #     if sym.val != self
             for sym in self.val:
