@@ -20,7 +20,7 @@ class TrigFunc(Function1Arg):
             while x > Fraction(2, 1):
                 x -= 2
         elif x < Fraction(0, 1):
-            while x < Fraction(2, 1):
+            while x < Fraction(0, 1):
                 x += 2
 
         return x
@@ -41,7 +41,8 @@ class Sin(TrigFunc):
             [Fraction(3, 4), "2^(-1/2)"],
             [Fraction(1, 6), "1/2"],
             [Fraction(5, 6), "1/2"],
-            [Fraction(1, 1), "0"]
+            [Fraction(1, 1), "0"],
+            [Fraction(0, 1), "0"]
         ]
         self.arg = x
         super().__init__()
