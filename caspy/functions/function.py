@@ -10,9 +10,6 @@ class Function:
         if isinstance(other, Function):
             return self.fname == other.fname and self.arg == other.arg
 
-    def __hash__(self):
-        return hash("{}({})".format(self.fname,self.arg))
-
 
 class Function1Arg(Function):
     def __init__(self):

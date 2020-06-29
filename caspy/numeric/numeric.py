@@ -159,9 +159,6 @@ class Numeric(Generic[Num]):
         # print("x {} and x recip {}".format(x,x.recip()))
         return self.mul(x.recip())
 
-    def __hash__(self):
-        return hash(str(self.val))
-
     def __eq__(self, other):
         if type(other) == Numeric:
             # Simplify this object and the other value
