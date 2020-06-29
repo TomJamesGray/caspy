@@ -204,3 +204,14 @@ class Numeric(Generic[Num]):
         for sym in self.val:
             ret += sym.sym_real_eval()
         return ret
+
+    def replace(self,x,y):
+        """
+        Replaces some variable like 'x' with y
+        :param x: Thing to be removed
+        :param y: Thing to be added inplace of x
+        :return: self
+        """
+        for sym in self.val:
+            sym.replace(x,y)
+        return self

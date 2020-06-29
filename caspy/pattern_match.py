@@ -5,35 +5,49 @@ from caspy.numeric.numeric import Num
 logger = logging.getLogger(__name__)
 
 
-def pmatch(pat: str, expr: Num, coeffs: dict):
-    # Evaluate the given pattern
+class PlaceholderVal:
+    pass
+
+
+class ConstPlaceholder(PlaceholderVal):
+    def __init__(self,name):
+        self.name = name
+
+    def __repr__(self):
+        return "<Constant placeholder>"
+
+
+def pmatch(pat: Num, expr: Num):
     out = {}
-    parser = P.Parser()
-    pat_eval = parser.parse(pat)
+    # Simplify both expressions
+    pat.simplify()
+    expr.simplify()
+
+    logger.info("Pattern matching {} with expr {}".format(pat,expr))
 
     for expr_sym in expr.val:
-        expr_sym.simplify()
-        sym_eq = True
-        for pat_sym in pat_eval.val:
-            pat_sym.simplify()
-            for (pat_sym_name,pat_pow) in pat_sym.val:
-                sym_part_eq = True
-
-                for (expr_sym_name,expr_pow) in expr_sym.val:
-                    if type(pat_sym_name) == str:
-                        if coeffs.get(pat_sym_name,False) == "const"\
-                                and type(expr_sym_name) != str:
-                            # Match ?!
-                            sym_part_eq = True
-                            out[pat_sym_name] = expr_sym_name
-                            break
-                    elif pat_sym_name == expr_sym_name and pat_pow == expr_pow:
-                        sym_part_eq = True
-                        break
-
-                if not sym_part_eq:
-                    return False
-        if not sym_eq:
-            return False
+        for pat_sym in pat.val:
+            if pat_sym.contains_sym(expr_sym):
+                logger.info("Symbol {} contains {}".format(pat_sym,expr_sym))
+            else:
+                logger.info("Symbol {} doesn't contain {}".format(pat_sym, expr_sym))
 
     return out
+
+
+def pat_construct(pat: str, coeffs: dict) -> Num:
+    """
+    Constructs a pattern for use in pmatch
+    :param pat: String containing an expression like "a*pi"
+    :param coeffs: Dict storing information about the placeholder terms
+    :return: Numeric object
+    """
+    # Evaluate the given pattern string
+    parser = P.Parser()
+    pat_eval = parser.parse(pat)
+    # Replace the given coefficents
+    for coeff in coeffs:
+        if coeffs[coeff] == "const":
+            pat_eval.replace(coeff, ConstPlaceholder(coeff))
+
+    return pat_eval

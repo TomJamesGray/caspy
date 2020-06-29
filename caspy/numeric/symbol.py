@@ -238,3 +238,40 @@ class Symbol:
                 raise Exception("Can't get float representation of {}".format(self))
 
         return ret.to_real()
+
+    def replace(self,x,y):
+        """
+        Replaces some variable like 'x' with y
+        :param x: Thing to be removed
+        :param y: Thing to be added inplace of x
+        :return: self
+        """
+        for i in range(0,len(self.val)):
+            if self.val[i][0] == x:
+                self.val[i][0] = y
+            if type(self.val[i][1]) == num.Numeric:
+                self.val[i][1] = self.val[i][1].replace(x,y)
+        return self
+
+    def contains_sym(self,x) -> bool:
+        """
+        Checks if this symbol contains another. Ignoring coefficients
+        For instance x*y would contain x
+        :param x: Symbol object
+        :return: Boolean
+        """
+        i = 0
+        for (sym_name_x,sym_pow_x) in x.val:
+            fnd = False
+            if i == x.get_coeff_index():
+                # Skip coefficient
+                continue
+            i += 1
+            for (sym_name,sym_pow) in self.val:
+                if sym_name_x == sym_name and sym_pow_x == sym_pow:
+                    fnd = True
+                    break
+            if not fnd:
+                return False
+
+        return True
