@@ -261,6 +261,8 @@ class Symbol:
         :return: Boolean
         """
         i = 0
+        if x.is_exclusive_numeric():
+            return False
         for (sym_name_x,sym_pow_x) in x.val:
             fnd = False
             if i == x.get_coeff_index():

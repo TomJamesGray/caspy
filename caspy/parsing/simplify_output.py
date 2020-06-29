@@ -52,6 +52,9 @@ class SimplifyOutput(Transformer,lark_transformer.LarkTransformerHelper):
         elif fname == "sin":
             func = trigonometric.Sin(unpacked[0])
             return func.eval()
+        elif fname == "cos":
+            func = trigonometric.Cos(unpacked[0])
+            return func.eval()
         elif fname == "sqrt":
             func = other.Sqrt(unpacked[0])
             return func.eval()
