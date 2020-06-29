@@ -33,10 +33,10 @@ class Sqrt(Function1Arg):
                 sym.simplify()
                 logger.debug("Symbol {}".format(sym))
                 surd_den = sym.val[0][0].den
-                # Sym is a fraction. Square it and then factorise it to ensure
-                # there isn't a square root on the bottom
-                frac = sym.val[0][0] ** 2
-                factors = factoriseNum(frac.num)
+                # Sym is a fraction. Multiply it by den/den Fraction to
+                # ensure
+                frac = sym.val[0][0]
+                factors = factoriseNum(frac.num*surd_den)
                 f_out = 1
                 surd = 1
                 if factors != [] and int(frac.den) == frac.den:
