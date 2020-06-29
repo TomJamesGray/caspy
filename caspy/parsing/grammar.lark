@@ -9,8 +9,8 @@
     | sum "-" product -> sub
 
 ?product:negation
-    | product "*" power -> mul
-    | product "/" power -> div
+    | product "*" negation -> mul
+    | product "/" negation -> div
 
 ?negation:power
     | "-" power -> neg
