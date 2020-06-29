@@ -46,6 +46,9 @@ class Fraction(Generic[Frac]):
         self.simplify()
         return self
 
+    def __sub__(self, other):
+        return self + (-1)*other
+
     def __eq__(self, other):
         if type(other) == Fraction:
             return self.num == other.num and self.den == other.den
@@ -91,3 +94,9 @@ class Fraction(Generic[Frac]):
         self.num = self.num ** power
         self.den = self.den ** power
         return self
+
+    def __lt__(self, other):
+        if type(other) == Fraction:
+            return self.to_real() < other.to_real()
+        else:
+            return self.to_real() < other
