@@ -1,8 +1,11 @@
+import logging
 from caspy.parsing import parser as P
 from caspy.numeric.numeric import Numeric
 from caspy.numeric.symbol import Symbol
 from caspy.numeric.fraction import Fraction
 from caspy.printing import latex_numeric as ln
+
+logger = logging.getLogger(__name__)
 
 
 class Function:
@@ -14,12 +17,17 @@ class Function:
 class Function1Arg(Function):
     def __init__(self):
         # TODO somehow use parser from main or otherwise to stop
-        # re-initiallising parser which is probably quiet ineficient
+        # re-initialising parser which is probably quiet ineficient
+
+        # Disable logging while initialising function
+        previous_level = logging.root.manager.disable
+        logging.disable(logging.CRITICAL)
         self.parser = P.Parser()
         self.evaled_set_points = []
         for (arg_val,f_val) in self.set_points:
             self.evaled_set_points.append([self.parser.parse(arg_val),
                                            self.parser.parse(f_val)])
+        logging.disable(previous_level)
 
     def eval(self):
         for i,pair in enumerate(self.evaled_set_points):

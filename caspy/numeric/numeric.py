@@ -156,7 +156,6 @@ class Numeric(Generic[Num]):
         :param x: Numeric object
         :return: self
         """
-        # print("x {} and x recip {}".format(x,x.recip()))
         return self.mul(x.recip())
 
     def __eq__(self, other):
