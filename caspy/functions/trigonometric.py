@@ -74,7 +74,9 @@ class Sin(TrigFunc):
                     return numeric_val.neg()
                 else:
                     return numeric_val
-
+        elif self.arg == Numeric(0,"number"):
+            # TODO somehow add handling for case a=0 in pattern matching
+            return Numeric(0,"number")
         return Numeric(Symbol(self, Fraction(1, 1)), "sym_obj")
 
 
@@ -99,5 +101,7 @@ class Cos(TrigFunc):
             sin_val = Sin(self.parser.parse("pi * {}".format(sin_a_val))).eval()
             if sin_val.is_exclusive_numeric():
                 return sin_val
-
+        elif self.arg == Numeric(0,"number"):
+            # TODO somehow add handling for case a=0 in pattern matching
+            return Numeric(1,"number")
         return Numeric(Symbol(self, Fraction(1, 1)), "sym_obj")
