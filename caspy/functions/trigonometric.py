@@ -1,4 +1,5 @@
 import logging
+import time
 from caspy.numeric.fraction import Fraction
 from caspy.functions.function import Function1Arg
 from caspy.pattern_match import pmatch, pat_construct
@@ -16,13 +17,16 @@ class TrigFunc(Function1Arg):
         :param x: Fraction
         :return: Fraction
         """
-        if x > Fraction(0, 1):
-            while x > Fraction(2, 1):
-                x -= 2
-        elif x < Fraction(0, 1):
-            while x < Fraction(0, 1):
-                x += 2
-
+        if x.to_real() > 0:
+            if int(x.to_real()) % 2 == 0:
+                x -= int(x.to_real())
+            else:
+                x = x - int(x.to_real()) + 1
+        else:
+            if (int(x.to_real())-1) % 2 == 0:
+                x -= int(x.to_real()) - 1
+            else:
+                x = x - (int(x.to_real())-1) + 1
         return x
 
 

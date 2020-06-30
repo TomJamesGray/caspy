@@ -12,7 +12,6 @@ class Parser:
         self.parser = Lark.open(os.path.join(os.path.dirname(inspect.stack()[0][1]), "grammar.lark"))
         self.simplifier_transformer = SimplifyOutput()
 
-
     def parse(self, line: str):
         tree = self.parser.parse(line)
         logger.debug("Tree = \n{}\n--".format(tree.pretty()))

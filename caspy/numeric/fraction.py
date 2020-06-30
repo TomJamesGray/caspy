@@ -47,7 +47,7 @@ class Fraction(Generic[Frac]):
         return self
 
     def __sub__(self, other):
-        return self + (-1)*other
+        return self + other*(-1)
 
     def __eq__(self, other):
         if type(other) == Fraction:
