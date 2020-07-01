@@ -39,10 +39,10 @@ class Sin(TrigFunc):
     def __init__(self, x):
         self.pi_coeffs = [
             [Fraction(1, 2), "1"],
-            [Fraction(1, 3), "3^(1/2)/2"],
-            [Fraction(2, 3), "3^(1/2)/2"],
-            [Fraction(1, 4), "2^(-1/2)"],
-            [Fraction(3, 4), "2^(-1/2)"],
+            [Fraction(1, 3), "sqrt(3)/2"],
+            [Fraction(2, 3), "sqrt(3)/2"],
+            [Fraction(1, 4), "sqrt(1/2)"],
+            [Fraction(3, 4), "sqrt(1/2)"],
             [Fraction(1, 6), "1/2"],
             [Fraction(5, 6), "1/2"],
             [Fraction(1, 1), "0"],
