@@ -1,5 +1,6 @@
 import logging
 import caspy.numeric.numeric as num
+import caspy.functions.function as funcs
 from caspy.numeric.fraction import Frac,Fraction
 
 logger = logging.getLogger(__name__)
@@ -212,6 +213,13 @@ class Symbol:
         """
         for (sym_name, sym_pow) in self.val:
             if type(sym_name) == Fraction:
+                if type(sym_pow) == num.Numeric:
+                    if not sym_pow.is_exclusive_numeric():
+                        return False
+            elif isinstance(sym_name,funcs.Function):
+                if type(sym_name.arg) == num.Numeric:
+                    if not sym_name.arg.is_exclusive_numeric():
+                        return False
                 if type(sym_pow) == num.Numeric:
                     if not sym_pow.is_exclusive_numeric():
                         return False

@@ -1,7 +1,7 @@
 import logging
+import caspy.numeric.numeric as num
+import caspy.numeric.symbol as sym
 from caspy.parsing import parser as P
-from caspy.numeric.numeric import Numeric
-from caspy.numeric.symbol import Symbol
 from caspy.numeric.fraction import Fraction
 from caspy.printing import latex_numeric as ln
 
@@ -34,7 +34,7 @@ class Function1Arg(Function):
             if pair[0] == self.arg:
                 return pair[1]
 
-        return Numeric(Symbol(self,Fraction(1,1)),"sym_obj")
+        return num.Numeric(sym.Symbol(self,Fraction(1,1)),"sym_obj")
 
     def latex_format(self):
         return "{}({}) ".format(self.latex_fname, ln.latex_numeric_str(self.arg))

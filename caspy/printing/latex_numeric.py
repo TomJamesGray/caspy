@@ -1,11 +1,11 @@
-from caspy.numeric.numeric import Num,Numeric
+import caspy.numeric.numeric as num
 from caspy.functions import function as fn
 from caspy.numeric.fraction import to_int
 from caspy.numeric.fraction import Fraction
 
 
-def latex_numeric_str(x: Num):
-    if type(x) != Numeric:
+def latex_numeric_str(x):
+    if type(x) != num.Numeric:
         return str(x)
     out = ""
     for sym in x.val:
@@ -33,7 +33,7 @@ def latex_numeric_str(x: Num):
                 if need_dot:
                     out += "\\cdot"
                     need_dot = False
-                if type(sym_name) == Numeric:
+                if type(sym_name) == num.Numeric:
                     power = latex_numeric_str(sym_name)
                     if power != "" and power != "1":
                         out += "({})".format(power)
@@ -44,7 +44,7 @@ def latex_numeric_str(x: Num):
                 power = latex_numeric_str(pow)
                 if power != "" and power != "1":
                     out += "^ {{{}}}".format(power)
-            elif type(pow) == Numeric:
+            elif type(pow) == num.Numeric:
                 out += "^ {{{}}}".format(latex_numeric_str(pow))
 
         out += "+"
