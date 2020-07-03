@@ -4,10 +4,17 @@ from lark import Transformer
 from caspy.numeric.numeric import Numeric
 from caspy.helpers import lark_transformer
 from caspy.functions import exponentials,trigonometric,other
+from caspy.functions.cas import expand
 
 logger = logging.getLogger(__name__)
 
-
+fns = {
+    "ln":lambda x: exponentials.Ln(x),
+    "sin":lambda x:trigonometric.Sin(x),
+    "cos":lambda x:trigonometric.Cos(x),
+    "sqrt":lambda x:other.Sqrt(x),
+    "expand":lambda x:expand.Expand(x)
+}
 # noinspection PyMethodMayBeStatic
 @v_args(inline=True)
 class SimplifyOutput(Transformer,lark_transformer.LarkTransformerHelper):
@@ -46,15 +53,6 @@ class SimplifyOutput(Transformer,lark_transformer.LarkTransformerHelper):
         for val in self.unpack_args(args):
             unpacked.append(val)
 
-        if fname == "ln":
-            func = exponentials.Ln(unpacked[0])
-            return func.eval()
-        elif fname == "sin":
-            func = trigonometric.Sin(unpacked[0])
-            return func.eval()
-        elif fname == "cos":
-            func = trigonometric.Cos(unpacked[0])
-            return func.eval()
-        elif fname == "sqrt":
-            func = other.Sqrt(unpacked[0])
+        if fname in fns:
+            func = fns[fname](unpacked[0])
             return func.eval()

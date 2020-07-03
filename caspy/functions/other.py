@@ -54,11 +54,11 @@ class Sqrt(Function1Arg):
                             # Only looks at each factor once
                             cnt_f = factors.count(f)
                             if cnt_f % 2 == 0:
-                                # Even amount of occurences of factors so factor
+                                # Even amount of occurrences of factors so factor
                                 # them all out
                                 f_out *= f ** (cnt_f//2)
                             elif cnt_f > 1:
-                                # Must be an odd amount of occurences of factor
+                                # Must be an odd amount of occurrences of factor
                                 f_out *= f ** ((cnt_f - 1)//2)
                                 surd *= f
                             else:

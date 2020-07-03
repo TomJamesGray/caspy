@@ -11,14 +11,26 @@ logging_config = {
         "main": {"format": "%(levelname)s-%(name)s-%(lineno)d: %(message)s"}
     },
     "handlers": {
-        "f_parsing": {
+        "numeric": {
+            "class": "logging.StreamHandler",
+            "formatter": "main",
+            "level": logging.WARNING},
+        "functions": {
             "class": "logging.StreamHandler",
             "formatter": "main",
             "level": logging.DEBUG}
     },
     "loggers": {
         "":{
-            "handlers":["f_parsing"],
+            "handlers":["numeric"],
+            "level":logging.WARNING
+        },
+        "caspy.numeric":{
+            "handlers":["numeric"],
+            "level":logging.WARNING
+        },
+        "caspy.functions":{
+            "handlers":["functions"],
             "level":logging.DEBUG
         },
     }
