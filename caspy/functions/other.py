@@ -36,6 +36,9 @@ class Sqrt(Function1Arg):
                 sym.simplify()
                 logger.debug("Symbol {}".format(sym))
 
+                if sym.is_zero():
+                    return Numeric(0,"number")
+
                 frac = sym.sym_frac_eval()
 
                 if frac.is_int_frac():
@@ -45,6 +48,7 @@ class Sqrt(Function1Arg):
                     factors = factoriseNum(frac.num*surd_den)
                     f_out = 1
                     surd = 1
+                    logger.debug("Factors {}".format(factors))
                     if factors != [] and int(frac.den) == frac.den:
                         for f in set(factors):
                             # Only looks at each factor once

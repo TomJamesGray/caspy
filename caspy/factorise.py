@@ -1,6 +1,7 @@
 def factoriseNum(n: float) -> [int]:
     """
-    Factorises a number n into it's prime factors (including -1 as a 'prime') if possible
+    Factorises a number n into it's prime factors, including -1 and 1 as
+    'primes'
     :param n: Float to factorise
     :return: list of prime factors
     """
@@ -10,6 +11,8 @@ def factoriseNum(n: float) -> [int]:
         if n < 0:
             factors.append(-1)
             n /= -1
+        else:
+            factors.append(1)
         while n % 2 == 0:
             factors.append(2)
             n /= 2

@@ -183,6 +183,11 @@ class Symbol:
         be simplified to 1/2
         :return: none
         """
+        logger.debug("Simplifying symbol {}".format(self))
+        if self.is_zero():
+            logger.debug("Value is zero so remove all other parts")
+            self.val = [[0,1]]
+            return
         acc = Fraction(1,1)
         to_remove = []
         for i in range(0,len(self.val)):
@@ -291,3 +296,9 @@ class Symbol:
                 return False
 
         return True
+
+    def is_zero(self) -> bool:
+        """Checks if this symbol is equal to zero"""
+        for (sym_name,sym_pow) in self.val:
+            if sym_name == 0:
+                return True
