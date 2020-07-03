@@ -91,8 +91,12 @@ class Fraction(Generic[Frac]):
         return self
 
     def __pow__(self, power, modulo=None):
-        self.num = self.num ** power
-        self.den = self.den ** power
+        if type(power) == Fraction:
+            self.num = self.num ** power.to_real()
+            self.den = self.den ** power.to_real()
+        else:
+            self.num = self.num ** power
+            self.den = self.den ** power
         return self
 
     def __lt__(self, other):
@@ -100,3 +104,13 @@ class Fraction(Generic[Frac]):
             return self.to_real() < other.to_real()
         else:
             return self.to_real() < other
+
+    def is_int_frac(self) -> bool:
+        """
+        Checks if the numerator and denominator of the fraction are integers
+        :return: Boolean
+        """
+        if int(self.num) == self.num and int(self.den) == self.den:
+            return True
+        else:
+            return False

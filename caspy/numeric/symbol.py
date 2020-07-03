@@ -227,7 +227,7 @@ class Symbol:
                 return False
         return True
 
-    def sym_real_eval(self) -> float:
+    def sym_frac_eval(self) -> Frac:
         """
         Attempts to get a floating point representation of this symbol. If this
         is not possible it raises an exception
@@ -239,13 +239,19 @@ class Symbol:
                 if type(sym_pow) == num.Numeric:
                     # TODO doesn't work, eg on sqrt(2^2). Implement
                     # __pow__ method for numeric class
-                    ret *= sym_pow.real_eval() ** sym_pow
+                    # pow_frac = sym_pow.frac_eval()
+                    x = sym_name ** sym_pow.frac_eval()
+
+                    logger.debug("{} to the power {} yields {}".format(
+                        sym_name,sym_pow.frac_eval(),x
+                    ))
+                    ret *= x
                 else:
                     ret *= sym_name ** sym_pow
             else:
                 raise Exception("Can't get float representation of {}".format(self))
 
-        return ret.to_real()
+        return ret
 
     def replace(self,x,y):
         """

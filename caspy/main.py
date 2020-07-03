@@ -1,6 +1,5 @@
 import logging
 import logging.config
-import subprocess
 from caspy.parsing import parser
 from caspy.printing.ascii_numeric import ascii_numeric_str
 from caspy.printing.latex_numeric import latex_numeric_str
@@ -43,4 +42,3 @@ def main():
         print("\nLaTeX:")
         tex = latex_numeric_str(out)
         print(tex)
-        # subprocess.call("latexTerm '$${}$$'".format(tex),shell=True)

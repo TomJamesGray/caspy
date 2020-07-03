@@ -1,4 +1,5 @@
 import logging
+import copy
 from caspy.functions.function import Function1Arg
 from caspy.printing import latex_numeric as ln
 from caspy.numeric.symbol import Symbol
@@ -27,44 +28,49 @@ class Sqrt(Function1Arg):
                                "contains more than 1 symbol. Not trying"
                                "to simplify").format(self.arg)
             else:
+                # Make a copy of the argument value in case the fraction
+                # evaluated doesn't give a nice fraction representation
+                sym = copy.deepcopy(self.arg.val[0])
                 # Attempt to simplify
-                sym = self.arg.val[0]
                 # Removing this breaks sqrt(1/4) for example?!?!
                 sym.simplify()
                 logger.debug("Symbol {}".format(sym))
-                surd_den = sym.val[0][0].den
-                # Sym is a fraction. Multiply it by den/den Fraction to
-                # ensure
-                frac = sym.val[0][0]
-                factors = factoriseNum(frac.num*surd_den)
-                f_out = 1
-                surd = 1
-                if factors != [] and int(frac.den) == frac.den:
-                    for f in set(factors):
-                        # Only looks at each factor once
-                        cnt_f = factors.count(f)
-                        if cnt_f % 2 == 0:
-                            # Even amount of occurences of factors so factor
-                            # them all out
-                            f_out *= f ** (cnt_f//2)
-                        elif cnt_f > 1:
-                            # Must be an odd amount of occurences of factor
-                            f_out *= f ** ((cnt_f - 1)//2)
-                            surd *= f
-                        else:
-                            surd *= f
-                    logger.debug("Simplified to {} * sqrt({})".format(
-                        f_out,surd
-                    ))
-                    if surd == 1:
-                        # It's just 1 inside the surd so just return the f_out
-                        # as a symbol
-                        return Numeric(f_out,"number")
-                    self.arg = surd
-                    new_num = Numeric(Symbol(self, Fraction(1, 1)), "sym_obj")
-                    scalar = Symbol(1,Fraction(f_out,surd_den))
-                    new_num.mul(Numeric(scalar,"sym_obj"))
-                    # new_num.val.append(Symbol(Fraction(f_out,1),1))
-                    return new_num
+
+                frac = sym.sym_frac_eval()
+
+                if frac.is_int_frac():
+                    surd_den = frac.den
+                    # Sym is a fraction. Multiply it by den/den Fraction to
+                    # ensure you don't end up with a surd on the bottom
+                    factors = factoriseNum(frac.num*surd_den)
+                    f_out = 1
+                    surd = 1
+                    if factors != [] and int(frac.den) == frac.den:
+                        for f in set(factors):
+                            # Only looks at each factor once
+                            cnt_f = factors.count(f)
+                            if cnt_f % 2 == 0:
+                                # Even amount of occurences of factors so factor
+                                # them all out
+                                f_out *= f ** (cnt_f//2)
+                            elif cnt_f > 1:
+                                # Must be an odd amount of occurences of factor
+                                f_out *= f ** ((cnt_f - 1)//2)
+                                surd *= f
+                            else:
+                                surd *= f
+                        logger.debug("Simplified to {} * sqrt({})".format(
+                            f_out,surd
+                        ))
+                        if surd == 1:
+                            # It's just 1 inside the surd so just return the
+                            # f_out as a symbol
+                            return Numeric(f_out,"number")
+                        self.arg = surd
+                        new_num = Numeric(Symbol(self, Fraction(1, 1)), "sym_obj")
+                        scalar = Symbol(1,Fraction(f_out,surd_den))
+                        new_num.mul(Numeric(scalar,"sym_obj"))
+                        # new_num.val.append(Symbol(Fraction(f_out,1),1))
+                        return new_num
 
         return Numeric(Symbol(self, Fraction(1, 1)), "sym_obj")

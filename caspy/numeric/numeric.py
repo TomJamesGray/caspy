@@ -1,7 +1,7 @@
 import copy
 import logging
 from caspy.numeric.symbol import Symbol
-from caspy.numeric.fraction import Fraction
+from caspy.numeric.fraction import Fraction,Frac
 from typing import TypeVar, Generic
 
 Num = TypeVar("Num")
@@ -194,15 +194,15 @@ class Numeric(Generic[Num]):
                 return False
         return True
 
-    def real_eval(self) -> float:
+    def frac_eval(self) -> Frac:
         """
         Attempts to get a floating point representation of this symbol. If this
         is not possible it raises an exception
         :return: float
         """
-        ret = 0
+        ret = Fraction(0,1)
         for sym in self.val:
-            ret += sym.sym_real_eval()
+            ret += sym.sym_frac_eval()
         return ret
 
     def replace(self,x,y):
