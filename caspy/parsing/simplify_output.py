@@ -15,6 +15,8 @@ fns = {
     "sqrt":lambda x:other.Sqrt(x),
     "expand":lambda x:expand.Expand(x)
 }
+
+
 # noinspection PyMethodMayBeStatic
 @v_args(inline=True)
 class SimplifyOutput(Transformer,lark_transformer.LarkTransformerHelper):
