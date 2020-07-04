@@ -186,7 +186,7 @@ class Symbol:
         logger.debug("Simplifying symbol {}".format(self))
         if self.is_zero():
             logger.debug("Value is zero so remove all other parts")
-            self.val = [[0,1]]
+            self.val = [[Fraction(0,1),1]]
             return
         acc = Fraction(1,1)
         to_remove = []
