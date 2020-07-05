@@ -40,3 +40,7 @@ class Function1Arg(Function):
 
     def latex_format(self):
         return "{}({}) ".format(self.latex_fname, ln.latex_numeric_str(self.arg))
+
+    def __deepcopy__(self, memodict={}):
+        new = type(self)(self.arg)
+        return new

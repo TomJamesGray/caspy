@@ -11,4 +11,4 @@ class Ln(Function1Arg):
 
     def __init__(self,x):
         self.arg = x
-        super().__init__()
+        # super().__init__()
