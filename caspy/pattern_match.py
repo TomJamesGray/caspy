@@ -1,5 +1,5 @@
 import logging
-from caspy.parsing import parser as P
+import caspy.parsing
 from caspy.numeric.numeric import Num
 
 logger = logging.getLogger(__name__)
@@ -25,16 +25,18 @@ def pmatch(pat: Num, expr: Num):
     :return: Dict with keys as Placeholder names
     """
     out = {}
+    used_terms = []
     # Simplify both expressions
     pat.simplify()
     expr.simplify()
 
     logger.info("Pattern matching {} with expr {}".format(pat,expr))
 
-    for expr_sym in expr.val:
+    for i,expr_sym in enumerate(expr.val):
         for pat_sym in pat.val:
             if pat_sym.contains_sym(expr_sym):
                 logger.info("Symbol {} contains {}".format(pat_sym,expr_sym))
+                used_terms.append(i)
                 # Find the placeholder
                 for (pat_sym_name,pat_sym_pow) in pat_sym.val:
                     if type(pat_sym_name) == ConstPlaceholder:
@@ -42,6 +44,9 @@ def pmatch(pat: Num, expr: Num):
                         out[pat_sym_name.name] = expr_sym.coeff
             else:
                 logger.info("Symbol {} doesn't contain {}".format(pat_sym, expr_sym))
+
+    if sorted(used_terms) != list(range(0,len(expr.val))):
+        return {}
 
     return out
 
@@ -54,7 +59,7 @@ def pat_construct(pat: str, coeffs: dict) -> Num:
     :return: Numeric object
     """
     # Evaluate the given pattern string
-    parser = P.Parser()
+    parser = caspy.parsing.parser.Parser()
     pat_eval = parser.parse(pat)
     # Replace the given coefficents
     for coeff in coeffs:

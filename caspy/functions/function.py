@@ -1,7 +1,7 @@
 import logging
 import caspy.numeric.numeric as num
 import caspy.numeric.symbol as sym
-from caspy.parsing import parser as P
+import caspy.parsing
 from caspy.numeric.fraction import Fraction
 from caspy.printing import latex_numeric as ln
 
@@ -22,7 +22,7 @@ class Function1Arg(Function):
         # Disable logging while initialising function
         previous_level = logging.root.manager.disable
         logging.disable(logging.CRITICAL)
-        self.parser = P.Parser()
+        self.parser = caspy.parsing.parser.Parser()
         if hasattr(self,'set_points'):
             self.evaled_set_points = []
             for (arg_val,f_val) in self.set_points:
