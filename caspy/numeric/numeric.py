@@ -76,6 +76,12 @@ class Numeric(Generic[Num]):
         :param y: Another numeric class
         :return: self
         """
+        if self.is_zero():
+            self.val = y.val
+            return self
+        elif y.is_zero():
+            return self
+
         for sym_y in y.val:
             sym_y.simplify()
             lookup = self.sym_and_pow_match(sym_y)
@@ -215,3 +221,10 @@ class Numeric(Generic[Num]):
         for sym in self.val:
             sym.replace(x,y)
         return self
+
+    def is_zero(self) -> bool:
+        """Checks if this numeric object is equal to zero"""
+        for sym in self.val:
+            if not sym.is_zero():
+                return False
+        return True
