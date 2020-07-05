@@ -29,6 +29,10 @@ logging_config = {
             "handlers":["numeric"],
             "level":logging.WARNING
         },
+        "caspy.pattern_match":{
+            "handlers":["functions"],
+            "level":logging.DEBUG
+        },
         "caspy.functions":{
             "handlers":["functions"],
             "level":logging.DEBUG

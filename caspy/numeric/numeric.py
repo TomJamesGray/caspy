@@ -228,3 +228,22 @@ class Numeric(Generic[Num]):
             if not sym.is_zero():
                 return False
         return True
+
+    def mul_expand(self,x: Num):
+        """
+        Multiplies this object by another numeric object term by term. So
+        (x+1)*(x+2) will be evaluated to x^2+3x+2
+        :param x: Numeric object
+        :return: Numeric object
+        """
+        # Initialise object to act as the accumulator
+        cur_val = copy.deepcopy(self)
+        acc = Numeric(0,"number")
+        for sym_cur_val in copy.deepcopy(cur_val.val):
+            for sym_mul in x.val:
+                logger.debug("{} mul {}".format(sym_cur_val, sym_mul))
+                tmp = copy.deepcopy(sym_mul)
+                acc.add(Numeric(tmp.mul(sym_cur_val), "sym_obj"))
+
+        # self.val = acc
+        return acc

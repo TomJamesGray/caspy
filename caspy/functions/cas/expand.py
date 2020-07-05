@@ -16,6 +16,7 @@ class Expand(Function1Arg):
 
     def eval(self):
         logger.debug("Attempting to expand {}".format(self.arg))
+        tot = num.Numeric(0,"number")
         for sym in self.arg.val:
             for (sym_name,sym_pow) in sym.val:
                 if type(sym_name) == num.Numeric:
@@ -31,14 +32,8 @@ class Expand(Function1Arg):
                             mul_by = copy.deepcopy(sym_name)
 
                             for i in range(0,int(frac_pow.to_real())-1):
-                                acc = num.Numeric(0,"number")
-                                for sym_cur_val in copy.deepcopy(cur_val.val):
-                                    for sym_mul in mul_by.val:
-                                        logger.debug("{} mul {}".format(sym_cur_val,sym_mul))
-                                        tmp = copy.deepcopy(sym_mul)
-                                        acc.add(num.Numeric(tmp.mul(sym_cur_val),"sym_obj"))
-                                cur_val = acc
+                                cur_val = cur_val.mul_expand(mul_by)
 
-                            return cur_val
+                            tot += cur_val
 
-        return super().eval()
+        return tot
