@@ -200,7 +200,7 @@ class Symbol:
                 acc *= self.val[i][0].recip()
                 to_remove.append(i)
 
-        if acc == 1 or to_remove == []:
+        if to_remove == []:
             return
         # Remove the indexes that have been factored into the acc
         new_val = []
