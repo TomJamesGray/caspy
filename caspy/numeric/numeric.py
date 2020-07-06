@@ -44,6 +44,10 @@ class Numeric(Generic[Num]):
         if type(other) == Numeric:
             return self.mul(other.recip())
 
+    def __pow__(self, power, modulo=None):
+        if type(power) == Numeric:
+            return self.pow(power)
+
     def sym_in(self,key):
         """
         Checks if a symbol such as 'x' already exists in this. Used
