@@ -18,6 +18,7 @@ class Expand(Function1Arg):
         logger.debug("Attempting to expand {}".format(self.arg))
         tot = num.Numeric(0,"number")
         for sym in self.arg.val:
+            sym_tot = num.Numeric(1,"number")
             for (sym_name,sym_pow) in sym.val:
                 if type(sym_name) == num.Numeric:
                     if sym_pow.is_exclusive_numeric():
@@ -34,6 +35,7 @@ class Expand(Function1Arg):
                             for i in range(0,int(frac_pow.to_real())-1):
                                 cur_val = cur_val.mul_expand(mul_by)
 
-                            tot += cur_val
+                            sym_tot = sym_tot.mul_expand(cur_val)
+            tot += sym_tot
 
         return tot
