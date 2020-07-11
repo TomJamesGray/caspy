@@ -252,7 +252,8 @@ class Symbol:
                     ))
                     ret *= x
                 else:
-                    ret *= sym_name ** sym_pow
+                    x = sym_name ** sym_pow
+                    ret *= x
             else:
                 raise Exception("Can't get float representation of {}".format(self))
 

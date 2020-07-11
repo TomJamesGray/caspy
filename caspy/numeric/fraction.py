@@ -95,8 +95,14 @@ class Fraction(Generic[Frac]):
             self.num = self.num ** power.to_real()
             self.den = self.den ** power.to_real()
         else:
-            self.num = self.num ** power
-            self.den = self.den ** power
+            if power >= 0:
+                self.num = self.num ** power
+                self.den = self.den ** power
+            elif power < 0:
+                # Swap numerator and denominator
+                self.num, self.den = self.den, self.num
+                self.num = self.num ** abs(power)
+                self.den = self.den ** abs(power)
         return self
 
     def __lt__(self, other):

@@ -212,7 +212,9 @@ class Numeric(Generic[Num]):
         """
         ret = Fraction(0,1)
         for sym in self.val:
-            ret += sym.sym_frac_eval()
+            x = sym.sym_frac_eval()
+            print("FRAC EVAL ADDING {}".format(x))
+            ret += x
         return ret
 
     def replace(self,x,y):

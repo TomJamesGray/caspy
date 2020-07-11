@@ -40,7 +40,10 @@ class Expand(Function1Arg):
                             sym_tot = sym_tot.mul_expand(cur_val)
                         else:
                             # Can't expand this term
-                            sym_tot = sym_tot * (sym_name ** sym_pow)
+                            new_pow = caspy.numeric.symbol.Symbol(1,frac_pow)
+                            new_pow_num = num.Numeric(new_pow,"sym_obj")
+                            logger.debug("Not expanding. Multiply sym_tot by {} ^ {}".format(sym_name,sym_pow))
+                            sym_tot = sym_tot * (sym_name ** new_pow_num)
                     else:
                         # Can't expand this term
                         sym_tot = sym_tot * (sym_name ** sym_pow)
