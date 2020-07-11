@@ -31,13 +31,23 @@ class Expand(Function1Arg):
                             # Can expand this term
                             logger.debug("Expanding term {} to the power {}\n".
                                          format(sym_name,frac_pow))
-                            # TODO handling when it's to negative powers
+                            if frac_pow.to_real() < 0:
+                                take_recip = True
+                                iters = int(abs(frac_pow.to_real())) - 1
+                            else:
+                                take_recip = False
+                                iters = int(frac_pow.to_real()) - 1
+
                             cur_val = copy.deepcopy(sym_name)
                             mul_by = copy.deepcopy(sym_name)
 
-                            for i in range(0,int(frac_pow.to_real())-1):
+                            for i in range(0,iters):
                                 cur_val = cur_val.mul_expand(mul_by)
-                            sym_tot = sym_tot.mul_expand(cur_val)
+
+                            if take_recip:
+                                sym_tot = sym_tot.mul_expand(cur_val.recip())
+                            else:
+                                sym_tot = sym_tot.mul_expand(cur_val)
                         else:
                             # Can't expand this term
                             new_pow = caspy.numeric.symbol.Symbol(1,frac_pow)
