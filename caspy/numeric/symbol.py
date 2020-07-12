@@ -191,6 +191,14 @@ class Symbol:
         acc = Fraction(1,1)
         to_remove = []
         for i in range(0,len(self.val)):
+            # Deal with the case when the power is zero
+            # By removing it we get rid of terms like x^0
+            if type(self.val[i][1]) == num.Numeric:
+                if self.val[i][1].is_zero():
+                    to_remove.append(i)
+                    continue
+
+            # Deal with numeric 'coefficient terms'
             if type(self.val[i][0]) == Fraction and self.val[i][1] == 1:
                 # Multiply accumulator by this fraction
                 acc *= self.val[i][0]
@@ -199,6 +207,7 @@ class Symbol:
                 # Multiply accumulator by reciprocal of this fraction
                 acc *= self.val[i][0].recip()
                 to_remove.append(i)
+
 
         if to_remove == []:
             return
