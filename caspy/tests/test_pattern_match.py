@@ -22,3 +22,9 @@ def test_pmatch_non_match(coeff):
     pat = pm.pat_construct("a*x", {"a": "const"})
     pmatch_res = pm.pmatch(pat, p.parse("{}*x+y".format(coeff)))
     assert pmatch_res == {}
+
+
+def test_pmatch_polyn():
+    pat = pm.pat_construct("a*x^2+b*x+c", {"a": "const","b": "const","c": "const"})
+    pmatch_res = pm.pmatch(pat, p.parse("2*x^2+3*x+1"))
+    assert pmatch_res == {}

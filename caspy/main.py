@@ -14,7 +14,7 @@ logging_config = {
         "numeric": {
             "class": "logging.StreamHandler",
             "formatter": "main",
-            "level": logging.WARNING},
+            "level": logging.DEBUG},
         "functions": {
             "class": "logging.StreamHandler",
             "formatter": "main",
@@ -27,7 +27,7 @@ logging_config = {
         },
         "caspy.numeric":{
             "handlers":["numeric"],
-            "level":logging.WARNING
+            "level":logging.DEBUG
         },
         "caspy.pattern_match":{
             "handlers":["functions"],

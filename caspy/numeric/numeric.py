@@ -235,7 +235,7 @@ class Numeric(Generic[Num]):
                 return False
         return True
 
-    def mul_expand(self,x: Num):
+    def mul_expand(self, x: Num):
         """
         Multiplies this object by another numeric object term by term. So
         (x+1)*(x+2) will be evaluated to x^2+3x+2

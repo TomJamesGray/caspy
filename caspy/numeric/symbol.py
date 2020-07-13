@@ -208,7 +208,6 @@ class Symbol:
                 acc *= self.val[i][0].recip()
                 to_remove.append(i)
 
-
         if to_remove == []:
             return
         # Remove the indexes that have been factored into the acc
@@ -290,7 +289,6 @@ class Symbol:
         :return: Boolean
         """
         i = 0
-        print("CHECK IF {} CONTAINS SYM {}".format(self,x))
         if x.is_exclusive_numeric():
             return False
         for (sym_name_x,sym_pow_x) in x.val:
@@ -300,7 +298,6 @@ class Symbol:
                 continue
             i += 1
             for (sym_name,sym_pow) in self.val:
-                print("COMP {} AND {}".format(sym_pow,sym_pow_x))
                 if sym_name_x == sym_name and sym_pow_x == sym_pow:
                     fnd = True
                     break
