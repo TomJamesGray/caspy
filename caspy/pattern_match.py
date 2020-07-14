@@ -51,19 +51,40 @@ def pmatch(pat: Num, expr: Num):
 
     logger.info("Pattern matching {} with expr {}".format(pat,expr))
 
-    for i,expr_sym in enumerate(expr.val):
-        for pat_sym in pat.val:
-            if pat_sym.contains_sym(expr_sym):
-                logger.info("Symbol {} contains {}".format(pat_sym,expr_sym))
-                used_terms.append(i)
-                # Find the placeholder
-                for (pat_sym_name,pat_sym_pow) in pat_sym.val:
-                    if type(pat_sym_name) == ConstPlaceholder:
-                        # Extract coefficient of expr_sym
-                        out[pat_sym_name.name] = expr_sym.coeff
-            else:
-                logger.info("Symbol {} doesn't contain {}".format(pat_sym, expr_sym))
-    print("OUT {} USED_TERMS {}".format(out,used_terms))
+    # for i,expr_sym in enumerate(expr.val):
+    #     for pat_sym in pat.val:
+    #
+    #         if pat_sym.contains_sym(expr_sym):
+    #             logger.info("Symbol {} contains {}".format(pat_sym,expr_sym))
+    #             used_terms.append(i)
+    #             # Find the placeholder
+    #             for (pat_sym_name,pat_sym_pow) in pat_sym.val:
+    #                 if type(pat_sym_name) == ConstPlaceholder:
+    #                     # Extract coefficient of expr_sym
+    #                     out[pat_sym_name.name] = expr_sym.coeff
+    #         else:
+    #             logger.info("Symbol {} doesn't contain {}".format(pat_sym, expr_sym))
+
+    for pat_sym in pat.val:
+        for i,expr_sym in enumerate(expr.val):
+            # Equality for symbol class takes into account the Placeholder classes
+            if pat_sym == expr_sym and i not in used_terms:
+                print("{} == {} yields {}".format(pat_sym,expr_sym,pat_sym == expr_sym))
+                logger.debug("{} == {} yields {}".format(pat_sym,expr_sym,pat_sym == expr_sym))
+                # Look for the placeholders
+                # TODO recurse into numeric objects to deal with powers
+                for (pat_sym_fact_name,pat_sym_fact_pow) in pat_sym.val:
+                    logger.debug("Look at term {} {}".format(
+                        pat_sym_fact_name,pat_sym_fact_pow
+                    ))
+                    if type(pat_sym_fact_name) == ConstPlaceholder:
+                        logger.debug("Term is ConstPlaceholder {}".format(pat_sym_fact_name))
+                        out[pat_sym_fact_name.name] = expr_sym.coeff
+                        used_terms.append(i)
+
+
+
+    logger.warning("OUT {} USED_TERMS {}".format(out,used_terms))
     if sorted(used_terms) != list(range(0,len(expr.val))):
         return {}
 

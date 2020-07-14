@@ -1,4 +1,5 @@
 import logging
+import caspy.pattern_match
 import caspy.numeric.numeric as num
 import caspy.functions.function as funcs
 from caspy.numeric.fraction import Frac,Fraction
@@ -143,6 +144,8 @@ class Symbol:
         for (sym_name,pow) in self.val:
             if type(sym_name) == Fraction and pow == 1:
                 continue
+            elif isinstance(sym_name,caspy.pattern_match.ConstPlaceholder):
+                continue
             else:
                 l += 1
         return l
@@ -157,10 +160,14 @@ class Symbol:
         if type(other) == Symbol:
             self.simplify()
             other.simplify()
+            if self.is_exclusive_numeric() and other.is_exclusive_numeric():
+                return True
             for (sym_name,pow) in self.val:
                 eq = False
                 # Ignoring the coefficient 'property'
                 if type(sym_name) == Fraction and pow == 1:
+                    continue
+                if isinstance(sym_name,caspy.pattern_match.PlaceholderVal):
                     continue
                 for (sym_name_o,pow_o) in other.val:
                     if sym_name == sym_name_o and pow == pow_o:
@@ -236,6 +243,13 @@ class Symbol:
                 if type(sym_pow) == num.Numeric:
                     if not sym_pow.is_exclusive_numeric():
                         return False
+            # TODO ADD CONSTANTS CLASS
+            elif sym_name in ("pi","e"):
+                continue
+            elif not(isinstance(sym_name,caspy.pattern_match.ConstPlaceholder)
+                     or isinstance(sym_name,caspy.pattern_match.ConstPlaceHolderNonZero)):
+                # Not a constant value placeholder
+                return False
             else:
                 return False
         return True
