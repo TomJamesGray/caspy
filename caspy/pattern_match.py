@@ -11,7 +11,7 @@ coeff - Numeric symbol that can contain things that aren't numeric
 """
 import logging
 import caspy.parsing
-from caspy.numeric.numeric import Num
+import caspy.numeric.numeric
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ class CoeffPlaceholder(PlaceholderVal):
         return "<Coefficient placeholder>"
 
 
-def pmatch(pat: Num, expr: Num):
+def pmatch(pat, expr):
     """
     Tries to match a pattern generated in pat_construct to a given expression
     :param pat: Numeric object with some Placeholder objects
@@ -49,7 +49,7 @@ def pmatch(pat: Num, expr: Num):
     pat.simplify()
     expr.simplify()
 
-    logger.info("Pattern matching {} with expr {}".format(pat,expr))
+    logger.info("Pattern matching {} with expr {}".format(pat, expr))
 
     # for i,expr_sym in enumerate(expr.val):
     #     for pat_sym in pat.val:
@@ -66,32 +66,43 @@ def pmatch(pat: Num, expr: Num):
     #             logger.info("Symbol {} doesn't contain {}".format(pat_sym, expr_sym))
 
     for pat_sym in pat.val:
-        for i,expr_sym in enumerate(expr.val):
+        for i, expr_sym in enumerate(expr.val):
             # Equality for symbol class takes into account the Placeholder classes
             if pat_sym == expr_sym and i not in used_terms:
-                print("{} == {} yields {}".format(pat_sym,expr_sym,pat_sym == expr_sym))
-                logger.debug("{} == {} yields {}".format(pat_sym,expr_sym,pat_sym == expr_sym))
+                logger.debug("{} == {} yields {}".format(pat_sym, expr_sym, pat_sym == expr_sym))
                 # Look for the placeholders
                 # TODO recurse into numeric objects to deal with powers
-                for (pat_sym_fact_name,pat_sym_fact_pow) in pat_sym.val:
+                for (pat_sym_fact_name, pat_sym_fact_pow) in pat_sym.val:
                     logger.debug("Look at term {} {}".format(
-                        pat_sym_fact_name,pat_sym_fact_pow
+                        pat_sym_fact_name, pat_sym_fact_pow
                     ))
                     if type(pat_sym_fact_name) == ConstPlaceholder:
-                        logger.debug("Term is ConstPlaceholder {}".format(pat_sym_fact_name))
+                        # TODO Dealing with non zero options
                         out[pat_sym_fact_name.name] = expr_sym.coeff
                         used_terms.append(i)
+                    else:
+                        # Dealing with numeric object powers
+                        if type(pat_sym_fact_pow) == caspy.numeric.numeric.Numeric:
+                            # Find matching term
+                            for j, expr_sym_fact in enumerate(expr_sym.val):
+                                if expr_sym_fact[0] == pat_sym_fact_name and \
+                                        expr_sym_fact[1].all_syms_eq(pat_sym_fact_pow):
+                                    # Matching term found, therefore turn the
+                                    # powers into Numeric objects and run pmatch
+                                    logger.debug("RECURSING WITH {} AND {}".format(pat_sym_fact_pow,expr_sym_fact[1]))
+                                    pmatch_res = pmatch(pat_sym_fact_pow,expr_sym_fact[1])
+                                    logger.debug("Recursed pmatch result {}".format(pmatch_res))
+                                    out.update(pmatch_res)
+                                    used_terms.append(i)
 
-
-
-    logger.warning("OUT {} USED_TERMS {}".format(out,used_terms))
-    if sorted(used_terms) != list(range(0,len(expr.val))):
+    logger.debug("OUT {} USED_TERMS {}".format(out, used_terms))
+    if sorted(used_terms) != list(range(0, len(expr.val))):
         return {}
 
     return out
 
 
-def pat_construct(pat: str, coeffs: dict) -> Num:
+def pat_construct(pat: str, coeffs: dict):
     """
     Constructs a pattern for use in pmatch
     :param pat: String containing an expression like "a*pi"

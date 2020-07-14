@@ -40,4 +40,5 @@ def test_pmatch_exp():
     xyz = p.parse("e^3")
     print("Other exlcusive numeric? {}".format(xyz.is_exclusive_numeric()))
     pmatch_res = pm.pmatch(pat, p.parse("e^3"))
-    assert pmatch_res == {}
+    print("")
+    assert pmatch_res == {"a":3}

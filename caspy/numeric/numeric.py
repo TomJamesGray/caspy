@@ -184,6 +184,25 @@ class Numeric(Generic[Num]):
                     return False
             return True
 
+    def all_syms_eq(self,other):
+        """
+        Checks all symbols in this numeric object have a corresponding symbol
+        in the other numeric object. Just uses the equaltiy operator for symbols.
+        Therefore this ignores differing coefficients for example
+        :param other: Numeric object
+        :return: Boolean
+        """
+        used_terms = []
+        for sym_self in self.val:
+            fnd = False
+            for i,sym_other in enumerate(other.val):
+                if sym_self == sym_other and i not in used_terms:
+                    used_terms.append(i)
+                    fnd = True
+            if not fnd:
+                return False
+        return True
+
     def simplify(self):
         """
         Simplifies all symbol objects stored in self.val
