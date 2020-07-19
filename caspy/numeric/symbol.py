@@ -179,13 +179,8 @@ class Symbol:
                         eq = True
                         # logger.warning("FOUND TERM {} {}".format(sym_name,pow_o))
                         break
-                    else:
-                        # logger.warning("Not found term {} ^ {}in self ({})".format(sym_name, pow, self))
-                        # logger.error("Names Eq? {} ({} == {})".format(sym_name == sym_name_o, sym_name, sym_name_o))
-                        # logger.error("Powers Eq? {}({} == {})".format(pow == pow_o, pow, pow_o))
 
                 if not eq:
-
                     return False
 
             logger.debug("Length no coeffs self {} and other {}".format(
