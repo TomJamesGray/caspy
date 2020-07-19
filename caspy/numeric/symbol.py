@@ -2,13 +2,14 @@ import logging
 import caspy.pattern_match
 import caspy.numeric.numeric as num
 import caspy.functions.function as funcs
-from caspy.numeric.fraction import Frac,Fraction
+from caspy.numeric.fraction import Frac, Fraction
 
 logger = logging.getLogger(__name__)
 
 
 class Symbol:
     """Represents a product of symbols and their powers"""
+
     def __init__(self, val, coeff: Frac):
         # Store value as a list of pair lists, ie
         # [[value1,power1],[value2,power2]] so x^2*y would be
@@ -19,18 +20,18 @@ class Symbol:
             self.val = [[coeff, 1]]
             # self.coeff = 1
         else:
-            self.val = [[val, num.Numeric(1,"number")],[coeff, 1]]
+            self.val = [[val, num.Numeric(1, "number")], [coeff, 1]]
             # self.coeff = 1
 
     def __mul__(self, other):
         if type(other) == Symbol:
-            if self.val == [[1,1]]:
+            if self.val == [[1, 1]]:
                 logger.debug("current sym val is [[1,1]] so ignore it completely")
                 self.val = other.val
             else:
-                logger.debug("Multiply {} by {}".format(self,other))
+                logger.debug("Multiply {} by {}".format(self, other))
 
-                for j in range(0,len(other.val)):
+                for j in range(0, len(other.val)):
                     sym_added = False
                     for i in range(0, len(self.val)):
                         if self.val[i][0] == other.val[j][0] and self.val[i][0] != 1:
@@ -41,7 +42,7 @@ class Symbol:
                                 self.val[i][1] += other.val[j][1]
                             else:
                                 # Make it a numeric type then increment it
-                                self.val[i][1] = num.Numeric(self.val[i][1],"number")
+                                self.val[i][1] = num.Numeric(self.val[i][1], "number")
                                 self.val[i][1] += other.val[j][1]
 
                             sym_added = True
@@ -60,21 +61,21 @@ class Symbol:
         :return: self
         """
         if type(power) == num.Numeric:
-            logger.debug("{} to the power {}".format(self,power))
-            for i in range(0,len(self.val)):
+            logger.debug("{} to the power {}".format(self, power))
+            for i in range(0, len(self.val)):
                 if type(self.val[i][1]) == num.Numeric:
                     self.val[i][1] = self.val[i][1].mul(power)
                 elif self.val[i][0] != 1:
                     # Check that the first term isn't one. If it is then it's pointless
                     # raising it's power and will only confusing the formatting
                     # of the output
-                    self.val[i][1] = power.mul(num.Numeric(self.val[i][1],"number"))
+                    self.val[i][1] = power.mul(num.Numeric(self.val[i][1], "number"))
             return self
 
     def mul(self, y):
         return self * y
 
-    def pow(self,x):
+    def pow(self, x):
         """
         Raises this symbol to the power x
         :param x: Numeric object
@@ -97,7 +98,7 @@ class Symbol:
         Finds the index of the coefficient term for this symbol
         :return: -1 if no such term found, otherwise returns the index
         """
-        for i in range(0,len(self.val)):
+        for i in range(0, len(self.val)):
             if type(self.val[i][0]) == Fraction and self.val[i][1] == 1:
                 # We have found the index of the coefficient term
                 return i
@@ -105,7 +106,7 @@ class Symbol:
         return -1
 
     def add_coeff(self, x: Frac) -> None:
-        logger.debug("Adding coefficient {} to {}".format(x,self))
+        logger.debug("Adding coefficient {} to {}".format(x, self))
         coeff_index = self.get_coeff_index()
         if coeff_index != -1:
             # Increment the coefficient by x
@@ -113,7 +114,7 @@ class Symbol:
         else:
             logger.info("No coefficient index found for object {}".format(self))
             # Introduce a coefficient term and add x
-            self.val.append([Fraction(1,1) + x,1])
+            self.val.append([Fraction(1, 1) + x, 1])
 
     def neg(self):
         """Negates this symbol"""
@@ -124,11 +125,11 @@ class Symbol:
         else:
             logger.warning("No coefficient index found for object {} so "
                            "adding one as -1".format(self))
-            self.val.append([Fraction(-1,1),1])
+            self.val.append([Fraction(-1, 1), 1])
 
     def recip(self):
         """Makes this symbol the reciprocal of itself"""
-        for i in range(0,len(self.val)):
+        for i in range(0, len(self.val)):
             if type(self.val[i][1]) == num.Numeric:
                 self.val[i][1] = self.val[i][1].neg()
             else:
@@ -141,10 +142,10 @@ class Symbol:
 
     def len_no_coeff(self) -> int:
         l = 0
-        for (sym_name,pow) in self.val:
+        for (sym_name, pow) in self.val:
             if type(sym_name) == Fraction and pow == 1:
                 continue
-            elif isinstance(sym_name,caspy.pattern_match.ConstPlaceholder):
+            elif isinstance(sym_name, caspy.pattern_match.ConstPlaceholder):
                 continue
             else:
                 l += 1
@@ -160,25 +161,35 @@ class Symbol:
         if type(other) == Symbol:
             self.simplify()
             other.simplify()
+            # logger.critical("CHECKING {} == {}".format(self,other))
+
             if self.is_exclusive_numeric() and other.is_exclusive_numeric():
                 return True
-            for (sym_name,pow) in self.val:
+            for (sym_name, pow) in self.val:
                 eq = False
                 # Ignoring the coefficient 'property'
                 if type(sym_name) == Fraction and pow == 1:
+                    # logger.warning("IGNORING COEFF PROPERTY {} {}".format(sym_name,pow))
                     continue
-                if isinstance(sym_name,caspy.pattern_match.PlaceholderVal):
+                if isinstance(sym_name, caspy.pattern_match.PlaceholderVal):
+                    # logger.warning("IGNORING PLACEHOLDER VAL {} {}".format(sym_name, pow))
                     continue
                 for (sym_name_o,pow_o) in other.val:
                     if sym_name == sym_name_o and pow == pow_o:
                         eq = True
+                        # logger.warning("FOUND TERM {} {}".format(sym_name,pow_o))
                         break
+                    else:
+                        # logger.warning("Not found term {} ^ {}in self ({})".format(sym_name, pow, self))
+                        # logger.error("Names Eq? {} ({} == {})".format(sym_name == sym_name_o, sym_name, sym_name_o))
+                        # logger.error("Powers Eq? {}({} == {})".format(pow == pow_o, pow, pow_o))
 
                 if not eq:
+
                     return False
 
             logger.debug("Length no coeffs self {} and other {}".format(
-                self.len_no_coeff(),other.len_no_coeff()))
+                self.len_no_coeff(), other.len_no_coeff()))
             return True and self.len_no_coeff() == other.len_no_coeff()
         else:
             return False
@@ -193,11 +204,11 @@ class Symbol:
         logger.debug("Simplifying symbol {}".format(self))
         if self.is_zero():
             logger.debug("Value is zero so remove all other parts")
-            self.val = [[Fraction(0,1),1]]
+            self.val = [[Fraction(0, 1), 1]]
             return
-        acc = Fraction(1,1)
+        acc = Fraction(1, 1)
         to_remove = []
-        for i in range(0,len(self.val)):
+        for i in range(0, len(self.val)):
             # Deal with the case when the power is zero
             # By removing it we get rid of terms like x^0
             if type(self.val[i][1]) == num.Numeric:
@@ -219,7 +230,7 @@ class Symbol:
             return
         # Remove the indexes that have been factored into the acc
         new_val = []
-        for (j,sym_part) in enumerate(self.val):
+        for (j, sym_part) in enumerate(self.val):
             if j not in to_remove:
                 new_val.append(sym_part)
 
@@ -236,7 +247,7 @@ class Symbol:
                 if type(sym_pow) == num.Numeric:
                     if not sym_pow.is_exclusive_numeric():
                         return False
-            elif isinstance(sym_name,funcs.Function):
+            elif isinstance(sym_name, funcs.Function):
                 if type(sym_name.arg) == num.Numeric:
                     if not sym_name.arg.is_exclusive_numeric():
                         return False
@@ -244,10 +255,10 @@ class Symbol:
                     if not sym_pow.is_exclusive_numeric():
                         return False
             # TODO ADD CONSTANTS CLASS
-            elif sym_name in ("pi","e"):
+            elif sym_name in ("pi", "e"):
                 continue
-            elif not(isinstance(sym_name,caspy.pattern_match.ConstPlaceholder)
-                     or isinstance(sym_name,caspy.pattern_match.ConstPlaceHolderNonZero)):
+            elif not (isinstance(sym_name, caspy.pattern_match.ConstPlaceholder)
+                      or isinstance(sym_name, caspy.pattern_match.ConstPlaceHolderNonZero)):
                 # Not a constant value placeholder
                 return False
             else:
@@ -260,8 +271,8 @@ class Symbol:
         is not possible it raises an exception
         :return: float
         """
-        ret = Fraction(1,1)
-        for (sym_name,sym_pow) in self.val:
+        ret = Fraction(1, 1)
+        for (sym_name, sym_pow) in self.val:
             if type(sym_name) == Fraction:
                 if type(sym_pow) == num.Numeric:
                     # TODO doesn't work, eg on sqrt(2^2). Implement
@@ -270,7 +281,7 @@ class Symbol:
                     x = sym_name ** sym_pow.frac_eval()
 
                     logger.debug("{} to the power {} yields {}".format(
-                        sym_name,sym_pow.frac_eval(),x
+                        sym_name, sym_pow.frac_eval(), x
                     ))
                     ret *= x
                 else:
@@ -281,21 +292,21 @@ class Symbol:
 
         return ret
 
-    def replace(self,x,y):
+    def replace(self, x, y):
         """
         Replaces some variable like 'x' with y
         :param x: Thing to be removed
         :param y: Thing to be added inplace of x
         :return: self
         """
-        for i in range(0,len(self.val)):
+        for i in range(0, len(self.val)):
             if self.val[i][0] == x:
                 self.val[i][0] = y
             if type(self.val[i][1]) == num.Numeric:
-                self.val[i][1] = self.val[i][1].replace(x,y)
+                self.val[i][1] = self.val[i][1].replace(x, y)
         return self
 
-    def contains_sym(self,x) -> bool:
+    def contains_sym(self, x) -> bool:
         """
         Checks if this symbol contains another. Ignoring coefficients
         For instance x*y would contain x
@@ -305,13 +316,13 @@ class Symbol:
         i = 0
         if x.is_exclusive_numeric():
             return False
-        for (sym_name_x,sym_pow_x) in x.val:
+        for (sym_name_x, sym_pow_x) in x.val:
             fnd = False
             if i == x.get_coeff_index():
                 # Skip coefficient
                 continue
             i += 1
-            for (sym_name,sym_pow) in self.val:
+            for (sym_name, sym_pow) in self.val:
                 if sym_name_x == sym_name and sym_pow_x == sym_pow:
                     fnd = True
                     break
@@ -322,6 +333,6 @@ class Symbol:
 
     def is_zero(self) -> bool:
         """Checks if this symbol is equal to zero"""
-        for (sym_name,sym_pow) in self.val:
+        for (sym_name, sym_pow) in self.val:
             if sym_name == 0:
                 return True

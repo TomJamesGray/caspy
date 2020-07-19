@@ -94,9 +94,12 @@ def pmatch(pat, expr):
                                     logger.debug("Recursed pmatch result {}".format(pmatch_res))
                                     out.update(pmatch_res)
                                     used_terms.append(i)
+                                    break
+            else:
+                logger.debug("{} == {} yields {}".format(pat_sym, expr_sym, pat_sym == expr_sym))
 
     logger.debug("OUT {} USED_TERMS {}".format(out, used_terms))
-    if sorted(used_terms) != list(range(0, len(expr.val))):
+    if sorted(set(used_terms)) != list(range(0, len(expr.val))):
         return {}
 
     return out

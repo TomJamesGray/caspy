@@ -36,9 +36,12 @@ def test_pmatch_polyn():
 
 def test_pmatch_exp():
     pat = pm.pat_construct("e^a", {"a": "const"})
-    print("Pattern exlcusive numeric? {}".format(pat.is_exclusive_numeric()))
-    xyz = p.parse("e^3")
-    print("Other exlcusive numeric? {}".format(xyz.is_exclusive_numeric()))
     pmatch_res = pm.pmatch(pat, p.parse("e^3"))
-    print("")
+    assert pmatch_res == {"a":3}
+
+
+def test_pmatch_exp_with_coeff():
+    pat = pm.pat_construct("e^a", {"a": "const"})
+    xyz = p.parse("e^3")
+    pmatch_res = pm.pmatch(pat, xyz)
     assert pmatch_res == {"a":3}
