@@ -53,7 +53,7 @@ class Sin(TrigFunc):
 
     def eval(self):
         pat = pat_construct("a*pi", {"a": "const"})
-        pmatch_res = pmatch(pat, self.arg)
+        pmatch_res, _ = pmatch(pat, self.arg)
         if pmatch_res != {}:
             # Don't check against a_val as 0 == False
             a_val = pmatch_res["a"]
@@ -95,7 +95,7 @@ class Cos(TrigFunc):
 
     def eval(self):
         pat = pat_construct("a*pi", {"a": "const"})
-        pmatch_res = pmatch(pat, self.arg)
+        pmatch_res, _ = pmatch(pat, self.arg)
         if pmatch_res != {}:
             # Don't check against a_val as 0 == False
             a_val = pmatch_res["a"]

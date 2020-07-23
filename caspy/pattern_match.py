@@ -53,12 +53,15 @@ def does_numeric_contain_placeholders(x) -> bool:
                     return True
     return False
 
+
 def pmatch(pat, expr):
     """
     Tries to match a pattern generated in pat_construct to a given expression
     :param pat: Numeric object with some Placeholder objects
     :param expr: Numeric object
-    :return: Dict with keys as Placeholder names
+    :return: A tuple: (dict with keys as Placeholder names, the matching numeric
+    expression). In effect the second term is just the expr input, but it is
+    there for recursive purposes
     """
     out = {}
     used_terms = []
@@ -68,6 +71,7 @@ def pmatch(pat, expr):
 
     logger.info("Pattern matching {} with expr {}".format(pat, expr))
 
+    attempted_match_sum = caspy.numeric.numeric.Numeric(0,"number")
     for pat_sym in pat.val:
         for i, expr_sym in enumerate(expr.val):
             # Attempt to match this pattern sym with this expression sym
@@ -85,19 +89,19 @@ def pmatch(pat, expr):
                     coeff_tmp_sym = caspy.numeric.symbol.Symbol(1,expr_sym.coeff)
                     attempted_match_sym = attempted_match_sym * coeff_tmp_sym
                     logger.debug("Multiply coefficient {} onto match_sym".format(expr_sym.coeff))
+                    used_terms.append(i)
 
                 # TODO dealing with functions
                 elif type(pat_sym_fact_name) == str:
                     if type(pat_sym_fact_pow) == caspy.numeric.numeric.Numeric:
                         if not does_numeric_contain_placeholders(pat_sym_fact_pow):
+                            used_terms.append(i)
                             # Can just multiply this term onto the match_sym val
                             attempted_match_sym.val.append([pat_sym_fact_name,
                                                             pat_sym_fact_pow])
                             logger.debug("Multiplying term {}^{} onto "
                                          "match_sym".format(pat_sym_fact_name,pat_sym_fact_pow))
                         else:
-                            # TODO Need to recurse as there are placeholders in this
-                            # numeric power
                             # Find matching term
                             for j, expr_sym_fact in enumerate(expr_sym.val):
                                 if expr_sym_fact[0] == pat_sym_fact_name and \
@@ -105,58 +109,38 @@ def pmatch(pat, expr):
                                     # Matching term found, therefore turn the
                                     # powers into Numeric objects and run pmatch
                                     logger.debug("RECURSING WITH {} AND {}".format(pat_sym_fact_pow,expr_sym_fact[1]))
-                                    pmatch_res = pmatch(pat_sym_fact_pow,expr_sym_fact[1])
+                                    pmatch_res,num_pow = pmatch(pat_sym_fact_pow,expr_sym_fact[1])
                                     logger.debug("Recursed pmatch result {}".format(pmatch_res))
+                                    # TODO refactor so it uses tmp_out possibly?
+                                    # would require returning the attempted_match_sym
                                     tmp_out.update(pmatch_res)
                                     used_terms.append(i)
+                                    attempted_match_sym.val.append([
+                                        pat_sym_fact_name,
+                                        num_pow
+                                    ])
                                     break
 
             if attempted_match_sym == expr_sym and \
                 attempted_match_sym.coeff == expr_sym.coeff:
+                logger.debug("Updating out dict")
                 # Have matched it successfully so can update the out dict
                 # TODO testing for when the same placeholder appears multiple
                 # times in patter, ie stuff like a*x^2 + a*y^2
                 out.update(tmp_out)
                 break
-
-    return out
-    # for pat_sym in pat.val:
-    #     for i, expr_sym in enumerate(expr.val):
-    #         # Equality for symbol class takes into account the Placeholder classes
-    #         if pat_sym == expr_sym and i not in used_terms:
-    #             logger.debug("{} == {} yields {}".format(pat_sym, expr_sym, pat_sym == expr_sym))
-    #             # Look for the placeholders
-    #             # TODO recurse into numeric objects to deal with powers
-    #             for (pat_sym_fact_name, pat_sym_fact_pow) in pat_sym.val:
-    #                 logger.debug("Look at term {} {}".format(
-    #                     pat_sym_fact_name, pat_sym_fact_pow
-    #                 ))
-    #                 if type(pat_sym_fact_name) == ConstPlaceholder:
-    #                     # TODO Dealing with non zero options
-    #                     out[pat_sym_fact_name.name] = expr_sym.coeff
-    #                     used_terms.append(i)
-    #                 else:
-    #                     # Dealing with numeric object powers
-    #                     if type(pat_sym_fact_pow) == caspy.numeric.numeric.Numeric:
-    #                         # Find matching term
-    #                         for j, expr_sym_fact in enumerate(expr_sym.val):
-    #                             if expr_sym_fact[0] == pat_sym_fact_name and \
-    #                                     expr_sym_fact[1].all_syms_eq(pat_sym_fact_pow):
-    #                                 # Matching term found, therefore turn the
-    #                                 # powers into Numeric objects and run pmatch
-    #                                 logger.debug("RECURSING WITH {} AND {}".format(pat_sym_fact_pow,expr_sym_fact[1]))
-    #                                 pmatch_res = pmatch(pat_sym_fact_pow,expr_sym_fact[1])
-    #                                 logger.debug("Recursed pmatch result {}".format(pmatch_res))
-    #                                 out.update(pmatch_res)
-    #                                 used_terms.append(i)
-    #                                 break
-    #         else:
-    #             logger.debug("{} == {} yields {}".format(pat_sym, expr_sym, pat_sym == expr_sym))
+            else:
+                logger.debug("Can't update out dict "
+                             "attempted_match_sym {} == expr_sym {} returns  {}".format(
+                    attempted_match_sym,expr_sym,attempted_match_sym == expr_sym
+                ))
+        attempted_match_sum = attempted_match_sum + \
+                              caspy.numeric.numeric.Numeric(attempted_match_sym,"sym_obj")
 
     if list(sorted(set(used_terms))) != list(range(0, len(expr.val))):
-        return {}
+        return {}, None
 
-    return out
+    return out, attempted_match_sum
 
 
 def pat_construct(pat: str, coeffs: dict):
