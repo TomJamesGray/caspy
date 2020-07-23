@@ -4,7 +4,7 @@ from lark import Transformer
 from caspy.numeric.numeric import Numeric
 from caspy.helpers import lark_transformer
 from caspy.functions import exponentials,trigonometric,other
-from caspy.functions.cas import expand
+from caspy.functions.cas import expand,integrate
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,8 @@ fns = {
     "sin":lambda x:trigonometric.Sin(x),
     "cos":lambda x:trigonometric.Cos(x),
     "sqrt":lambda x:other.Sqrt(x),
-    "expand":lambda x:expand.Expand(x)
+    "expand":lambda x:expand.Expand(x),
+    "integrate":lambda *args:integrate.Integrate(*args)
 }
 
 
@@ -56,5 +57,5 @@ class SimplifyOutput(Transformer,lark_transformer.LarkTransformerHelper):
             unpacked.append(val)
 
         if fname in fns:
-            func = fns[fname](unpacked[0])
+            func = fns[fname](*unpacked)
             return func.eval()

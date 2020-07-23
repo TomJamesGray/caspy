@@ -63,8 +63,15 @@ def test_pmatch_exp_with_coeff():
     pmatch_res,_ = pm.pmatch(pat, xyz)
     assert pmatch_res == {"a":3,"b":2}
 
+
 def test_pmatch_exp_x_with_coeff():
     pat = pm.pat_construct("b*x^a", {"a": "const","b":"const"})
     xyz = p.parse("10*x^3")
     pmatch_res,_ = pm.pmatch(pat, xyz)
     assert pmatch_res == {"a":3,"b":10}
+
+
+def test_pmatch_exp_with_terms():
+    pat = pm.pat_construct("x^(a*y)", {"a": "const"})
+    pmatch_res, _ = pm.pmatch(pat, p.parse("x^(3*y)"))
+    assert pmatch_res == {"a": 3}

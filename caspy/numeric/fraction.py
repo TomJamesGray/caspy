@@ -55,6 +55,10 @@ class Fraction(Generic[Frac]):
         else:
             return self.num / self.den == other
 
+    def __truediv__(self, other):
+        if type(other) == Fraction:
+            return self * other.recip()
+
     def to_real(self) -> float:
         return self.num / self.den
 
