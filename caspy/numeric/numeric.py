@@ -19,7 +19,10 @@ class Numeric(Generic[Num]):
             self.val.append(Symbol(val, Fraction(1, 1)))
         elif typ == "number":
             # in this case the 1 represents that this value is just a number
-            self.val.append(Symbol(1, Fraction(float(val), 1)))
+            if type(val) == Fraction:
+                self.val.append(Symbol(1,val))
+            else:
+                self.val.append(Symbol(1, Fraction(float(val), 1)))
         elif typ == "sym_obj":
             self.val.append(val)
 

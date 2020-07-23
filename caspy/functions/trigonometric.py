@@ -1,5 +1,6 @@
 import logging
 import time
+import caspy.parsing.parser
 from caspy.numeric.fraction import Fraction
 from caspy.functions.function import Function1Arg
 from caspy.pattern_match import pmatch, pat_construct
@@ -10,6 +11,10 @@ logger = logging.getLogger(__name__)
 
 
 class TrigFunc(Function1Arg):
+    def __init__(self):
+        self.parser = caspy.parsing.parser.Parser()
+        super().__init__()
+
     def shift_to_2pi(self, x: Fraction):
         """
         Takes a fraction that represents a coefficient of pi and shifts it
@@ -33,8 +38,6 @@ class TrigFunc(Function1Arg):
 class Sin(TrigFunc):
     fname = "sin"
     latex_fname = "\\sin"
-
-    set_points = []
 
     def __init__(self, x):
         self.pi_coeffs = [
@@ -87,7 +90,6 @@ class Sin(TrigFunc):
 class Cos(TrigFunc):
     fname = "cos"
     latex_fname = "\\cos"
-    set_points = []
 
     def __init__(self,x):
         self.arg = x
