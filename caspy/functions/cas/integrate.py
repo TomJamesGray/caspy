@@ -4,6 +4,7 @@ import caspy.numeric.numeric
 import caspy.pattern_match as pm
 import caspy.parsing.parser
 from caspy.functions.function import Function
+from caspy.printing import latex_numeric as ln
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,9 @@ class Integrate(Function):
                                             "multiple options for wrt property")
         else:
             self.wrt = wrt
+
+    def latex_format(self):
+        return "\\int {} \\mathrm{{d}}{}".format(ln.latex_numeric_str(self.arg),self.wrt)
 
     def eval(self):
         """

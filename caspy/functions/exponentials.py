@@ -17,8 +17,12 @@ class Ln(Function1Arg):
     def eval(self):
         pat = caspy.pattern_match.pat_construct("e^a", {"a": "const"})
         pmatch_res,_ = caspy.pattern_match.pmatch(pat,self.arg)
+
         if pmatch_res != {}:
             logger.debug("Pmatch result {}".format(pmatch_res))
             return caspy.numeric.numeric.Numeric(pmatch_res["a"],"number")
+        elif self.arg == caspy.numeric.numeric.Numeric(1,"number"):
+            # Check if argument is just 1
+            return caspy.numeric.numeric.Numeric(0,"number")
         else:
             return super().eval()
