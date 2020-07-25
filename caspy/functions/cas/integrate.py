@@ -77,12 +77,16 @@ class Integrate(Function):
             pmatch_res,_ = pm.pmatch(pat,numeric_wrapper)
             if pmatch_res != {}:
                 logger.debug("Integrating polynomial term {}, pmatch result {}".format(sym,pmatch_res))
-                # TODO maybe refactor Fraction class so it doesn't return false
-                # so we don't need to do a ridiculous amount of copying like this
-                term_val = parser.parse("{} * {} ^ {}".format(
-                    copy(pmatch_res["a"])/(copy(pmatch_res["n"])+1), self.wrt, copy(pmatch_res["n"]) + 1
-                ))
-                logger.debug("pmatch res now {}".format(pmatch_res))
+                if pmatch_res["n"] == -1:
+                    term_val = parser.parse("{} * ln({})".format(
+                        copy(pmatch_res["a"]), self.wrt
+                    ))
+                else:
+                    # TODO maybe refactor Fraction class so it doesn't return self
+                    # so we don't need to do a ridiculous amount of copying like this
+                    term_val = parser.parse("{} * {} ^ {}".format(
+                        copy(pmatch_res["a"])/(copy(pmatch_res["n"])+1), self.wrt, copy(pmatch_res["n"]) + 1
+                    ))
                 tot += term_val
                 integrated_values.append(i)
                 # Go onto next term

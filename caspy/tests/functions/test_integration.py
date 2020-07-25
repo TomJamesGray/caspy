@@ -15,3 +15,7 @@ def test_integrate_const(x):
 @given(st.floats(min_value=-1000,max_value=1000))
 def test_integrate_const_wrt_y(x):
     assert p.parse("integrate({},y)".format(x)) == p.parse("{}*y".format(x))
+
+
+def test_integrate_recip():
+    assert p.parse("integrate(1/x)") == p.parse("ln(x)")
