@@ -8,11 +8,13 @@ const_non_zero - Numeric constant that can't be zero -> ConstPlaceholderNonZero
 coeff - Numeric symbol that can contain things that aren't numeric
         for instance if the pattern is a*x then if the expression is
         5*x*y*cos(z) a would be 5*y*cos(z) -> CoeffPlaceholder
+rem - Collects any terms that aren't used
 """
 import logging
 import caspy.parsing
 import caspy.numeric.numeric
 import caspy.numeric.symbol
+import caspy.functions.function
 from caspy.numeric.fraction import Fraction
 
 logger = logging.getLogger(__name__)
@@ -36,6 +38,11 @@ class ConstPlaceHolderNonZero(PlaceholderVal):
 class CoeffPlaceholder(PlaceholderVal):
     def __repr__(self):
         return "<Coefficient placeholder>"
+
+
+class RemainingPlaceholder(PlaceholderVal):
+    def __repr__(self):
+        return "<Remaining placeholder>"
 
 
 def does_numeric_contain_placeholders(x) -> bool:
@@ -65,6 +72,7 @@ def pmatch(pat, expr):
     """
     out = {}
     used_terms = []
+    remaining_placeholder_name = None
     # Simplify both expressions
     pat.simplify()
     expr.simplify()
@@ -90,6 +98,11 @@ def pmatch(pat, expr):
                     attempted_match_sym = attempted_match_sym * coeff_tmp_sym
                     logger.debug("Multiply coefficient {} onto match_sym".format(expr_sym.coeff))
                     used_terms.append(i)
+
+                elif type(pat_sym_fact_name) == RemainingPlaceholder:
+                    # Set a flag so remaining terms will be included in out dict
+                    # once all other terms have been matched
+                    remaining_placeholder_name = pat_sym_fact_name.name
 
                 # TODO dealing with functions
                 elif type(pat_sym_fact_name) == str:
@@ -130,12 +143,22 @@ def pmatch(pat, expr):
                 out.update(tmp_out)
                 break
             else:
-                logger.debug("Can't update out dict "
+                logger.info("Can't update out dict "
                              "attempted_match_sym {} == expr_sym {} returns  {}".format(
                     attempted_match_sym,expr_sym,attempted_match_sym == expr_sym
                 ))
         attempted_match_sum = attempted_match_sum + \
                               caspy.numeric.numeric.Numeric(attempted_match_sym,"sym_obj")
+
+    if remaining_placeholder_name != None:
+        remaining_numeric_obj = caspy.numeric.numeric.Numeric(0,"number")
+        for i,sym in enumerate(expr.val):
+            if i not in used_terms:
+                sym_numeric_obj = caspy.numeric.numeric.Numeric(sym,"sym_obj")
+                remaining_numeric_obj += sym_numeric_obj
+        out[remaining_placeholder_name] = remaining_numeric_obj
+
+        return out,expr
 
     if list(sorted(set(used_terms))) != list(range(0, len(expr.val))):
         return {}, None
@@ -161,5 +184,7 @@ def pat_construct(pat: str, coeffs: dict):
             pat_eval.replace(coeff, ConstPlaceHolderNonZero(coeff))
         elif coeffs[coeff] == "coeff":
             pat_eval.replace(coeff, CoeffPlaceholder(coeff))
+        elif coeffs[coeff] == "rem":
+            pat_eval.replace(coeff, RemainingPlaceholder(coeff))
 
     return pat_eval
