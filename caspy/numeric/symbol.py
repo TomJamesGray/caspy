@@ -249,9 +249,6 @@ class Symbol:
                 if type(sym_pow) == num.Numeric:
                     if not sym_pow.is_exclusive_numeric():
                         return False
-            # TODO ADD CONSTANTS CLASS
-            elif sym_name in ("pi", "e"):
-                continue
             elif not (isinstance(sym_name, caspy.pattern_match.ConstPlaceholder)
                       or isinstance(sym_name, caspy.pattern_match.ConstPlaceHolderNonZero)):
                 # Not a constant value placeholder
@@ -264,7 +261,7 @@ class Symbol:
         """
         Attempts to get a floating point representation of this symbol. If this
         is not possible it raises an exception
-        :return: float
+        :return: Fraction
         """
         ret = Fraction(1, 1)
         for (sym_name, sym_pow) in self.val:
