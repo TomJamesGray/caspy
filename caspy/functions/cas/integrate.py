@@ -49,6 +49,16 @@ class Integrate(Function):
         tot = caspy.numeric.numeric.Numeric(0,"number")
         integrated_values = []
         for i,sym in enumerate(self.arg.val):
+            if sym.is_exclusive_numeric():
+                # Integrate constant term
+                frac_val = sym.sym_frac_eval()
+                frac_val_num = caspy.numeric.numeric.Numeric(frac_val, "number")
+                wrt_term = caspy.numeric.numeric.Numeric(self.wrt, "sym")
+                tot += wrt_term * frac_val_num
+                integrated_values.append(i)
+                # Go onto next term
+                continue
+
             # Try matching x^n
             pat = pm.pat_construct("a*{}^n".format(self.wrt),{"n":"const","a":"const"})
             numeric_wrapper = caspy.numeric.numeric.Numeric(sym,"sym_obj")
@@ -63,8 +73,9 @@ class Integrate(Function):
                 logger.debug("pmatch res now {}".format(pmatch_res))
                 tot += term_val
                 integrated_values.append(i)
-            else:
-                pass
+                # Go onto next term
+                continue
+
 
         new_val = []
         # Remove integrated values from the arg property
