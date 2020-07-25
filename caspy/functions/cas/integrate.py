@@ -49,6 +49,9 @@ class Integrate(Function):
         tot = caspy.numeric.numeric.Numeric(0,"number")
         integrated_values = []
         for i,sym in enumerate(self.arg.val):
+            # Simplify symbol, this get's rid of issues caused by terms
+            # like x^0
+            sym.simplify()
             if sym.is_exclusive_numeric():
                 # Integrate constant term
                 frac_val = sym.sym_frac_eval()
@@ -57,6 +60,15 @@ class Integrate(Function):
                 tot += wrt_term * frac_val_num
                 integrated_values.append(i)
                 # Go onto next term
+                continue
+
+            if not sym.has_variable_in(self.wrt):
+                # Integrate term that doesn't contain the variable we're
+                # integrating with respect to
+                sym_numeric_obj = caspy.numeric.numeric.Numeric(sym,"sym_obj")
+                wrt_term = caspy.numeric.numeric.Numeric(self.wrt, "sym")
+                tot += sym_numeric_obj * wrt_term
+                integrated_values.append(i)
                 continue
 
             # Try matching x^n

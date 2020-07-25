@@ -326,6 +326,21 @@ class Symbol:
 
         return True
 
+    def has_variable_in(self, x: str) -> bool:
+        """
+        Checks if this symbol has a term in 'x'. For instance the symbol
+        x*y^2 has a term in y
+        :param x: String representing some variable
+        :return: boolean
+        """
+        for (sym_name,sym_pow) in self.val:
+            if sym_name == x:
+                return True
+            if type(sym_pow) == num.Numeric:
+                if sym_pow.has_variable_in(x):
+                    return True
+        return False
+
     def is_zero(self) -> bool:
         """Checks if this symbol is equal to zero"""
         for (sym_name, sym_pow) in self.val:

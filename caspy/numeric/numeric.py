@@ -275,3 +275,15 @@ class Numeric(Generic[Num]):
 
         # self.val = acc
         return acc
+
+    def has_variable_in(self, x: str) -> bool:
+        """
+        Checks if this symbol has a term in 'x'. For instance the symbol
+        x*y^2 has a term in y
+        :param x: String representing some variable
+        :return: boolean
+        """
+        for sym in self.val:
+            if sym.has_variable_in(x):
+                return True
+        return False
