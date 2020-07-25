@@ -336,6 +336,9 @@ class Symbol:
             if type(sym_pow) == num.Numeric:
                 if sym_pow.has_variable_in(x):
                     return True
+            if isinstance(sym_name,funcs.Function):
+                if sym_name.arg.has_variable_in(x):
+                    return True
         return False
 
     def is_zero(self) -> bool:
