@@ -296,6 +296,9 @@ class Symbol:
                 self.val[i][0] = y
             if type(self.val[i][1]) == num.Numeric:
                 self.val[i][1] = self.val[i][1].replace(x, y)
+            if isinstance(self.val[i][0],funcs.Function):
+                self.val[i][0].arg = self.val[i][0].arg.replace(x, y)
+
         return self
 
     def contains_sym(self, x) -> bool:

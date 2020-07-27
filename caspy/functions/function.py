@@ -24,3 +24,8 @@ class Function1Arg(Function):
     def __deepcopy__(self, memodict={}):
         new = type(self)(self.arg)
         return new
+
+    def __repr__(self):
+        return "<Function {}, arg {}>".format(
+            self.fname,ln.latex_numeric_str(self.arg)
+        )

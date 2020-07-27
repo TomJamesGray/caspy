@@ -81,3 +81,9 @@ def test_pmatch_remaining():
     pat = pm.pat_construct("x^a + b", {"a": "const", "b": "rem"})
     pmatch_res, _ = pm.pmatch(pat, p.parse("x^3 + y*x"))
     assert pmatch_res == {"a": 3, "b": p.parse("y*x")}
+
+
+def test_pmatch_fn_args():
+    pat = pm.pat_construct("ln(a*x)", {"a": "const"})
+    pmatch_res, _ = pm.pmatch(pat, p.parse("ln(3*x)"))
+    assert pmatch_res == {"a": 3}

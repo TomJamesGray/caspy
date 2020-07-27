@@ -15,6 +15,7 @@ import caspy.parsing
 import caspy.numeric.numeric
 import caspy.numeric.symbol
 import caspy.functions.function
+import caspy.parsing.simplify_output
 from caspy.numeric.fraction import Fraction
 
 logger = logging.getLogger(__name__)
@@ -124,8 +125,6 @@ def pmatch(pat, expr):
                                     logger.debug("RECURSING WITH {} AND {}".format(pat_sym_fact_pow,expr_sym_fact[1]))
                                     pmatch_res,num_pow = pmatch(pat_sym_fact_pow,expr_sym_fact[1])
                                     logger.debug("Recursed pmatch result {}".format(pmatch_res))
-                                    # TODO refactor so it uses tmp_out possibly?
-                                    # would require returning the attempted_match_sym
                                     tmp_out.update(pmatch_res)
                                     used_terms.append(i)
                                     attempted_match_sym.val.append([
@@ -133,6 +132,45 @@ def pmatch(pat, expr):
                                         num_pow
                                     ])
                                     break
+
+                elif isinstance(pat_sym_fact_name,caspy.functions.function.Function):
+                    # TODO checking numeric powers
+                    if not does_numeric_contain_placeholders(pat_sym_fact_name.arg):
+                        used_terms.append(i)
+                        # Can just multiply this term onto the match_sym val
+                        attempted_match_sym.val.append([pat_sym_fact_name,
+                                                        pat_sym_fact_pow])
+                        logger.debug("Multiplying term {}^{} onto "
+                                     "match_sym".format(pat_sym_fact_name, pat_sym_fact_pow))
+                    else:
+                        # Find matching term
+                        logger.debug("Trying to find matching term")
+                        for j, expr_sym_fact in enumerate(expr_sym.val):
+                            logger.debug("Matching {} with {}".format(pat_sym_fact_name,expr_sym_fact))
+                            if not isinstance(expr_sym_fact[0],caspy.functions.function.Function):
+                                continue
+                            if expr_sym_fact[0].fname == pat_sym_fact_name.fname:
+                                # Matching term found, therefore pmatch the
+                                # funtion arguments
+                                logger.debug("RECURSING WITH {} AND {}".format(
+                                    pat_sym_fact_name.arg, expr_sym_fact[0].arg
+                                ))
+                                pmatch_res, pmatch_res_arg = pmatch(
+                                    pat_sym_fact_name.arg, expr_sym_fact[0].arg
+                                )
+                                logger.debug("Recursed pmatch result {}".format(pmatch_res))
+                                tmp_out.update(pmatch_res)
+                                used_terms.append(i)
+
+                                # TODO maybe define fns dict somewhere else
+                                if expr_sym_fact[0].fname in caspy.parsing.simplify_output.fns:
+                                    new_fn_obj = caspy.parsing.simplify_output.fns[expr_sym_fact[0].fname](
+                                        pmatch_res_arg)
+                                attempted_match_sym.val.append([
+                                    new_fn_obj,
+                                    pat_sym_fact_pow
+                                ])
+                                break
 
             if attempted_match_sym == expr_sym and \
                 attempted_match_sym.coeff == expr_sym.coeff:
@@ -150,7 +188,7 @@ def pmatch(pat, expr):
         attempted_match_sum = attempted_match_sum + \
                               caspy.numeric.numeric.Numeric(attempted_match_sym,"sym_obj")
 
-    if remaining_placeholder_name != None:
+    if remaining_placeholder_name is not None:
         remaining_numeric_obj = caspy.numeric.numeric.Numeric(0,"number")
         for i,sym in enumerate(expr.val):
             if i not in used_terms:

@@ -1,9 +1,8 @@
 import logging
-import time
+import caspy.pattern_match
 import caspy.parsing.parser
 from caspy.numeric.fraction import Fraction
 from caspy.functions.function import Function1Arg
-from caspy.pattern_match import pmatch, pat_construct
 from caspy.numeric.numeric import Numeric
 from caspy.numeric.symbol import Symbol
 
@@ -55,8 +54,8 @@ class Sin(TrigFunc):
         super().__init__()
 
     def eval(self):
-        pat = pat_construct("a*pi", {"a": "const"})
-        pmatch_res, _ = pmatch(pat, self.arg)
+        pat = caspy.pattern_match.pat_construct("a*pi", {"a": "const"})
+        pmatch_res, _ = caspy.pattern_match.pmatch(pat, self.arg)
         if pmatch_res != {}:
             # Don't check against a_val as 0 == False
             a_val = pmatch_res["a"]
@@ -96,8 +95,8 @@ class Cos(TrigFunc):
         super().__init__()
 
     def eval(self):
-        pat = pat_construct("a*pi", {"a": "const"})
-        pmatch_res, _ = pmatch(pat, self.arg)
+        pat = caspy.pattern_match.pat_construct("a*pi", {"a": "const"})
+        pmatch_res, _ = caspy.pattern_match.pmatch(pat, self.arg)
         if pmatch_res != {}:
             # Don't check against a_val as 0 == False
             a_val = pmatch_res["a"]
