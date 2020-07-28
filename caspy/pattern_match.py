@@ -149,7 +149,9 @@ def pmatch(pat, expr):
                             logger.debug("Matching {} with {}".format(pat_sym_fact_name,expr_sym_fact))
                             if not isinstance(expr_sym_fact[0],caspy.functions.function.Function):
                                 continue
-                            if expr_sym_fact[0].fname == pat_sym_fact_name.fname:
+
+                            if expr_sym_fact[0].fname == pat_sym_fact_name.fname \
+                                    and expr_sym_fact[1] == pat_sym_fact_pow:
                                 # Matching term found, therefore pmatch the
                                 # funtion arguments
                                 logger.debug("RECURSING WITH {} AND {}".format(

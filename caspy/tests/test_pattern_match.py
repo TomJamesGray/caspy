@@ -19,7 +19,6 @@ def test_x_coeff(coeff):
     """Tests pattern matching with input a*x"""
     # Generate the pattern
     pat = pm.pat_construct("a*x", {"a": "const"})
-    print("Pattern exlcusive numeric? {}".format(pat.is_exclusive_numeric()))
     pmatch_res, _ = pm.pmatch(pat, p.parse("{}*x".format(coeff)))
     assert pmatch_res == {"a": coeff}
 
@@ -99,3 +98,15 @@ def test_pmatch_fn_args_rem():
     pat = pm.pat_construct("ln(a)", {"a": "rem"})
     pmatch_res, _ = pm.pmatch(pat, p.parse("ln(x+y)"))
     assert pmatch_res == {"a": p.parse("x+y")}
+
+
+def test_pmatch_fn_args_with_pow():
+    pat = pm.pat_construct("ln(a*x)^2", {"a": "const"})
+    pmatch_res, _ = pm.pmatch(pat, p.parse("ln(x)^2"))
+    assert pmatch_res == {"a": 1}
+
+
+def test_pmatch_fn_args_with_pow_non_match():
+    pat = pm.pat_construct("ln(a*x)^2", {"a": "const"})
+    pmatch_res, _ = pm.pmatch(pat, p.parse("ln(x)"))
+    assert pmatch_res == {}
