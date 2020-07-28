@@ -3,6 +3,8 @@ from copy import copy
 import caspy.numeric.numeric
 import caspy.pattern_match as pm
 import caspy.parsing.parser
+import caspy.functions.cas.differentiate as diff
+import caspy.functions.trigonometric as trig
 from caspy.functions.function import Function
 from caspy.printing import latex_numeric as ln
 
@@ -91,6 +93,32 @@ class Integrate(Function):
                 integrated_values.append(i)
                 # Go onto next term
                 continue
+
+            # Try integrating sin(___) term with a 'u' substitution
+            pat = pm.pat_construct("b*sin(a)", {"a": "rem","b":"const"})
+            numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
+            pmatch_res, _ = pm.pmatch(pat, numeric_wrapper)
+            if pmatch_res != {}:
+                logger.debug("Integrating sin object, pmatch_res {}".format(pmatch_res))
+                # Differentiate the argument of sin
+                diff_obj = diff.Differentiate(pmatch_res["a"])
+                derivative = diff_obj.eval()
+                if diff_obj.fully_diffed:
+                    derivative.simplify()
+                    if derivative.is_exclusive_numeric():
+                        term_val = caspy.numeric.numeric.Numeric(
+                            copy(pmatch_res["b"])*(-1)/derivative.frac_eval(),"number"
+                        )
+                        # Multiply cos(a) onto the numeric object by appending
+                        # it to the symbol
+                        cos_obj = trig.Cos(pmatch_res["a"])
+                        term_val.val[0].val.append([
+                            cos_obj,1
+                        ])
+                        integrated_values.append(i)
+                        tot += term_val
+                        continue
+
 
 
         new_val = []

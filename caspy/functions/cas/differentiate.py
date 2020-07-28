@@ -8,12 +8,14 @@ from caspy.printing import latex_numeric as ln
 
 logger = logging.getLogger(__name__)
 
+
 class Differentiate(Function):
     """Caspy function to differentiate a numeric object symbolically"""
     fname = "diff"
 
     def __init__(self, arg, wrt="x"):
         self.arg = arg
+        self.fully_diffed = False
         # Annoyingly the 'wrt' if provided will be a numeric object
         # so we need to extract the actual variable in question
         if type(wrt) == caspy.numeric.numeric.Numeric:
@@ -77,6 +79,7 @@ class Differentiate(Function):
 
         if new_val == []:
             # All terms have been integrated
+            self.fully_diffed = True
             return tot
         else:
             # Make a numeric object to store the non integrated terms
