@@ -54,6 +54,11 @@ class Symbol:
             # self.coeff *= other.coeff
             return self
 
+    def __truediv__(self, other):
+        if type(other) == Symbol:
+            self * other.recip()
+            return self
+
     def __pow__(self, power):
         """
         Raises this symbol to the power x

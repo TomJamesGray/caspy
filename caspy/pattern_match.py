@@ -8,9 +8,10 @@ const_non_zero - Numeric constant that can't be zero -> ConstPlaceholderNonZero
 coeff - Numeric symbol that can contain things that aren't numeric
         for instance if the pattern is a*x then if the expression is
         5*x*y*cos(z) a would be 5*y*cos(z) -> CoeffPlaceholder
-rem - Collects any terms that aren't used
+rem - Collects any terms that aren't used -> RemainingPlaceholder
 """
 import logging
+import copy
 import caspy.parsing
 import caspy.numeric.numeric
 import caspy.numeric.symbol
@@ -86,12 +87,15 @@ def pmatch(pat, expr):
             # Attempt to match this pattern sym with this expression sym
             # Initialise a blank symbol with value 1
             attempted_match_sym = caspy.numeric.symbol.Symbol(1,Fraction(1,1))
+            syms_added_from_pat = caspy.numeric.symbol.Symbol(1,Fraction(1,1))
             # Make a temporary dict to store the names of coefficients used
             # and their values in this attempt. If the symbols match then we
             # transfer these values to the actual out dict
             tmp_out = {}
+            unused_expression_factors_name = None
+            used_expression_factors = []
+            logger.error("Expr sym is {}".format(expr_sym))
             for (pat_sym_fact_name, pat_sym_fact_pow) in pat_sym.val:
-
                 if type(pat_sym_fact_name) == ConstPlaceholder:
                     tmp_out[pat_sym_fact_name.name] = expr_sym.coeff
                     # Multiply the attempted_match_sym by the coeff
@@ -99,13 +103,16 @@ def pmatch(pat, expr):
                     attempted_match_sym = attempted_match_sym * coeff_tmp_sym
                     logger.debug("Multiply coefficient {} onto match_sym".format(expr_sym.coeff))
                     used_terms.append(i)
+                    used_expression_factors.append(expr_sym.get_coeff_index())
 
                 elif type(pat_sym_fact_name) == RemainingPlaceholder:
                     # Set a flag so remaining terms will be included in out dict
                     # once all other terms have been matched
                     remaining_placeholder_name = pat_sym_fact_name.name
 
-                # TODO dealing with functions
+                elif type(pat_sym_fact_name) == CoeffPlaceholder:
+                    unused_expression_factors_name = pat_sym_fact_name.name
+
                 elif type(pat_sym_fact_name) == str:
                     if type(pat_sym_fact_pow) == caspy.numeric.numeric.Numeric:
                         if not does_numeric_contain_placeholders(pat_sym_fact_pow):
@@ -113,6 +120,13 @@ def pmatch(pat, expr):
                             # Can just multiply this term onto the match_sym val
                             attempted_match_sym.val.append([pat_sym_fact_name,
                                                             pat_sym_fact_pow])
+                            # Multiply this term onto syms_added_from_pat
+                            # so it won't appear twice if we are using a
+                            # CoeffPlaceholder
+                            syms_added_from_pat.val.append([
+                                pat_sym_fact_name,
+                                pat_sym_fact_pow])
+
                             logger.debug("Multiplying term {}^{} onto "
                                          "match_sym".format(pat_sym_fact_name,pat_sym_fact_pow))
                         else:
@@ -127,6 +141,7 @@ def pmatch(pat, expr):
                                     logger.debug("Recursed pmatch result {}".format(pmatch_res))
                                     tmp_out.update(pmatch_res)
                                     used_terms.append(i)
+                                    used_expression_factors.append(j)
                                     attempted_match_sym.val.append([
                                         pat_sym_fact_name,
                                         num_pow
@@ -174,8 +189,27 @@ def pmatch(pat, expr):
                                 ])
                                 break
 
+            # Use up remaining factors of the expression symbol if we have
+            # encountered a CoeffPlaceholder object
+            if unused_expression_factors_name is not None:
+                logger.debug("syms_added_from_pat {}".format(syms_added_from_pat))
+                logger.debug("Attempted match sym {}".format(attempted_match_sym))
+                unused_factors_prod = caspy.numeric.symbol.Symbol(1,Fraction(1,1))
+                for k, expression_factor in enumerate(expr_sym.val):
+                    if k not in used_expression_factors:
+                        unused_factors_prod.val.append(copy.deepcopy(expression_factor))
+
+                logger.debug("unused_factors_prod {}".format(unused_factors_prod))
+                unused_factors_prod = unused_factors_prod / copy.deepcopy(syms_added_from_pat)
+                unused_factors_prod.simplify()
+                logger.debug("Coeff val {}".format(unused_factors_prod))
+                tmp_out.update({
+                    unused_expression_factors_name:caspy.numeric.numeric.Numeric(unused_factors_prod,"sym_obj")
+                })
+                attempted_match_sym = attempted_match_sym * unused_factors_prod
+
             if attempted_match_sym == expr_sym and \
-                attempted_match_sym.coeff == expr_sym.coeff:
+                    attempted_match_sym.coeff == expr_sym.coeff:
                 logger.debug("Updating out dict")
                 # Have matched it successfully so can update the out dict
                 # TODO testing for when the same placeholder appears multiple
@@ -184,7 +218,7 @@ def pmatch(pat, expr):
                 break
             else:
                 logger.info("Can't update out dict "
-                             "attempted_match_sym {} == expr_sym {} returns  {}".format(
+                            "attempted_match_sym {} == expr_sym {} returns  {}".format(
                     attempted_match_sym,expr_sym,attempted_match_sym == expr_sym
                 ))
         attempted_match_sum = attempted_match_sum + \

@@ -110,3 +110,9 @@ def test_pmatch_fn_args_with_pow_non_match():
     pat = pm.pat_construct("ln(a*x)^2", {"a": "const"})
     pmatch_res, _ = pm.pmatch(pat, p.parse("ln(x)"))
     assert pmatch_res == {}
+
+
+def test_pmatch_coeff():
+    pat = pm.pat_construct("a*x", {"a": "coeff"})
+    pmatch_res, _ = pm.pmatch(pat, p.parse("x^2*y*z"))
+    assert pmatch_res == {"a": p.parse("x*y*z")}
