@@ -34,7 +34,7 @@ class Differentiate(Function):
             self.wrt = wrt
 
     def latex_format(self):
-        return "\\frac{{\mathrm{{d}}}}{{\mathrm{{d}}{}}} ({})".format(
+        return "\\frac{{\\mathrm{{d}}}}{{\\mathrm{{d}}{}}} ({})".format(
             self.wrt,ln.latex_numeric_str(self.arg)
         )
 
@@ -60,7 +60,7 @@ class Differentiate(Function):
             numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
             pmatch_res, _ = pm.pmatch(pat, numeric_wrapper)
             if pmatch_res != {}:
-                term_val = parser.parse("{} * {} ^ {}".format(
+                term_val = parser.parse("{} * {} ^ ({})".format(
                     copy(pmatch_res["a"]) * copy(pmatch_res["n"]),
                     self.wrt,
                     copy(pmatch_res["n"]) - 1
