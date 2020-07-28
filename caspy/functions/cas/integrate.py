@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class Integrate(Function):
-    """Function to integrate a numeric object symbolically"""
+    """Caspy function to integrate a numeric object symbolically"""
     fname = "integrate"
     latex_fname = "integrate"
 

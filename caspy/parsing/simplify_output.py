@@ -4,7 +4,7 @@ from lark import Transformer
 from caspy.numeric.numeric import Numeric
 from caspy.helpers import lark_transformer
 from caspy.functions import exponentials,trigonometric,other
-from caspy.functions.cas import expand,integrate
+from caspy.functions.cas import expand,integrate,differentiate
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,8 @@ fns = {
     "cos":lambda x:trigonometric.Cos(x),
     "sqrt":lambda x:other.Sqrt(x),
     "expand":lambda x:expand.Expand(x),
-    "integrate":lambda *args:integrate.Integrate(*args)
+    "integrate":lambda *args:integrate.Integrate(*args),
+    "diff":lambda *args:differentiate.Differentiate(*args)
 }
 
 
