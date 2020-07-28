@@ -116,3 +116,9 @@ def test_pmatch_coeff():
     pat = pm.pat_construct("a*x", {"a": "coeff"})
     pmatch_res, _ = pm.pmatch(pat, p.parse("x^2*y*z"))
     assert pmatch_res == {"a": p.parse("x*y*z")}
+
+
+def test_pmatch_coeff_with_const():
+    pat = pm.pat_construct("a*b*y/z", {"a": "const", "b":"coeff"})
+    pmatch_res, _ = pm.pmatch(pat, p.parse("5*sin(x)*y/z"))
+    assert pmatch_res == {"b": p.parse("sin(x)"), "a": 5}
