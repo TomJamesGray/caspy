@@ -87,3 +87,15 @@ def test_pmatch_fn_args():
     pat = pm.pat_construct("ln(a*x)", {"a": "const"})
     pmatch_res, _ = pm.pmatch(pat, p.parse("ln(3*x)"))
     assert pmatch_res == {"a": 3}
+
+
+def test_pmatch_fn_args_non_match():
+    pat = pm.pat_construct("ln(a*y)", {"a": "const"})
+    pmatch_res, _ = pm.pmatch(pat, p.parse("ln(3*x)"))
+    assert pmatch_res == {}
+
+
+def test_pmatch_fn_args_rem():
+    pat = pm.pat_construct("ln(a)", {"a": "rem"})
+    pmatch_res, _ = pm.pmatch(pat, p.parse("ln(x+y)"))
+    assert pmatch_res == {"a": p.parse("x+y")}
