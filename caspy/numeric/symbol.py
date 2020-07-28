@@ -336,6 +336,9 @@ class Symbol:
         for (sym_name,sym_pow) in self.val:
             if sym_name == x:
                 return True
+            if type(sym_name) == num.Numeric:
+                if sym_name.has_variable_in(x):
+                    return True
             if type(sym_pow) == num.Numeric:
                 if sym_pow.has_variable_in(x):
                     return True
