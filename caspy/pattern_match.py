@@ -178,7 +178,7 @@ def pmatch(pat, expr):
                                 logger.debug("Recursed pmatch result {}".format(pmatch_res))
                                 tmp_out.update(pmatch_res)
                                 used_terms.append(i)
-
+                                used_expression_factors.append(j)
                                 # TODO maybe define fns dict somewhere else
                                 if expr_sym_fact[0].fname in caspy.parsing.simplify_output.fns:
                                     new_fn_obj = caspy.parsing.simplify_output.fns[expr_sym_fact[0].fname](

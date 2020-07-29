@@ -95,7 +95,7 @@ class Integrate(Function):
                 continue
 
             # Try integrating sin(___) term with a 'u' substitution
-            pat = pm.pat_construct("b*sin(a)", {"a": "rem","b":"const"})
+            pat = pm.pat_construct("b*sin(a)", {"a": "rem","b":"coeff"})
             numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
             pmatch_res, _ = pm.pmatch(pat, numeric_wrapper)
             if pmatch_res != {}:
@@ -105,9 +105,11 @@ class Integrate(Function):
                 derivative = diff_obj.eval()
                 if diff_obj.fully_diffed:
                     derivative.simplify()
-                    if derivative.is_exclusive_numeric():
+                    val_coeff = pmatch_res["b"] / derivative
+                    val_coeff.simplify()
+                    if val_coeff.is_exclusive_numeric():
                         term_val = caspy.numeric.numeric.Numeric(
-                            copy(pmatch_res["b"])*(-1)/derivative.frac_eval(),"number"
+                            val_coeff.frac_eval()*(-1),"number"
                         )
                         # Multiply cos(a) onto the numeric object by appending
                         # it to the symbol
@@ -118,8 +120,6 @@ class Integrate(Function):
                         integrated_values.append(i)
                         tot += term_val
                         continue
-
-
 
         new_val = []
         # Remove integrated values from the arg property
