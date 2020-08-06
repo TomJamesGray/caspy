@@ -1,12 +1,26 @@
-from caspy.numeric.symbol import Symbol
 from caspy.tests.test_symbolic import p
 
 
-# def test_try_replace_numeric():
-#     tst_sym = p.parse("sin(x^2)").val[0]
-#     replace = p.parse("")
-#     replaced_obj = tst_sym.try_replace_numeric_with_var(replace,"u")
-#     assert replaced_obj == p.parse("sin(u)")
+def test_try_replace_numeric():
+    tst_sym = p.parse("x^4").val[0]
+    replace = p.parse("x^2")
+    replaced_obj = tst_sym.try_replace_numeric_with_var(replace,"u")
+    assert replaced_obj == p.parse("u^2")
+
+
+def test_try_replace_numeric_with_func():
+    tst_sym = p.parse("x^4*sin(x^2)").val[0]
+    replace = p.parse("x^2")
+    replaced_obj = tst_sym.try_replace_numeric_with_var(replace,"u")
+    assert replaced_obj == p.parse("sin(u)*u^2")
+
+
+def test_try_replace_numeric_polyn():
+    tst_num = p.parse("(x+1)^3")
+    replace = p.parse("x+1")
+    replaced_obj = tst_num.try_replace_numeric_with_var(replace,"u")
+    assert replaced_obj == p.parse("u^3")
+
 
 def test_get_variables_in_func():
     num = p.parse("x*sin(u)")
