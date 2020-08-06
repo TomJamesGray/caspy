@@ -1,6 +1,7 @@
 import logging
 from copy import copy
 import caspy.numeric.numeric
+import caspy.numeric.symbol
 import caspy.pattern_match as pm
 import caspy.parsing.parser
 import caspy.functions.cas.differentiate as diff
@@ -39,6 +40,25 @@ class Integrate(Function):
 
     def latex_format(self):
         return "\\int {} \\mathrm{{d}}{}".format(ln.latex_numeric_str(self.arg),self.wrt)
+
+    def u_sub_int(self, u, integrand):
+        """
+        Try's to integrate a symbol using a u substitution
+        :param u: substitution to make - Numeric object
+        :param integrand: numeric object to integrate
+        :return: Numeric object
+        """
+        diff_obj = diff.Differentiate(u,self.wrt)
+        derivative = diff_obj.eval()
+        if diff_obj.fully_diffed:
+            derivative.simplify()
+            new_val = integrand / derivative
+            new_val.simplify()
+            # Need to try and replace the occurrences of u in terms of with
+            # respect to self.wrt with another variable. So if u = x^2 then
+            # sin(x^2) --> sin(u)
+            new_val_with_u = caspy.numeric.symbol.Symbol(1,new_val.coeff)
+
 
     def eval(self):
         """
@@ -121,6 +141,32 @@ class Integrate(Function):
                         tot += term_val
                         continue
 
+            # Try integrating sin(___) term with a 'u' substitution
+            pat = pm.pat_construct("b*cos(a)", {"a": "rem", "b": "coeff"})
+            numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
+            pmatch_res, _ = pm.pmatch(pat, numeric_wrapper)
+            if pmatch_res != {}:
+                logger.debug("Integrating sin object, pmatch_res {}".format(pmatch_res))
+                # Differentiate the argument of sin
+                diff_obj = diff.Differentiate(pmatch_res["a"])
+                derivative = diff_obj.eval()
+                if diff_obj.fully_diffed:
+                    derivative.simplify()
+                    val_coeff = pmatch_res["b"] / derivative
+                    val_coeff.simplify()
+                    if val_coeff.is_exclusive_numeric():
+                        term_val = caspy.numeric.numeric.Numeric(
+                            val_coeff.frac_eval(), "number"
+                        )
+                        # Multiply cos(a) onto the numeric object by appending
+                        # it to the symbol
+                        cos_obj = trig.Sin(pmatch_res["a"])
+                        term_val.val[0].val.append([
+                            cos_obj, 1
+                        ])
+                        integrated_values.append(i)
+                        tot += term_val
+                        continue
         new_val = []
         # Remove integrated values from the arg property
         for j,term_val in enumerate(self.arg.val):

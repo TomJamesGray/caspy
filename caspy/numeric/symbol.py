@@ -1,4 +1,5 @@
 import logging
+import copy
 import caspy.pattern_match
 import caspy.numeric.numeric as num
 import caspy.functions.function as funcs
@@ -305,6 +306,42 @@ class Symbol:
                 self.val[i][0].arg = self.val[i][0].arg.replace(x, y)
 
         return self
+
+    def try_replace_numeric_with_var(self, x, y):
+        """
+        Trys to replace some term (x) in this symbol with another variable. For
+        instance we could try and replace the term x^2 in the symbol sin(x^2)
+        with a variable u. So sin(x^2) would become sin(u)
+        :param x: Numeric object
+        :param y: String
+        :return: Another numeric object if it has been successful, otherwise None
+        """
+        new_val = num.Numeric(0, "number")
+        new_sym = copy.deepcopy(self)
+        new_sym_list = []
+        for (sym_fact_name, sym_fact_pow) in new_sym.val:
+            if isinstance(sym_fact_name,funcs.Function):
+                # deal with the function argument
+                sym_fact_name.arg = sym_fact_name.arg.try_replace_numeric_with_var(x, y)
+
+    def get_variables_in(self):
+        """
+        Makes a set of all the variable names that are in this symbol
+        :return: Set
+        """
+        vars_in = set()
+        for (sym_fact_name,sym_fact_pow) in self.val:
+            if type(sym_fact_name) == str:
+                vars_in.add(sym_fact_name)
+            elif type(sym_fact_name) == caspy.numeric.numeric.Numeric:
+                vars_in = vars_in.union(sym_fact_name.get_variables_in())
+            elif isinstance(sym_fact_name, funcs.Function):
+                vars_in = vars_in.union(sym_fact_name.arg.get_variables_in())
+
+            if type(sym_fact_pow) == caspy.numeric.numeric.Numeric:
+                vars_in = vars_in.union(sym_fact_pow.get_variables_in())
+
+        return vars_in
 
     def contains_sym(self, x) -> bool:
         """

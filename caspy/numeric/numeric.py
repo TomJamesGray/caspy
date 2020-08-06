@@ -250,6 +250,31 @@ class Numeric(Generic[Num]):
             sym.replace(x,y)
         return self
 
+    def try_replace_numeric_with_var(self, x, y):
+        """
+        Trys to replace some term (x) in this symbol with another variable. For
+        instance we could try and replace the term x^2 in the symbol sin(x^2)
+        with a variable u. So sin(x^2) would become sin(u)
+        :param x: Numeric object
+        :param y: String
+        :return: Another numeric object if it has been successful, otherwise None
+        """
+        new_val = Numeric(0,"number")
+        for sym in self.val:
+            new_val += sym.try_replace_numeric_with_var(x,y)
+        return new_val
+
+    def get_variables_in(self):
+        """
+        Makes a set of all the variable names that are in this symbol
+        :return: Set
+        """
+        vars_in = set()
+        for sym in self.val:
+            vars_in = vars_in.union(sym.get_variables_in())
+
+        return vars_in
+
     def is_zero(self) -> bool:
         """Checks if this numeric object is equal to zero"""
         for sym in self.val:
