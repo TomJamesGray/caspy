@@ -19,6 +19,7 @@ class Integrate(Function):
 
     def __init__(self, arg, wrt="x"):
         self.arg = arg
+        self.fully_integrated = False
         # Annoyingly the 'wrt' if provided will be a numeric object
         # so we need to extract the actual variable in question
         if type(wrt) == caspy.numeric.numeric.Numeric:
@@ -54,11 +55,20 @@ class Integrate(Function):
             derivative.simplify()
             new_val = integrand / derivative
             new_val.simplify()
+            logger.warning("New val is {}".format(new_val))
             # Need to try and replace the occurrences of u in terms of with
             # respect to self.wrt with another variable. So if u = x^2 then
             # sin(x^2) --> sin(u)
-            new_val_with_u = caspy.numeric.symbol.Symbol(1,new_val.coeff)
-
+            logger.warning("Replacing with {}".format(u))
+            replaced_obj = new_val.try_replace_numeric_with_var(u,"u")
+            logger.warning("Replaced obj is {}".format(replaced_obj))
+            if replaced_obj is not None:
+                # Try and integrate replaced_obj wrt to u
+                subbed_int = Integrate(replaced_obj,"u")
+                int_result = subbed_int.eval()
+                if subbed_int.fully_integrated:
+                    return int_result
+        return None
 
     def eval(self):
         """
@@ -114,34 +124,36 @@ class Integrate(Function):
                 # Go onto next term
                 continue
 
+            # Try matching simple sin terms like sin(ax+b)
+            pat = pm.pat_construct("a*sin(b*{}+c)".format(self.wrt),
+                                   {"a": "const", "b": "const", "c": "const"})
+            numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
+            pmatch_res, _ = pm.pmatch(pat, numeric_wrapper)
+            if pmatch_res != {}:
+                logger.debug("Integrating simple linear sin term")
+                term_val = parser.parse("{} * cos({}*{}+{})".format(
+                    copy(pmatch_res["a"])*(-1)/copy(pmatch_res["b"]), pmatch_res["b"],
+                    self.wrt, pmatch_res.get("c",0)
+                ))
+                tot += term_val
+                integrated_values.append(i)
+                continue
+
             # Try integrating sin(___) term with a 'u' substitution
             pat = pm.pat_construct("b*sin(a)", {"a": "rem","b":"coeff"})
             numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
             pmatch_res, _ = pm.pmatch(pat, numeric_wrapper)
             if pmatch_res != {}:
-                logger.debug("Integrating sin object, pmatch_res {}".format(pmatch_res))
-                # Differentiate the argument of sin
-                diff_obj = diff.Differentiate(pmatch_res["a"])
-                derivative = diff_obj.eval()
-                if diff_obj.fully_diffed:
-                    derivative.simplify()
-                    val_coeff = pmatch_res["b"] / derivative
-                    val_coeff.simplify()
-                    if val_coeff.is_exclusive_numeric():
-                        term_val = caspy.numeric.numeric.Numeric(
-                            val_coeff.frac_eval()*(-1),"number"
-                        )
-                        # Multiply cos(a) onto the numeric object by appending
-                        # it to the symbol
-                        cos_obj = trig.Cos(pmatch_res["a"])
-                        term_val.val[0].val.append([
-                            cos_obj,1
-                        ])
-                        integrated_values.append(i)
-                        tot += term_val
-                        continue
+                logger.warning("Integrating sin object with u sub, pmatch_res {}".format(pmatch_res))
 
-            # Try integrating sin(___) term with a 'u' substitution
+                u_subbed = self.u_sub_int(pmatch_res["a"],numeric_wrapper)
+                if u_subbed is not None:
+                    logger.warning("U sub integral worked")
+                    tot += u_subbed
+                    integrated_values.append(i)
+                    continue
+
+            # Try integrating cos(___) term with a 'u' substitution
             pat = pm.pat_construct("b*cos(a)", {"a": "rem", "b": "coeff"})
             numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
             pmatch_res, _ = pm.pmatch(pat, numeric_wrapper)
@@ -167,6 +179,7 @@ class Integrate(Function):
                         integrated_values.append(i)
                         tot += term_val
                         continue
+
         new_val = []
         # Remove integrated values from the arg property
         for j,term_val in enumerate(self.arg.val):
@@ -175,6 +188,7 @@ class Integrate(Function):
 
         if new_val == []:
             # All terms have been integrated
+            self.fully_integrated = True
             return tot
         else:
             # Make a numeric object to store the non integrated terms

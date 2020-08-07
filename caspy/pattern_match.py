@@ -170,13 +170,13 @@ def pmatch(pat, expr):
                                     and expr_sym_fact[1] == pat_sym_fact_pow:
                                 # Matching term found, therefore pmatch the
                                 # funtion arguments
-                                logger.warning("RECURSING WITH {} AND {}".format(
+                                logger.info("Recursing with {} and {}".format(
                                     pat_sym_fact_name.arg, expr_sym_fact[0].arg
                                 ))
                                 pmatch_res, pmatch_res_arg = pmatch(
                                     pat_sym_fact_name.arg, expr_sym_fact[0].arg
                                 )
-                                logger.warning("Recursed pmatch result {} resulting arg {}".format(
+                                logger.info("Recursed pmatch result {} resulting arg {}".format(
                                     pmatch_res,pmatch_res_arg))
 
                                 tmp_out.update(pmatch_res)

@@ -15,6 +15,13 @@ def test_try_replace_numeric_with_func():
     assert replaced_obj == p.parse("sin(u)*u^2")
 
 
+def test_try_replace_numeric_with_func_2():
+    tst_sym = p.parse("sin(x^2)")
+    replace = p.parse("x^2")
+    replaced_obj = tst_sym.try_replace_numeric_with_var(replace,"u")
+    assert replaced_obj == p.parse("sin(u)")
+
+
 def test_try_replace_numeric_polyn():
     tst_num = p.parse("(x+1)^3")
     replace = p.parse("x+1")

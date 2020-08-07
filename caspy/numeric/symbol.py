@@ -316,9 +316,9 @@ class Symbol:
         :param y: String
         :return: Another numeric object if it has been successful, otherwise None
         """
-        MAX_DIVS = 10
-        MAX_MULTS = 10
-
+        MAX_DIVS = 2
+        MAX_MULTS = 2
+        logger.warning("SUBS")
         vars_to_remove = x.get_variables_in()
         sym_args_done = copy.deepcopy(self)
         for (sym_fact_name, sym_fact_pow) in sym_args_done.val:
@@ -326,7 +326,13 @@ class Symbol:
                 # deal with the function argument
                 result = sym_fact_name.arg.try_replace_numeric_with_var(x, y)
                 if result is not None:
+                    logger.warning("SUBS DONE")
                     sym_fact_name.arg = result
+
+        if sym_args_done.get_variables_in().intersection(vars_to_remove) == set():
+            # Don't need to try multiplication or division on this as it is
+            # already done
+            return caspy.numeric.numeric.Numeric(sym_args_done,"sym_obj")
 
         sym_try_divs = copy.deepcopy(sym_args_done)
         # Try repeated division to remove the numeric object in question
