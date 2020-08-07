@@ -50,6 +50,20 @@ def test_pmatch_x_exp():
     assert pmatch_res == {"a": 3}
 
 
+def test_pmatch_linear_sin_arg():
+    pat = pm.pat_construct("a*sin(b*x+c)",
+                           {"a": "const", "b": "const", "c": "const"})
+    pmatch_res, _ = pm.pmatch(pat, p.parse("2*sin(3*x+10)"))
+    assert pmatch_res == {"a": 2, "b": 3, "c": 10}
+
+
+def test_recursion_return_part():
+    pat = pm.pat_construct("b*x+c",
+                           {"b": "const", "c": "const"})
+    pmatch_res, pmatch_res_2 = pm.pmatch(pat, p.parse("x"))
+    assert pmatch_res_2 == p.parse("x")
+
+
 def test_pmatch_exp():
     pat = pm.pat_construct("e^a", {"a": "const"})
     pmatch_res, _ = pm.pmatch(pat, p.parse("e^3"))

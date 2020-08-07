@@ -83,6 +83,7 @@ def pmatch(pat, expr):
 
     attempted_match_sum = caspy.numeric.numeric.Numeric(0,"number")
     for pat_sym in pat.val:
+        sym_done = False
         for i, expr_sym in enumerate(expr.val):
             # Attempt to match this pattern sym with this expression sym
             # Initialise a blank symbol with value 1
@@ -94,7 +95,7 @@ def pmatch(pat, expr):
             tmp_out = {}
             unused_expression_factors_name = None
             used_expression_factors = []
-            logger.error("Expr sym is {}".format(expr_sym))
+            logger.debug("Expr sym is {}".format(expr_sym))
             for (pat_sym_fact_name, pat_sym_fact_pow) in pat_sym.val:
                 if type(pat_sym_fact_name) == ConstPlaceholder:
                     tmp_out[pat_sym_fact_name.name] = expr_sym.coeff
@@ -169,13 +170,15 @@ def pmatch(pat, expr):
                                     and expr_sym_fact[1] == pat_sym_fact_pow:
                                 # Matching term found, therefore pmatch the
                                 # funtion arguments
-                                logger.debug("RECURSING WITH {} AND {}".format(
+                                logger.warning("RECURSING WITH {} AND {}".format(
                                     pat_sym_fact_name.arg, expr_sym_fact[0].arg
                                 ))
                                 pmatch_res, pmatch_res_arg = pmatch(
                                     pat_sym_fact_name.arg, expr_sym_fact[0].arg
                                 )
-                                logger.debug("Recursed pmatch result {}".format(pmatch_res))
+                                logger.warning("Recursed pmatch result {} resulting arg {}".format(
+                                    pmatch_res,pmatch_res_arg))
+
                                 tmp_out.update(pmatch_res)
                                 used_terms.append(i)
                                 used_expression_factors.append(j)
@@ -215,14 +218,18 @@ def pmatch(pat, expr):
                 # TODO testing for when the same placeholder appears multiple
                 # times in patter, ie stuff like a*x^2 + a*y^2
                 out.update(tmp_out)
+                # Break out of this loop as the symbol has been matched
+                sym_done = True
                 break
             else:
                 logger.info("Can't update out dict "
                             "attempted_match_sym {} == expr_sym {} returns  {}".format(
                     attempted_match_sym,expr_sym,attempted_match_sym == expr_sym
                 ))
-        attempted_match_sum = attempted_match_sum + \
-                              caspy.numeric.numeric.Numeric(attempted_match_sym,"sym_obj")
+
+        if sym_done:
+            attempted_match_sum = attempted_match_sum + \
+                                  caspy.numeric.numeric.Numeric(attempted_match_sym,"sym_obj")
 
     if remaining_placeholder_name is not None:
         remaining_numeric_obj = caspy.numeric.numeric.Numeric(0,"number")
