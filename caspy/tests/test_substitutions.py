@@ -10,7 +10,7 @@ def test_try_replace_numeric():
     assert replaced_obj == p.parse("u^2")
 
 
-def test_try_replace_numeric_with_func_xx():
+def test_try_replace_numeric_with_func():
     tst_sym = p.parse("x^4*sin(x^2)").val[0]
     replace = p.parse("x^2")
     var_obj = caspy.numeric.numeric.Numeric("u", "sym")

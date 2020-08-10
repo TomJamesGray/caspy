@@ -341,7 +341,7 @@ class Symbol:
             logger.info("New sym num {} vars {} x {}".format(new_sym_num,new_sym_num.get_variables_in(),x))
             if new_sym_num.get_variables_in().intersection(vars_to_remove) == set():
                 power = caspy.numeric.numeric.Numeric(i,"number")
-                new_sym_num * (y ** power)
+                new_sym_num * (copy.deepcopy(y) ** power)
                 return new_sym_num
 
         # Try repeated multiplication to remove the numeric object
@@ -353,7 +353,7 @@ class Symbol:
             logger.info("New sym num {} vars {} x {}".format(new_sym_num,new_sym_num.get_variables_in(),x))
             if new_sym_num.get_variables_in().intersection(vars_to_remove) == set():
                 power = caspy.numeric.numeric.Numeric(i,"number")
-                new_sym_num / (y ** power)
+                new_sym_num / (copy.deepcopy(y) ** power)
                 return new_sym_num
 
         # Haven't been able to replace the numeric with the variable
