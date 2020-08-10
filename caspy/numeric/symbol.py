@@ -313,20 +313,18 @@ class Symbol:
         instance we could try and replace the term x^2 in the symbol sin(x^2)
         with a variable u. So sin(x^2) would become sin(u)
         :param x: Numeric object
-        :param y: String
+        :param y: Numeric object
         :return: Another numeric object if it has been successful, otherwise None
         """
-        MAX_DIVS = 2
-        MAX_MULTS = 2
-        logger.warning("SUBS")
+        MAX_DIVS = 10
+        MAX_MULTS = 10
         vars_to_remove = x.get_variables_in()
         sym_args_done = copy.deepcopy(self)
         for (sym_fact_name, sym_fact_pow) in sym_args_done.val:
             if isinstance(sym_fact_name,funcs.Function):
                 # deal with the function argument
-                result = sym_fact_name.arg.try_replace_numeric_with_var(x, y)
+                result = sym_fact_name.arg.try_replace_numeric_with_var(x, copy.deepcopy(y))
                 if result is not None:
-                    logger.warning("SUBS DONE")
                     sym_fact_name.arg = result
 
         if sym_args_done.get_variables_in().intersection(vars_to_remove) == set():
@@ -342,10 +340,8 @@ class Symbol:
             new_sym_num.simplify()
             logger.info("New sym num {} vars {} x {}".format(new_sym_num,new_sym_num.get_variables_in(),x))
             if new_sym_num.get_variables_in().intersection(vars_to_remove) == set():
-                y_pow_obj = caspy.numeric.numeric.Numeric(y,"sym")
                 power = caspy.numeric.numeric.Numeric(i,"number")
-                y_pow_obj ** power
-                new_sym_num * y_pow_obj
+                new_sym_num * (y ** power)
                 return new_sym_num
 
         # Try repeated multiplication to remove the numeric object
@@ -356,10 +352,8 @@ class Symbol:
             new_sym_num.simplify()
             logger.info("New sym num {} vars {} x {}".format(new_sym_num,new_sym_num.get_variables_in(),x))
             if new_sym_num.get_variables_in().intersection(vars_to_remove) == set():
-                y_pow_obj = caspy.numeric.numeric.Numeric(y,"sym")
                 power = caspy.numeric.numeric.Numeric(i,"number")
-                y_pow_obj ** power
-                new_sym_num / y_pow_obj
+                new_sym_num / (y ** power)
                 return new_sym_num
 
         # Haven't been able to replace the numeric with the variable

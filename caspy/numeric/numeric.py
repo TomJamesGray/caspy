@@ -256,12 +256,12 @@ class Numeric(Generic[Num]):
         instance we could try and replace the term x^2 in the symbol sin(x^2)
         with a variable u. So sin(x^2) would become sin(u)
         :param x: Numeric object
-        :param y: String
+        :param y: Numeric object
         :return: Another numeric object if it has been successful, otherwise None
         """
         new_val = Numeric(0,"number")
         for sym in self.val:
-            new_val += sym.try_replace_numeric_with_var(x,y)
+            new_val += sym.try_replace_numeric_with_var(x, copy.deepcopy(y))
         return new_val
 
     def get_variables_in(self):
