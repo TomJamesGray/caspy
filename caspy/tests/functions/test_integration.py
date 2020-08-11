@@ -25,5 +25,9 @@ def test_int_sin():
     assert p.parse("integrate(sin(x))") == p.parse("-cos(x)")
 
 
+def test_int_cos():
+    assert p.parse("integrate(cos(x))") == p.parse("sin(x)")
+
+
 def test_u_sub_int():
     assert p.parse("integrate(x*sin(x^2))") == p.parse("-cos(x^2)/2")
