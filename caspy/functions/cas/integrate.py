@@ -141,6 +141,21 @@ class Integrate(Function):
                 integrated_values.append(i)
                 continue
 
+            # Try matching simple sin terms like cos(ax+b)
+            pat = pm.pat_construct("a*cos(b*{}+c)".format(self.wrt),
+                                   {"a": "const", "b": "const", "c": "const"})
+            numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
+            pmatch_res, _ = pm.pmatch(pat, numeric_wrapper)
+            if pmatch_res != {}:
+                logger.debug("Integrating simple linear cos term")
+                term_val = parser.parse("{} * sin({}*{}+{})".format(
+                    copy(pmatch_res["a"]) / copy(pmatch_res["b"]), pmatch_res["b"],
+                    self.wrt, pmatch_res.get("c", 0)
+                ))
+                tot += term_val
+                integrated_values.append(i)
+                continue
+
             # Try integrating sin(___) term with a 'u' substitution
             pat = pm.pat_construct("b*sin(a)", {"a": "rem","b":"coeff"})
             numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
