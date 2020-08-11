@@ -4,6 +4,7 @@ import caspy.numeric.numeric
 import caspy.pattern_match as pm
 import caspy.parsing.parser
 from caspy.functions.function import Function
+import caspy.functions.trigonometric as trig
 from caspy.printing import latex_numeric as ln
 
 logger = logging.getLogger(__name__)
@@ -70,6 +71,28 @@ class Differentiate(Function):
                 tot += term_val
                 diffed_values.append(i)
                 continue
+
+            # Try diffing sin terms
+            pat = pm.pat_construct("A1*sin(A2)", {"A1": "const", "A2": "rem"})
+            numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
+            pmatch_res, _ = pm.pmatch(pat, numeric_wrapper)
+            if pmatch_res != {}:
+                logger.debug("Differentiating sin term")
+                # Diff the argument
+                d_obj = Differentiate(pmatch_res["A2"])
+                derivative = d_obj.eval()
+                if d_obj.fully_diffed:
+                    numeric_coeff = caspy.numeric.numeric.Numeric(
+                        pmatch_res["A1"], "number"
+                    )
+                    term_val = numeric_coeff * derivative
+                    # Multiply the cos function onto the term value
+                    term_val.val[0].val.append([
+                        trig.Cos(pmatch_res["A2"]), 1
+                    ])
+                    tot += term_val
+                    diffed_values.append(i)
+                    continue
 
         new_val = []
         # Remove integrated values from the arg property
