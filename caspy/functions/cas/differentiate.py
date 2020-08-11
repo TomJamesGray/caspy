@@ -82,14 +82,14 @@ class Differentiate(Function):
                 d_obj = Differentiate(pmatch_res["A2"])
                 derivative = d_obj.eval()
                 if d_obj.fully_diffed:
+                    derivative.simplify()
                     numeric_coeff = caspy.numeric.numeric.Numeric(
                         pmatch_res["A1"], "number"
                     )
-                    term_val = numeric_coeff * derivative
-                    # Multiply the cos function onto the term value
-                    term_val.val[0].val.append([
-                        trig.Cos(pmatch_res["A2"]), 1
-                    ])
+                    cos_obj = caspy.numeric.numeric.Numeric(
+                        trig.Cos(pmatch_res["A2"]), "sym"
+                    )
+                    term_val = numeric_coeff * derivative * cos_obj
                     tot += term_val
                     diffed_values.append(i)
                     continue

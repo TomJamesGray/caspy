@@ -15,3 +15,6 @@ def test_diff_polyn(a, b, c):
 def test_diff_x_pow(n):
     assert p.parse("diff(x^({}))".format(n)) == p.parse("{}*x^({})".format(n, n-1))
 
+
+def test_diff_sin():
+    assert p.parse("diff(sin(x))") == p.parse("cos(x)")
