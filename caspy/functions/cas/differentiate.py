@@ -25,7 +25,7 @@ class Differentiate(Function):
                                 "multiple symbols")
             else:
                 set_wrt = False
-                for (sym_fact_name,sym_fact_pow) in wrt.val[0].val:
+                for (sym_fact_name, sym_fact_pow) in wrt.val[0].val:
                     if type(sym_fact_name) == str:
                         if not set_wrt:
                             self.wrt = sym_fact_name
@@ -94,6 +94,28 @@ class Differentiate(Function):
                     diffed_values.append(i)
                     continue
 
+            # Try diffing cos terms
+            pat = pm.pat_construct("A1*cos(A2)", {"A1": "const", "A2": "rem"})
+            numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
+            pmatch_res, _ = pm.pmatch(pat, numeric_wrapper)
+            if pmatch_res != {}:
+                logger.debug("Differentiating cos term")
+                # Diff the argument
+                d_obj = Differentiate(pmatch_res["A2"])
+                derivative = d_obj.eval()
+                if d_obj.fully_diffed:
+                    derivative.simplify()
+                    numeric_coeff = caspy.numeric.numeric.Numeric(
+                        pmatch_res["A1"], "number"
+                    ).neg()
+                    cos_obj = caspy.numeric.numeric.Numeric(
+                        trig.Sin(pmatch_res["A2"]), "sym"
+                    )
+                    term_val = numeric_coeff * derivative * cos_obj
+                    tot += term_val
+                    diffed_values.append(i)
+                    continue
+        
         new_val = []
         # Remove integrated values from the arg property
         for j, term_val in enumerate(self.arg.val):
