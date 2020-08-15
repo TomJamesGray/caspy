@@ -1,6 +1,6 @@
 import hypothesis.strategies as st
 from caspy.tests.test_symbolic import p
-from hypothesis import given, settings
+from hypothesis import given
 
 
 @given(st.floats(min_value=-1000, max_value=1000),
@@ -18,3 +18,7 @@ def test_diff_x_pow(n):
 
 def test_diff_sin():
     assert p.parse("diff(sin(x))") == p.parse("cos(x)")
+
+
+def test_diff_cos():
+    assert p.parse("diff(cos(x))") == p.parse("-sin(x)")

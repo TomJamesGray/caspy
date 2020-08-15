@@ -16,7 +16,7 @@ class Ln(Function1Arg):
 
     def eval(self):
         pat = caspy.pattern_match.pat_construct("e^a", {"a": "const"})
-        pmatch_res,_ = caspy.pattern_match.pmatch(pat,self.arg)
+        pmatch_res, _ = caspy.pattern_match.pmatch(pat, self.arg)
 
         if pmatch_res != {}:
             logger.debug("Pmatch result {}".format(pmatch_res))
