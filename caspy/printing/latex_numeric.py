@@ -20,6 +20,8 @@ def latex_numeric_str(x):
                 continue
             elif sym.coeff.den == 1:
                 out += "{}".format(to_int(sym.coeff.num))
+            elif sym.coeff.den == -1:
+                out += "{}".format(to_int(sym.coeff.num * -1))
             else:
                 out += "\\frac{{{}}}{{{}}}".format(to_int(sym.coeff.num), to_int(sym.coeff.den))
         elif sym.val == [[1,1]]:

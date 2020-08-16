@@ -34,6 +34,8 @@ class Fraction(Generic[Frac]):
     def __repr__(self):
         if self.den == 1:
             return str(self.num)
+        elif self.den == -1:
+            return str(self.num * -1)
         else:
             return "{}/{}".format(self.num, self.den)
 
