@@ -1,10 +1,11 @@
 import logging
-from copy import copy
+from copy import copy,deepcopy
 import caspy.numeric.numeric
 import caspy.numeric.symbol
 import caspy.pattern_match as pm
 import caspy.parsing.parser
 import caspy.functions.cas.differentiate as diff
+import caspy.functions.cas.expand as expand
 import caspy.functions.trigonometric as trig
 from caspy.functions.function import Function
 from caspy.printing import latex_numeric as ln
@@ -196,6 +197,18 @@ class Integrate(Function):
                         integrated_values.append(i)
                         tot += term_val
                         continue
+
+
+            # Try expanding the symbol then integrating
+            sym_numeric = caspy.numeric.numeric.Numeric(deepcopy(sym),"sym_obj")
+            expand_obj = expand.Expand(sym_numeric)
+            expanded = expand_obj.eval()
+            integ_exp = Integrate(expanded,self.wrt)
+            new_integral = integ_exp.eval()
+            if integ_exp.fully_integrated:
+                integrated_values.append(i)
+                tot += new_integral
+                continue
 
         new_val = []
         # Remove integrated values from the arg property
