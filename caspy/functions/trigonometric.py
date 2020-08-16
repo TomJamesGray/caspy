@@ -110,3 +110,24 @@ class Cos(TrigFunc):
             # TODO somehow add handling for case a=0 in pattern matching
             return Numeric(1,"number")
         return Numeric(Symbol(self, Fraction(1, 1)), "sym_obj")
+
+
+class Tan(TrigFunc):
+    fname = "tan"
+    latex_fname = "\\tan"
+
+    def __init__(self, x):
+        self.arg = x
+        super().__init__()
+
+    def eval(self):
+        """Evaluates the tan function by computing sin(x)/cos(x)"""
+        pat = caspy.pattern_match.pat_construct("A1*pi", {"A1": "const"})
+        pmatch_res, _ = caspy.pattern_match.pmatch(pat, self.arg)
+        if pmatch_res != {}:
+            sin_x = Sin(self.arg).eval()
+            cos_x = Cos(self.arg).eval()
+            if sin_x.is_exclusive_numeric() and cos_x.is_exclusive_numeric():
+                return sin_x / cos_x
+
+        return super().eval()
