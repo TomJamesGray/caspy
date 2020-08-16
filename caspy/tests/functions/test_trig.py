@@ -28,6 +28,16 @@ cos_pi_coeffs = [
     [Fraction(0, 1), "1"]
 ]
 
+tan_pi_coeffs = [
+    [Fraction(1, 3), "sqrt(3)"],
+    [Fraction(2, 3), "-sqrt(3)"],
+    [Fraction(1, 4), "1"],
+    [Fraction(3, 4), "-1"],
+    [Fraction(1, 6), "1/sqrt(3)"],
+    [Fraction(5, 6), "-1/sqrt(3)"],
+    [Fraction(1, 1), "0"],
+    [Fraction(0, 1), "0"]
+]
 
 # Default deadline is reached on travis, so increase it
 @settings(deadline=timedelta(milliseconds=500))
@@ -64,6 +74,14 @@ def test_cos_periodicity(pair, period):
 
 
 @settings(deadline=timedelta(milliseconds=500))
+@given(st.sampled_from(tan_pi_coeffs), st.integers(min_value=-1000, max_value=1000))
+def test_tan_periodicity(pair, period):
+    """Test tan has period 2pi"""
+    assert latex_eval("tan({}*pi + {}*pi)".format(pair[0], 2 * period)) == \
+           latex_eval(pair[1])
+
+
+@settings(deadline=timedelta(milliseconds=500))
 @given(st.sampled_from(cos_pi_coeffs), st.integers(min_value=-1000, max_value=1000))
 def test_cos_even(pair, period):
     """Test cos is an even function"""
@@ -77,3 +95,11 @@ def test_sin_odd(pair, period):
     """Test cos is an even function"""
     assert latex_eval("sin({}*pi + {}*pi)".format(pair[0], 2 * period)) == \
            latex_eval("-sin(-({}*pi + {}*pi))".format(pair[0], 2 * period))
+
+
+@settings(deadline=timedelta(milliseconds=500))
+@given(st.sampled_from(tan_pi_coeffs), st.integers(min_value=-1000, max_value=1000))
+def test_tan_odd(pair, period):
+    """Test cos is an even function"""
+    assert latex_eval("tan({}*pi + {}*pi)".format(pair[0], 2 * period)) == \
+           latex_eval("-tan(-({}*pi + {}*pi))".format(pair[0], 2 * period))

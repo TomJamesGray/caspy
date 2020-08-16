@@ -127,6 +127,7 @@ class Tan(TrigFunc):
         if pmatch_res != {}:
             sin_x = Sin(self.arg).eval()
             cos_x = Cos(self.arg).eval()
+            # TODO make it so that 1/sqrt(3) automatically simplifies to sqrt(3)/3
             if sin_x.is_exclusive_numeric() and cos_x.is_exclusive_numeric():
                 return sin_x / cos_x
 
