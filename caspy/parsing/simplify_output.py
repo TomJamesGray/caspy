@@ -9,16 +9,15 @@ from caspy.functions.cas import expand,integrate,differentiate
 logger = logging.getLogger(__name__)
 
 fns = {
-    "ln":lambda x: exponentials.Ln(x),
-    "sin":lambda x: trigonometric.Sin(x),
-    "cos":lambda x: trigonometric.Cos(x),
-    "tan":lambda x: trigonometric.Tan(x),
-    "sqrt":lambda x:other.Sqrt(x),
-    "expand":lambda x:expand.Expand(x),
-    "integrate":lambda *args:integrate.Integrate(*args),
-    "diff":lambda *args:differentiate.Differentiate(*args)
+    "ln": lambda x: exponentials.Ln(x),
+    "sin": lambda x: trigonometric.Sin(x),
+    "cos": lambda x: trigonometric.Cos(x),
+    "tan": lambda x: trigonometric.Tan(x),
+    "sqrt": lambda x: other.Sqrt(x),
+    "expand": lambda x: expand.Expand(x),
+    "integrate": lambda *args: integrate.Integrate(*args),
+    "diff": lambda *args: differentiate.Differentiate(*args)
 }
-
 
 # noinspection PyMethodMayBeStatic
 @v_args(inline=True)

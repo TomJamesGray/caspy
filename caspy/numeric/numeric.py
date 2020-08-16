@@ -45,6 +45,9 @@ class Numeric(Generic[Num]):
 
     def __truediv__(self, other):
         if type(other) == Numeric:
+            if other.is_zero():
+                logger.critical("Division by zero")
+                raise ZeroDivisionError("Trying to divide {} by zero".format(self))
             return self.mul(other.recip())
 
     def __pow__(self, power, modulo=None):
