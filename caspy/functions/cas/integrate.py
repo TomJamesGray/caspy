@@ -18,9 +18,10 @@ class Integrate(Function):
     fname = "integrate"
     latex_fname = "integrate"
 
-    def __init__(self, arg, wrt="x"):
+    def __init__(self, arg, wrt="x", root_integral=True):
         self.arg = arg
         self.fully_integrated = False
+        self.root_integral = root_integral
         # Annoyingly the 'wrt' if provided will be a numeric object
         # so we need to extract the actual variable in question
         if type(wrt) == caspy.numeric.numeric.Numeric:
@@ -198,17 +199,17 @@ class Integrate(Function):
                         tot += term_val
                         continue
 
-
-            # Try expanding the symbol then integrating
-            sym_numeric = caspy.numeric.numeric.Numeric(deepcopy(sym),"sym_obj")
-            expand_obj = expand.Expand(sym_numeric)
-            expanded = expand_obj.eval()
-            integ_exp = Integrate(expanded,self.wrt)
-            new_integral = integ_exp.eval()
-            if integ_exp.fully_integrated:
-                integrated_values.append(i)
-                tot += new_integral
-                continue
+            if self.root_integral:
+                # Try expanding the symbol then integrating
+                sym_numeric = caspy.numeric.numeric.Numeric(deepcopy(sym),"sym_obj")
+                expand_obj = expand.Expand(sym_numeric)
+                expanded = expand_obj.eval()
+                integ_exp = Integrate(expanded,self.wrt,False)
+                new_integral = integ_exp.eval()
+                if integ_exp.fully_integrated:
+                    integrated_values.append(i)
+                    tot += new_integral
+                    continue
 
         new_val = []
         # Remove integrated values from the arg property
