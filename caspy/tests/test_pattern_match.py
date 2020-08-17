@@ -84,6 +84,12 @@ def test_pmatch_exp_x_with_coeff():
     assert pmatch_res == {"a": 3, "b": 10}
 
 
+def test_pmatch_exponentials():
+    pat = pm.pat_construct("e^(b)", {"b": "rem"})
+    pmatch_res, _ = pm.pmatch(pat, p.parse("e^(x)"))
+    assert pmatch_res == {"b": p.parse("x")}
+
+
 def test_pmatch_exp_with_terms():
     pat = pm.pat_construct("x^(a*y)", {"a": "const"})
     pmatch_res, _ = pm.pmatch(pat, p.parse("x^(3*y)"))

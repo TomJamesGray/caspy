@@ -133,8 +133,7 @@ def pmatch(pat, expr):
                         else:
                             # Find matching term
                             for j, expr_sym_fact in enumerate(expr_sym.val):
-                                if expr_sym_fact[0] == pat_sym_fact_name and \
-                                        expr_sym_fact[1].all_syms_eq(pat_sym_fact_pow):
+                                if expr_sym_fact[0] == pat_sym_fact_name:
                                     # Matching term found, therefore turn the
                                     # powers into Numeric objects and run pmatch
                                     logger.debug("RECURSING WITH {} AND {}".format(pat_sym_fact_pow,expr_sym_fact[1]))
