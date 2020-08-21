@@ -172,7 +172,7 @@ class Numeric(Generic[Num]):
         :param x: Numeric object
         :return: self
         """
-        return self.mul(x.recip())
+        return self.__truediv__(x)
 
     def __eq__(self, other):
         if type(other) == Numeric:
