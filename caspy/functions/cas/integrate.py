@@ -115,7 +115,7 @@ class Integrate(Function):
                 continue
 
             # Try matching x^n
-            pmatch_res = pmatch_sym("a*{}^n".format(self.wrt),
+            pmatch_res = pm.pmatch_sym("a*{}^n".format(self.wrt),
                                     {"n":"const","a":"const"}, sym)
             if pmatch_res != {}:
                 logger.debug("Integrating polynomial term {}, pmatch result {}".format(sym,pmatch_res))
@@ -135,7 +135,7 @@ class Integrate(Function):
                 continue
 
             # Try integrating exponential terms
-            pmatch_res = pmatch_sym("A1 * e^(A2)".format(self.wrt),
+            pmatch_res = pm.pmatch_sym("A1 * e^(A2)".format(self.wrt),
                                     {"A1": "const", "A2": "rem"}, sym)
             if pmatch_res != {}:
                 logger.debug("Integrating exponential term, pmatch result {}".format(pmatch_res))
@@ -158,7 +158,7 @@ class Integrate(Function):
                     continue
 
             # Try matching simple sin terms like sin(ax+b)
-            pmatch_res = pmatch_sym("a*sin(b*{}+c)".format(self.wrt),
+            pmatch_res = pm.pmatch_sym("a*sin(b*{}+c)".format(self.wrt),
                                     {"a": "const", "b": "const", "c": "const"},
                                     sym)
             if pmatch_res != {}:
@@ -172,7 +172,7 @@ class Integrate(Function):
                 continue
 
             # Try matching simple sin terms like cos(ax+b)
-            pmatch_res = pmatch_sym("a*cos(b*{}+c)".format(self.wrt),
+            pmatch_res = pm.pmatch_sym("a*cos(b*{}+c)".format(self.wrt),
                                     {"a": "const", "b": "const", "c": "const"},
                                     sym)
             if pmatch_res != {}:
@@ -186,7 +186,7 @@ class Integrate(Function):
                 continue
 
             # Try integrating sin(___) term with a 'u' substitution
-            pmatch_res = pmatch_sym("b*sin(a)", {"a": "rem","b":"coeff"}, sym)
+            pmatch_res = pm.pmatch_sym("b*sin(a)", {"a": "rem","b":"coeff"}, sym)
             if pmatch_res != {}:
                 logger.debug("Integrating sin object with u sub, pmatch_res {}".format(pmatch_res))
                 numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
@@ -198,7 +198,7 @@ class Integrate(Function):
                     continue
 
             # Try integrating cos(___) term with a 'u' substitution
-            pmatch_res = pmatch_sym("b*cos(a)", {"a": "rem", "b": "coeff"}, sym)
+            pmatch_res = pm.pmatch_sym("b*cos(a)", {"a": "rem", "b": "coeff"}, sym)
             if pmatch_res != {}:
                 logger.debug("Integrating cos object with u sub, pmatch_res {}".format(pmatch_res))
                 numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")

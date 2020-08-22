@@ -22,3 +22,7 @@ def test_diff_sin():
 
 def test_diff_cos():
     assert p.parse("diff(cos(x))") == p.parse("-sin(x)")
+
+
+def test_diff_exp():
+    assert p.parse("diff(e^(2*x))") == p.parse("2*e^(2*x)")

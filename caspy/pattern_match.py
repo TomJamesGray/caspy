@@ -63,6 +63,20 @@ def does_numeric_contain_placeholders(x) -> bool:
     return False
 
 
+def pmatch_sym(pat, pat_dict, sym):
+    """
+    Simple helper function to run pattern match on a symbol
+    :param pat: Pattern string to be passed to pat_construct
+    :param pat_dict: Dictionary of placeholders for pat_construct
+    :param sym: The symbol object to have pmatch run on it
+    :return:
+    """
+    pat = pat_construct(pat, pat_dict)
+    numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
+    pmatch_res, _ = pmatch(pat, numeric_wrapper)
+    return pmatch_res
+
+
 def pmatch(pat, expr):
     """
     Tries to match a pattern generated in pat_construct to a given expression
