@@ -9,6 +9,8 @@ import caspy.functions.cas.expand as expand
 import caspy.functions.trigonometric as trig
 from caspy.functions.function import Function
 from caspy.printing import latex_numeric as ln
+from caspy.helpers.helpers import group_list_into_all_poss_pairs
+from caspy.numeric.fraction import Fraction
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +55,7 @@ class Integrate(Function):
 
     def u_sub_int(self, u, integrand):
         """
-        Try's to integrate a symbol using a u substitution
+        Tries to integrate a symbol using a u substitution
         :param u: substitution to make - Numeric object
         :param integrand: numeric object to integrate
         :return: Numeric object
@@ -81,11 +83,41 @@ class Integrate(Function):
                     return int_result.try_replace_numeric_with_var(var_obj,u)
         return None
 
+    def int_by_parts(self, u_prime, v):
+        """
+        Tries to integrate a symbol by parts by splitting the symbol into
+        2 parts u_prime and v. So
+        integral(u_prime * v) = u * v - integral(u * diff(v))
+        where u = integral(u_prime)
+        :param u_prime: Numeric object
+        :param v: Numeric object
+        :return: Numeric object
+        """
+        # Make it not root integral so we don't get lots of recursion
+        int_u_obj = Integrate(u_prime,self.wrt,False)
+        u = int_u_obj.eval()
+        if not int_u_obj.fully_integrated:
+            return None
+
+        diff_v_obj = diff.Differentiate(v,self.wrt)
+        v_prime = diff_v_obj.eval()
+        if not diff_v_obj.fully_diffed:
+            return None
+
+        part_to_int = deepcopy(u) * deepcopy(v_prime)
+        # Make it not root integral so we don't get lots of recursion
+        int_part_obj = Integrate(part_to_int,self.wrt, False)
+        int_part_val = int_part_obj.eval()
+        if not int_part_obj.fully_integrated:
+            return None
+
+        return u * v - int_part_val
+
     def eval(self):
         """
         Evaluates the integral. This will be done symbol by symbol, so for
         instance 2*x^2 + sin(x) will be done by integrating 2x^2 then sin(x)
-        :return: Numeirc object
+        :return: Numeric object
         """
         logger.debug("Attempting to integrate {}".format(self.arg))
         parser = caspy.parsing.parser.Parser()
@@ -220,6 +252,38 @@ class Integrate(Function):
                     integrated_values.append(i)
                     tot += new_integral
                     continue
+
+            if not self.root_integral:
+                continue
+            # Try integrating by parts
+            int_done_by_parts = False
+            for (a,b) in group_list_into_all_poss_pairs(deepcopy(sym.val)):
+                # Make symbols for a and b
+                a_sym = caspy.numeric.symbol.Symbol(1,Fraction(1,1))
+                a_sym.val = a
+                a_num = caspy.numeric.numeric.Numeric(a_sym,"sym_obj")
+                b_sym = caspy.numeric.symbol.Symbol(1, Fraction(1, 1))
+                b_sym.val = b
+                b_num = caspy.numeric.numeric.Numeric(b_sym,"sym_obj")
+
+                by_parts_ab = self.int_by_parts(a_num,b_num)
+                if by_parts_ab is not None:
+                    tot += by_parts_ab
+                    integrated_values.append(i)
+                    int_done_by_parts = True
+                else:
+                    by_part_ba = self.int_by_parts(b_num,a_num)
+                    if by_part_ba is not None:
+                        tot += by_part_ba
+                        integrated_values.append(i)
+                        int_done_by_parts = True
+
+                if int_done_by_parts:
+                    break
+
+            if int_done_by_parts:
+                continue
+
 
         new_val = []
         # Remove integrated values from the arg property
