@@ -33,6 +33,10 @@ def test_u_sub_int():
     assert p.parse("integrate(x*sin(x^2))") == p.parse("-cos(x^2)/2")
 
 
+def test_u_sub_int_cos():
+    assert p.parse("integrate(x*cos(x^2))") == p.parse("sin(x^2)/2")
+
+
 def test_expand_then_int():
     assert p.parse("integrate((x+1)^2)") == p.parse("x^3/3+x^2+x")
 
