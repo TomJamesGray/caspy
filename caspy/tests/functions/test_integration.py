@@ -1,5 +1,5 @@
 import hypothesis.strategies as st
-from caspy.tests.test_symbolic import p
+from caspy.tests.test_symbolic import p,latex_eval
 from hypothesis import given, settings
 
 
@@ -35,3 +35,7 @@ def test_u_sub_int():
 
 def test_expand_then_int():
     assert p.parse("integrate((x+1)^2)") == p.parse("x^3/3+x^2+x")
+
+
+def test_integrate_exp():
+    assert p.parse("integrate(e^(x+5))") == p.parse("e^(x+5)")

@@ -128,6 +128,30 @@ class Integrate(Function):
                 # Go onto next term
                 continue
 
+            # Try integrating exponential terms
+            pat = pm.pat_construct("A1 * e^(A2)".format(self.wrt), {"A1": "const", "A2": "rem"})
+            numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
+            pmatch_res, _ = pm.pmatch(pat, numeric_wrapper)
+            if pmatch_res != {}:
+                logger.debug("Integrating exponential term, pmatch result {}".format(pmatch_res))
+                # Currently pattern matching doesn't quite work correctly with matching
+                # things like e^(a*x+b) so we will have to pattern match the A2 term
+                exp_pow = expand.Expand(pmatch_res["A2"]).eval()
+                pat = pm.pat_construct("B1 * {} + B2".format(self.wrt),
+                                       {"B1": "const", "B2": "const"})
+                pmatch_res_pow, _ = pm.pmatch(pat,exp_pow)
+                logger.debug("Power pmatch result {}".format(pmatch_res_pow))
+                if pmatch_res_pow != {}:
+                    term_val = parser.parse(" {} * e ^ ({} * {} + {})".format(
+                        copy(pmatch_res["A1"])/copy(pmatch_res_pow["B1"]),
+                        pmatch_res_pow["B1"],
+                        self.wrt,
+                        pmatch_res_pow.get("B2",0)
+                    ))
+                    tot += term_val
+                    integrated_values.append(i)
+                    continue
+
             # Try matching simple sin terms like sin(ax+b)
             pat = pm.pat_construct("a*sin(b*{}+c)".format(self.wrt),
                                    {"a": "const", "b": "const", "c": "const"})
