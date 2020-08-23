@@ -5,7 +5,7 @@ from copy import deepcopy
 def group_list_into_all_poss_pairs(lst):
     """
     Splits list into all possible groupings. So for example the list
-    [1,2,3,4] could be split into
+    [1,2,3] could be split into
     [1],[2,3]
     [2],[1,3]
     [3],[1,2]

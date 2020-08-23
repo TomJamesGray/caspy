@@ -114,6 +114,24 @@ class Differentiate(Function):
                     diffed_values.append(i)
                     continue
 
+            # Try diffing ln terms
+            pmatch_res = pm.pmatch_sym("A1*ln(A2)",
+                                       {"A1": "const", "A2": "rem"}, sym)
+            if pmatch_res != {}:
+                logger.debug("Differentiating ln term")
+                # Diff the argument
+                d_obj = Differentiate(pmatch_res["A2"])
+                derivative = d_obj.eval()
+                if d_obj.fully_diffed:
+                    derivative.simplify()
+                    numeric_coeff = caspy.numeric.numeric.Numeric(
+                        pmatch_res["A1"], "number"
+                    )
+                    term_val = numeric_coeff * derivative / pmatch_res["A2"]
+                    tot += term_val
+                    diffed_values.append(i)
+                    continue
+
             # Try differentiating exponential terms
             pmatch_res = pm.pmatch_sym("A1 * e^(A2)".format(self.wrt),
                                     {"A1": "const", "A2": "rem"}, sym)

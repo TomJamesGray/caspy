@@ -32,7 +32,7 @@ logging_config = {
         },
         "caspy.pattern_match":{
             "handlers":["functions"],
-            "level":logging.DEBUG
+            "level":logging.WARNING
         },
         "caspy.functions":{
             "handlers":["functions"],
