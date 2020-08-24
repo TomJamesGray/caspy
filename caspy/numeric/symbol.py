@@ -271,22 +271,25 @@ class Symbol:
         """
         ret = Fraction(1, 1)
         for (sym_name, sym_pow) in self.val:
-            if type(sym_name) == Fraction:
-                if type(sym_pow) == num.Numeric:
-                    # TODO doesn't work, eg on sqrt(2^2). Implement
-                    # __pow__ method for numeric class
-                    # pow_frac = sym_pow.frac_eval()
-                    x = sym_name ** sym_pow.frac_eval()
-
-                    logger.debug("{} to the power {} yields {}".format(
-                        sym_name, sym_pow.frac_eval(), x
-                    ))
-                    ret *= x
-                else:
-                    x = sym_name ** sym_pow
-                    ret *= x
+            if type(sym_pow) == num.Numeric:
+                sym_pow_frac = sym_pow.frac_eval()
+            elif type(sym_pow) == Fraction:
+                sym_pow_frac = sym_pow
+            elif type(sym_pow) in (int,float):
+                sym_pow_frac = sym_pow
             else:
-                raise Exception("Can't get float representation of {}".format(self))
+                raise Exception("Can't get fraction representation of {}".format(sym_pow))
+
+            if type(sym_name) == Fraction:
+                ret *= sym_name ** sym_pow_frac
+                logger.warning("Dealt with symbol {}".format((sym_name,sym_pow)))
+            elif isinstance(sym_name, funcs.Function):
+                if sym_name.fname != "re":
+                    ret *= sym_name.to_frac() ** sym_pow_frac
+                else:
+                    continue
+            else:
+                raise Exception("Can't get fraction representation of {}".format(self))
 
         return ret
 

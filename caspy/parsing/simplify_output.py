@@ -3,7 +3,7 @@ from lark import v_args
 from lark import Transformer
 from caspy.numeric.numeric import Numeric
 from caspy.helpers import lark_transformer
-from caspy.functions import exponentials,trigonometric,other
+from caspy.functions import exponentials,trigonometric,other,to_real
 from caspy.functions.cas import expand,integrate,differentiate
 
 logger = logging.getLogger(__name__)
@@ -15,6 +15,7 @@ fns = {
     "tan": lambda x: trigonometric.Tan(x),
     "sqrt": lambda x: other.Sqrt(x),
     "expand": lambda x: expand.Expand(x),
+    "re": lambda x: to_real.ToReal(x),
     "integrate": lambda *args: integrate.Integrate(*args),
     "diff": lambda *args: differentiate.Differentiate(*args)
 }

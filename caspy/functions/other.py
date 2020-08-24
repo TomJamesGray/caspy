@@ -1,5 +1,6 @@
 import logging
 import copy
+import math
 from caspy.functions.function import Function1Arg
 from caspy.printing import latex_numeric as ln
 from caspy.numeric.symbol import Symbol
@@ -19,6 +20,14 @@ class Sqrt(Function1Arg):
 
     def latex_format(self):
         return "\\sqrt{{{}}}".format(ln.latex_numeric_str(self.arg))
+
+    def to_frac(self):
+        if self.arg.is_exclusive_numeric():
+            return Fraction(self.arg.frac_eval().to_real() ** 0.5, 1)
+        else:
+            logger.error("Argument {} of sqrt isn't exclusive numeric".format(
+                self.arg
+            ))
 
     def eval(self):
         if self.arg.is_exclusive_numeric():
@@ -70,7 +79,7 @@ class Sqrt(Function1Arg):
                             # It's just 1 inside the surd so just return the
                             # f_out as a symbol
                             return Numeric(f_out,"number")
-                        self.arg = surd
+                        self.arg = Numeric(surd,"number")
                         new_num = Numeric(Symbol(self, Fraction(1, 1)), "sym_obj")
                         scalar = Symbol(1,Fraction(f_out,surd_den))
                         new_num.mul(Numeric(scalar,"sym_obj"))

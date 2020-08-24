@@ -235,10 +235,10 @@ class Numeric(Generic[Num]):
         is not possible it raises an exception
         :return: float
         """
+        logger.warning("Frac eval on {}".format(self))
         ret = Fraction(0,1)
         for sym in self.val:
             x = sym.sym_frac_eval()
-            print("FRAC EVAL ADDING {}".format(x))
             ret += x
         return ret
 

@@ -63,7 +63,7 @@ def main():
         line = input(">> ")
         try:
             out = parser_cls.parse(line)
-        except (ZeroDivisionError, VisitError):
+        except ZeroDivisionError:
             print("Math Error: Division by zero")
             continue
         print("Parser output = {}".format(out))
