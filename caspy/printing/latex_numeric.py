@@ -11,13 +11,19 @@ def latex_numeric_str(x):
     for sym in x.val:
         need_dot = False
         sym.simplify()
-        if not (sym.coeff.num == 1 and sym.coeff.den == 1):
+        if sym.val == [[-1,1]]:
+            # Handles case when the symbol is just the number '-1' on it's own
+            out += "-1"
+        elif not (sym.coeff.num == 1 and sym.coeff.den == 1):
             need_dot = True
             # Print the coefficient as a fraction only if necessary
             if sym.coeff.num == 0:
                 # Include the '+' so it doesn't get chopped off by return out[:-1]
                 out += "0+"
                 continue
+            elif sym.coeff.num == -1:
+                out += "-"
+                need_dot = False
             elif sym.coeff.den == 1:
                 out += "{}".format(to_int(sym.coeff.num))
             elif sym.coeff.den == -1:

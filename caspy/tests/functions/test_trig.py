@@ -77,8 +77,8 @@ def test_cos_periodicity(pair, period):
 @given(st.sampled_from(tan_pi_coeffs), st.integers(min_value=-1000, max_value=1000))
 def test_tan_periodicity(pair, period):
     """Test tan has period 2pi"""
-    assert latex_eval("tan({}*pi + {}*pi)".format(pair[0], 2 * period)) == \
-           latex_eval(pair[1])
+    assert p.parse("tan({}*pi + {}*pi)".format(pair[0], 2 * period)) == \
+           p.parse(pair[1])
 
 
 @settings(deadline=timedelta(milliseconds=500))
@@ -101,5 +101,5 @@ def test_sin_odd(pair, period):
 @given(st.sampled_from(tan_pi_coeffs), st.integers(min_value=-1000, max_value=1000))
 def test_tan_odd(pair, period):
     """Test cos is an even function"""
-    assert latex_eval("tan({}*pi + {}*pi)".format(pair[0], 2 * period)) == \
-           latex_eval("-tan(-({}*pi + {}*pi))".format(pair[0], 2 * period))
+    assert p.parse("tan({}*pi + {}*pi)".format(pair[0], 2 * period)) == \
+           p.parse("-tan(-({}*pi + {}*pi))".format(pair[0], 2 * period))
