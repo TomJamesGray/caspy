@@ -282,7 +282,6 @@ class Symbol:
 
             if type(sym_name) == Fraction:
                 ret *= sym_name ** sym_pow_frac
-                logger.warning("Dealt with symbol {}".format((sym_name,sym_pow)))
             elif isinstance(sym_name, funcs.Function):
                 if sym_name.fname != "re":
                     ret *= sym_name.to_frac() ** sym_pow_frac

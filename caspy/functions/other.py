@@ -1,6 +1,5 @@
 import logging
 import copy
-import math
 from caspy.functions.function import Function1Arg
 from caspy.printing import latex_numeric as ln
 from caspy.numeric.symbol import Symbol

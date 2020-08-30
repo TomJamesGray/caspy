@@ -1,7 +1,9 @@
 import logging
+import math
 import caspy.pattern_match
 import caspy.numeric.numeric
 from caspy.functions.function import Function1Arg
+from caspy.numeric.fraction import Fraction
 
 logger = logging.getLogger(__name__)
 
@@ -26,3 +28,11 @@ class Ln(Function1Arg):
             return caspy.numeric.numeric.Numeric(0,"number")
         else:
             return super().eval()
+
+    def to_frac(self):
+        if self.arg.is_exclusive_numeric():
+            return Fraction(math.log(self.arg.frac_eval().to_real()), 1)
+        else:
+            logger.error("Argument {} of sqrt isn't exclusive numeric".format(
+                self.arg
+            ))
