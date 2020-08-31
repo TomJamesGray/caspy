@@ -1,5 +1,6 @@
 import logging
 import caspy.numeric.numeric
+from caspy.numeric.fraction import Fraction
 from caspy.functions.function import Function1Arg
 
 logger = logging.getLogger(__name__)
@@ -18,4 +19,6 @@ class ToReal(Function1Arg):
         if self.float_rep:
             return val.to_real()
         else:
-            return caspy.numeric.numeric.Numeric(val, "number")
+            return caspy.numeric.numeric.Numeric(Fraction(
+                val.to_real(), 1
+            ), "number")
