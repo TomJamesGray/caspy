@@ -1,8 +1,10 @@
 import copy
 import logging
+import math
 from caspy.numeric.symbol import Symbol
-from caspy.numeric.fraction import Fraction,Frac
+from caspy.numeric.fraction import Fraction, Frac
 from typing import TypeVar, Generic
+from caspy.functions import to_real
 
 Num = TypeVar("Num")
 logger = logging.getLogger(__name__)
@@ -20,7 +22,7 @@ class Numeric(Generic[Num]):
         elif typ == "number":
             # in this case the 1 represents that this value is just a number
             if type(val) == Fraction:
-                self.val.append(Symbol(1,val))
+                self.val.append(Symbol(1, val))
             else:
                 self.val.append(Symbol(1, Fraction(float(val), 1)))
         elif typ == "sym_obj":
@@ -32,7 +34,7 @@ class Numeric(Generic[Num]):
     def __add__(self, other):
         if type(other) == Numeric:
             return self.add(other)
-        elif type(other) in (int,float):
+        elif type(other) in (int, float):
             return self.add(Numeric(other, "number"))
 
     def __mul__(self, other):
@@ -54,7 +56,7 @@ class Numeric(Generic[Num]):
         if type(power) == Numeric:
             return self.pow(power)
 
-    def sym_in(self,key):
+    def sym_in(self, key):
         """
         Checks if a symbol such as 'x' already exists in this. Used
         for multiplication of terms like x and x^2
@@ -67,7 +69,7 @@ class Numeric(Generic[Num]):
                 return key_x
         return False
 
-    def sym_and_pow_match(self,sym):
+    def sym_and_pow_match(self, sym):
         """
         Checks if a symbol is in this numeric class
         :param key: symbol object in this class
@@ -98,14 +100,14 @@ class Numeric(Generic[Num]):
             if lookup:
                 # A term with the same symbols already exists in this numeric expression
                 # so just add coeffs
-                logger.debug("sym_and_pow match on {} and {}".format(self,sym_y))
+                logger.debug("sym_and_pow match on {} and {}".format(self, sym_y))
                 # Find coefficient for sym_y
                 sym_y_coeff_index = sym_y.get_coeff_index()
                 if sym_y_coeff_index != -1:
                     lookup.add_coeff(sym_y.val[sym_y_coeff_index][0])
                 else:
                     logger.debug("No coefficient for symbol {} so adding '1' as coeff".format(sym_y))
-                    sym_y.val.append([Fraction(1,1),1])
+                    sym_y.val.append([Fraction(1, 1), 1])
                     lookup.add_coeff(sym_y.val[sym_y_coeff_index][0])
             else:
                 self.val.append(sym_y)
@@ -127,9 +129,9 @@ class Numeric(Generic[Num]):
             self.val[0] = self.val[0].recip()
             return self
         else:
-            return self.pow(Numeric(-1,"number"))
+            return self.pow(Numeric(-1, "number"))
 
-    def pow(self,x: Num) -> Num:
+    def pow(self, x: Num) -> Num:
         """
         Raises this number to the power x
         :param x: Numeric object
@@ -166,7 +168,7 @@ class Numeric(Generic[Num]):
             self.val[0].mul(x.val[0])
         return self
 
-    def div(self,x: Num) -> Num:
+    def div(self, x: Num) -> Num:
         """
         Divides this number by x
         :param x: Numeric object
@@ -179,18 +181,32 @@ class Numeric(Generic[Num]):
             # Simplify this object and the other value
             self.simplify()
             other.simplify()
-            # for sym in self.val:
-            #     if sym.val != self
+            sym_not_fnd = False
             for sym in self.val:
                 fnd = False
                 for sym_o in other.val:
                     if sym_o.val == sym.val and sym_o.coeff == sym.coeff:
                         fnd = True
                 if not fnd:
+                    sym_not_fnd = True
+                    break
+            if sym_not_fnd:
+                if self.is_exclusive_numeric() and other.is_exclusive_numeric():
+                    a = to_real.ToReal(self, True).eval()
+                    b = to_real.ToReal(other, True).eval()
+                    if math.isclose(a, b):
+                        logger.debug("Values {} and {} close enough for "
+                                     "equality".format(a, b))
+                        return True
+                    else:
+                        return False
+                else:
                     return False
             return True
+            # Try comparing the actual numerical values as there may
+            # be multiple representations
 
-    def all_syms_eq(self,other):
+    def all_syms_eq(self, other):
         """
         Checks all symbols in this numeric object have a corresponding symbol
         in the other numeric object. Just uses the equaltiy operator for symbols.
@@ -201,7 +217,7 @@ class Numeric(Generic[Num]):
         used_terms = []
         for sym_self in self.val:
             fnd = False
-            for i,sym_other in enumerate(other.val):
+            for i, sym_other in enumerate(other.val):
                 if sym_self == sym_other and i not in used_terms:
                     used_terms.append(i)
                     fnd = True
@@ -236,13 +252,13 @@ class Numeric(Generic[Num]):
         :return: float
         """
         logger.warning("Frac eval on {}".format(self))
-        ret = Fraction(0,1)
+        ret = Fraction(0, 1)
         for sym in self.val:
             x = sym.sym_frac_eval()
             ret += x
         return ret
 
-    def replace(self,x,y):
+    def replace(self, x, y):
         """
         Replaces some variable like 'x' with y
         :param x: Thing to be removed
@@ -250,7 +266,7 @@ class Numeric(Generic[Num]):
         :return: self
         """
         for sym in self.val:
-            sym.replace(x,y)
+            sym.replace(x, y)
         return self
 
     def try_replace_numeric_with_var(self, x, y):
@@ -262,7 +278,7 @@ class Numeric(Generic[Num]):
         :param y: Numeric object
         :return: Another numeric object if it has been successful, otherwise None
         """
-        new_val = Numeric(0,"number")
+        new_val = Numeric(0, "number")
         for sym in self.val:
             new_val += sym.try_replace_numeric_with_var(x, copy.deepcopy(y))
         return new_val
@@ -294,7 +310,7 @@ class Numeric(Generic[Num]):
         """
         # Initialise object to act as the accumulator
         cur_val = copy.deepcopy(self)
-        acc = Numeric(0,"number")
+        acc = Numeric(0, "number")
         for sym_cur_val in copy.deepcopy(cur_val.val):
             for sym_mul in x.val:
                 logger.debug("{} mul {}".format(sym_cur_val, sym_mul))
