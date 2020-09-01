@@ -21,7 +21,7 @@ def latex_numeric_str(x):
                 # Include the '+' so it doesn't get chopped off by return out[:-1]
                 out += "0+"
                 continue
-            elif sym.coeff.num == -1:
+            elif sym.coeff.num == -1 and sym.coeff.den == 1:
                 out += "-"
                 need_dot = False
             elif sym.coeff.den == 1:
