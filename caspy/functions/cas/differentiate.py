@@ -1,5 +1,5 @@
 import logging
-from copy import copy
+from copy import copy,deepcopy
 import caspy.numeric.numeric
 import caspy.pattern_match as pm
 import caspy.parsing.parser
@@ -120,14 +120,14 @@ class Differentiate(Function):
             if pmatch_res != {}:
                 logger.debug("Differentiating ln term")
                 # Diff the argument
-                d_obj = Differentiate(pmatch_res["A2"])
+                d_obj = Differentiate(deepcopy(pmatch_res["A2"]))
                 derivative = d_obj.eval()
                 if d_obj.fully_diffed:
                     derivative.simplify()
                     numeric_coeff = caspy.numeric.numeric.Numeric(
                         pmatch_res["A1"], "number"
                     )
-                    term_val = numeric_coeff * derivative / pmatch_res["A2"]
+                    term_val = numeric_coeff * derivative / deepcopy(pmatch_res["A2"])
                     tot += term_val
                     diffed_values.append(i)
                     continue

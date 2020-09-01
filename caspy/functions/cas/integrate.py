@@ -111,7 +111,7 @@ class Integrate(Function):
         if not int_part_obj.fully_integrated:
             return None
 
-        return u * v - int_part_val
+        return deepcopy(u) * deepcopy(v) - deepcopy(int_part_val)
 
     def eval(self):
         """
@@ -258,28 +258,38 @@ class Integrate(Function):
             # Try integrating by parts
             int_done_by_parts = False
             for (a,b) in group_list_into_all_poss_pairs(deepcopy(sym.val)):
-                # Make symbols for a and b
+                # Make symbols for a and b\
                 a_sym = caspy.numeric.symbol.Symbol(1,Fraction(1,1))
                 a_sym.val = a
                 a_num = caspy.numeric.numeric.Numeric(a_sym,"sym_obj")
                 b_sym = caspy.numeric.symbol.Symbol(1, Fraction(1, 1))
                 b_sym.val = b
                 b_num = caspy.numeric.numeric.Numeric(b_sym,"sym_obj")
-
+                logger.debug("PRE Int by parts u_prime {} v {}".format(
+                    ln.latex_numeric_str(a_num),
+                    ln.latex_numeric_str(b_num)))
                 by_parts_ab = self.int_by_parts(a_num,b_num)
                 if by_parts_ab is not None:
+                    logger.debug("Int by parts u_prime {} v {}".format(
+                        ln.latex_numeric_str(a_num),
+                        ln.latex_numeric_str(b_num)))
                     tot += by_parts_ab
                     integrated_values.append(i)
                     int_done_by_parts = True
                 else:
                     by_part_ba = self.int_by_parts(b_num,a_num)
                     if by_part_ba is not None:
+                        logger.debug("Int by parts2 u_prime {} v {}".format(
+                            ln.latex_numeric_str(b_num),
+                            ln.latex_numeric_str(a_num)))
                         tot += by_part_ba
                         integrated_values.append(i)
                         int_done_by_parts = True
 
                 if int_done_by_parts:
                     break
+                else:
+                    logger.debug("One round of int by parts failed")
 
             if int_done_by_parts:
                 continue
