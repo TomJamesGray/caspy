@@ -70,14 +70,14 @@ class Integrate(Function):
             # Need to try and replace the occurrences of u in terms of with
             # respect to self.wrt with another variable. So if u = x^2 then
             # sin(x^2) --> sin(u)
-            var_obj = caspy.numeric.numeric.Numeric("u","sym")
+            var_obj = caspy.numeric.numeric.Numeric("U1","sym")
             logger.warning("Replacing with {}".format(var_obj))
 
             replaced_obj = new_val.try_replace_numeric_with_var(u,var_obj)
             logger.warning("Replaced obj is {}".format(replaced_obj))
             if replaced_obj is not None:
                 # Try and integrate replaced_obj wrt to u
-                subbed_int = Integrate(replaced_obj,"u", False)
+                subbed_int = Integrate(replaced_obj,"U1", False)
                 int_result = subbed_int.eval()
                 if subbed_int.fully_integrated:
                     return int_result.try_replace_numeric_with_var(var_obj,u)
