@@ -78,7 +78,7 @@ class Differentiate(Function):
             if pmatch_res != {}:
                 logger.debug("Differentiating sin term")
                 # Diff the argument
-                d_obj = Differentiate(pmatch_res["A2"])
+                d_obj = Differentiate(pmatch_res["A2"],self.wrt)
                 derivative = d_obj.eval()
                 if d_obj.fully_diffed:
                     derivative.simplify()
@@ -99,7 +99,7 @@ class Differentiate(Function):
             if pmatch_res != {}:
                 logger.debug("Differentiating cos term")
                 # Diff the argument
-                d_obj = Differentiate(pmatch_res["A2"])
+                d_obj = Differentiate(pmatch_res["A2"],self.wrt)
                 derivative = d_obj.eval()
                 if d_obj.fully_diffed:
                     derivative.simplify()

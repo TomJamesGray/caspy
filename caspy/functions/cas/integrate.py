@@ -77,7 +77,7 @@ class Integrate(Function):
             logger.warning("Replaced obj is {}".format(replaced_obj))
             if replaced_obj is not None:
                 # Try and integrate replaced_obj wrt to u
-                subbed_int = Integrate(replaced_obj,"u")
+                subbed_int = Integrate(replaced_obj,"u", False)
                 int_result = subbed_int.eval()
                 if subbed_int.fully_integrated:
                     return int_result.try_replace_numeric_with_var(var_obj,u)
@@ -103,7 +103,10 @@ class Integrate(Function):
         v_prime = diff_v_obj.eval()
         if not diff_v_obj.fully_diffed:
             return None
-
+        logger.debug("Int by parts u: {}, v_prime: {}".format(
+            ln.latex_numeric_str(u),
+            ln.latex_numeric_str(v_prime)
+        ))
         part_to_int = deepcopy(u) * deepcopy(v_prime)
         # Make it not root integral so we don't get lots of recursion
         int_part_obj = Integrate(part_to_int,self.wrt, False)
