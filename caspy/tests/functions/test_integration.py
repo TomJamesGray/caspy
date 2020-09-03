@@ -43,3 +43,7 @@ def test_expand_then_int():
 
 def test_integrate_exp():
     assert p.parse("integrate(e^(x+5))") == p.parse("e^(x+5)")
+
+
+def test_int_by_parts():
+    assert p.parse("integrate(x*ln(x^2))") == p.parse("x^2 * ln(x^2)/2-x^2/2")
