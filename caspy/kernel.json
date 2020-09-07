@@ -1,0 +1,3 @@
+{"argv":["python","-m","caspy.caspy_kernel", "-f", "{connection_file}"],
+"display_name":"Caspy",
+"language":"python"}
