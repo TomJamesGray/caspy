@@ -1,8 +1,10 @@
 import logging
 import copy
 import caspy.numeric.symbol
+import caspy.pattern_match as pm
 from caspy.numeric.fraction import Fraction
 from caspy.functions.function import Function1Arg
+from caspy.functions import trigonometric as trig
 from caspy.numeric import numeric as num
 
 logger = logging.getLogger(__name__)
@@ -67,3 +69,44 @@ class Expand(Function1Arg):
             tot += sym_tot
 
         return tot
+
+
+class ExpandTrig(Function1Arg):
+    fname = "expand_trig"
+    latex_fname = "expand_trig"
+
+    def __init__(self,arg):
+        self.arg = arg
+
+    def eval(self):
+        tot = num.Numeric(0, "number")
+        for sym in self.arg.val:
+            pmatch_res = pm.pmatch_sym("B1*sin(A1)", {"A1": "rem","B1":"coeff"}, sym)
+            if pmatch_res != {}:
+                # Expand a sin term
+                if len(pmatch_res["A1"].val) == 1:
+                    term = num.Numeric(1, "number")
+                    coeff = pmatch_res["A1"].val[0].coeff
+                    coeff_r = coeff.to_real()
+                    # Don't try and expand it when it's not an int coeff
+                    if coeff_r == int(coeff_r) and abs(coeff_r) > 1:
+                        sym_arg = copy.deepcopy(pmatch_res["A1"])
+                        sym_uni = copy.deepcopy(sym_arg) / num.Numeric(coeff,"number")
+                        # Get the representation of the symbol without the
+                        # coeff
+                        sym_uni.simplify()
+                        b_val = num.Numeric(coeff_r - 1, "number") * copy.deepcopy(sym_uni)
+
+                        # Expand using identity:
+                        # sin(a+b) = sin(a)cos(b)+cos(a)sin(b)
+                        s1 = trig.Sin(sym_uni).eval()
+                        c1 = trig.Cos(b_val).eval()
+                        c2 = trig.Cos(sym_uni).eval()
+                        s2 = ExpandTrig(trig.Sin(copy.deepcopy(b_val)).eval()).eval()
+                        tot += s1*c1 + c2*s2
+                    else:
+                        tot += num.Numeric(sym,"sym_obj")
+            else:
+                tot.val.append(sym)
+        return tot
+

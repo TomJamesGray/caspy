@@ -17,7 +17,8 @@ fns = {
     "expand": lambda x: expand.Expand(x),
     "re": lambda x: to_real.ToReal(x),
     "integrate": lambda *args: integrate.Integrate(*args),
-    "diff": lambda *args: differentiate.Differentiate(*args)
+    "diff": lambda *args: differentiate.Differentiate(*args),
+    "expand_trig": lambda x: expand.ExpandTrig(x)
 }
 
 # noinspection PyMethodMayBeStatic
