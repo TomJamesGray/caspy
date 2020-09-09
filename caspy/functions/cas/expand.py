@@ -82,11 +82,22 @@ class ExpandTrig(Function1Arg):
     def eval(self):
         tot = num.Numeric(0, "number")
         for sym in self.arg.val:
-            pmatch_res = pm.pmatch_sym("B1*sin(A1)", {"A1": "rem","B1":"coeff"}, sym)
-            if pmatch_res != {}:
-                # Expand a sin term
+            sin_id = False
+            cos_id = False
+            pmatch_res_sin = pm.pmatch_sym("B1*sin(A1)", {"A1": "rem","B1":"coeff"}, sym)
+            if pmatch_res_sin == {}:
+                # Try pmatch with cos
+                pmatch_res_cos = pm.pmatch_sym("B1*cos(A1)", {"A1": "rem", "B1": "coeff"}, sym)
+                if pmatch_res_cos != {}:
+                    cos_id = True
+                    pmatch_res = pmatch_res_cos
+            else:
+                sin_id = True
+                pmatch_res = pmatch_res_sin
+
+            if sin_id or cos_id:
+                # Expand a trigonometric term
                 if len(pmatch_res["A1"].val) == 1:
-                    term = num.Numeric(1, "number")
                     coeff = pmatch_res["A1"].val[0].coeff
                     coeff_r = coeff.to_real()
                     # Don't try and expand it when it's not an int coeff
@@ -98,17 +109,28 @@ class ExpandTrig(Function1Arg):
                         sym_uni.simplify()
                         b_val = num.Numeric(coeff_r - 1, "number") * copy.deepcopy(sym_uni)
 
-                        # Expand using identity:
-                        # sin(a+b) = sin(a)cos(b)+cos(a)sin(b)
-                        s1 = trig.Sin(sym_uni).eval()
-                        c1 = trig.Cos(b_val).eval()
-                        c2 = trig.Cos(sym_uni).eval()
-                        s2 = ExpandTrig(trig.Sin(copy.deepcopy(b_val)).eval(), False).eval()
-                        tot += s1*c1 + c2*s2
-                    else:
-                        tot += num.Numeric(sym,"sym_obj")
-            else:
-                tot.val.append(sym)
+                        if sin_id:
+                            # Expand using identity:
+                            # sin(a+b) = sin(a)cos(b)+cos(a)sin(b)
+                            s1 = trig.Sin(sym_uni).eval()
+                            c1 = trig.Cos(b_val).eval()
+                            c2 = trig.Cos(sym_uni).eval()
+                            s2 = ExpandTrig(trig.Sin(copy.deepcopy(b_val)).eval(), False).eval()
+                            tot += pmatch_res["B1"] * (s1*c1 + c2*s2)
+                            # Go onto next term
+                            continue
+                        else:
+                            # Expand using identity:
+                            # cos(a+b) = cos(a)cos(b)-sin(a)sin(b)
+                            c1 = trig.Cos(sym_uni).eval()
+                            c2 = ExpandTrig(trig.Cos(copy.deepcopy(b_val)).eval(), False).eval()
+                            s1 = trig.Sin(sym_uni).eval()
+                            s2 = ExpandTrig(trig.Sin(copy.deepcopy(b_val)).eval(), False).eval()
+                            tot += pmatch_res["B1"] * (c1 * c2 - s1 * s2)
+                            # Go onto next term
+                            continue
+
+            tot += num.Numeric(sym,"sym_obj")
         if self.expand_result:
             return Expand(tot).eval()
         return tot
