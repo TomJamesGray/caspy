@@ -75,8 +75,9 @@ class ExpandTrig(Function1Arg):
     fname = "expand_trig"
     latex_fname = "expand_trig"
 
-    def __init__(self,arg):
+    def __init__(self,arg,expand_result=True):
         self.arg = arg
+        self.expand_result = expand_result
 
     def eval(self):
         tot = num.Numeric(0, "number")
@@ -102,11 +103,13 @@ class ExpandTrig(Function1Arg):
                         s1 = trig.Sin(sym_uni).eval()
                         c1 = trig.Cos(b_val).eval()
                         c2 = trig.Cos(sym_uni).eval()
-                        s2 = ExpandTrig(trig.Sin(copy.deepcopy(b_val)).eval()).eval()
+                        s2 = ExpandTrig(trig.Sin(copy.deepcopy(b_val)).eval(), False).eval()
                         tot += s1*c1 + c2*s2
                     else:
                         tot += num.Numeric(sym,"sym_obj")
             else:
                 tot.val.append(sym)
+        if self.expand_result:
+            return Expand(tot).eval()
         return tot
 

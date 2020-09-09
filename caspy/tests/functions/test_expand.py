@@ -14,5 +14,4 @@ def test_brackets_and_term_expansion():
 
 
 def test_expand_trig_sin():
-    assert latex_eval("expand_trig(sin(3*x))") == ""
-    assert p.parse("expand_trig(sin(3*x))") == p.parse("sin(x)*cos(2*x)+2sin(x)*cos(x)^2")
+    assert p.parse("expand_trig(sin(3*x))") == p.parse("sin(x)*cos(2*x)+2*cos(x)^2*sin(x)")
