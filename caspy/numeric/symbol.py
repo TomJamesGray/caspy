@@ -216,7 +216,9 @@ class Symbol:
                 if self.val[i][1].is_zero():
                     to_remove.append(i)
                     continue
-
+            elif isinstance(self.val[i][0], funcs.Function):
+                self.val[i][0].simplify()
+                continue
             # Deal with numeric 'coefficient terms'
             if type(self.val[i][0]) == Fraction and self.val[i][1] == 1:
                 # Multiply accumulator by this fraction
