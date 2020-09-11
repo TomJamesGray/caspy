@@ -75,10 +75,11 @@ def sin_id_expand(a,b):
     # Expand using identity:
     # sin(a+b) = sin(a)cos(b)+cos(a)sin(b)
     s1 = trig.Sin(a).eval()
-    c1 = trig.Cos(b).eval()
+    c1 = ExpandTrig(trig.Cos(copy.deepcopy(b)).eval(), False).eval()
     c2 = trig.Cos(a).eval()
     s2 = ExpandTrig(trig.Sin(copy.deepcopy(b)).eval(), False).eval()
     return s1 * c1 + c2 * s2
+
 
 def cos_id_expand(a,b):
     # Expand using identity:
@@ -139,14 +140,18 @@ class ExpandTrig(Function1Arg):
                 else:
                     # Expand term by term
                     a_val = num.Numeric(copy.deepcopy(pmatch_res["A1"].val[0]),"sym_obj")
-                    b_val = copy.deepcopy(pmatch_res["A1"]) - a_val
-                    b_val.simplify()
+                    b_val = copy.deepcopy(pmatch_res["A1"]) - copy.deepcopy(a_val)
                     logger.debug("Expanding term by term; a: {} b: {}".format(
                         a_val,b_val
                     ))
                     if sin_id:
                         tot += pmatch_res["B1"] * sin_id_expand(
                             a_val,b_val
+                        )
+                        continue
+                    else:
+                        tot += pmatch_res["B1"] * cos_id_expand(
+                            a_val, b_val
                         )
                         continue
 
