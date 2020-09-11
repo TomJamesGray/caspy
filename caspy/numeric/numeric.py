@@ -111,7 +111,13 @@ class Numeric(Generic[Num]):
                     lookup.add_coeff(sym_y.val[sym_y_coeff_index][0])
             else:
                 self.val.append(sym_y)
-
+        # Check for unnecessary zeroes
+        new_val = []
+        if len(self.val) > 1:
+            for sym in self.val:
+                if not sym.is_zero():
+                    new_val.append(sym)
+            self.val = new_val
         return self
 
     def neg(self) -> Num:
