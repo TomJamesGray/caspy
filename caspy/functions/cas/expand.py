@@ -71,6 +71,25 @@ class Expand(Function1Arg):
         return tot
 
 
+def sin_id_expand(a,b):
+    # Expand using identity:
+    # sin(a+b) = sin(a)cos(b)+cos(a)sin(b)
+    s1 = trig.Sin(a).eval()
+    c1 = trig.Cos(b).eval()
+    c2 = trig.Cos(a).eval()
+    s2 = ExpandTrig(trig.Sin(copy.deepcopy(b)).eval(), False).eval()
+    return s1 * c1 + c2 * s2
+
+def cos_id_expand(a,b):
+    # Expand using identity:
+    # cos(a+b) = cos(a)cos(b)-sin(a)sin(b)
+    c1 = trig.Cos(a).eval()
+    c2 = ExpandTrig(trig.Cos(copy.deepcopy(b)).eval(), False).eval()
+    s1 = trig.Sin(a).eval()
+    s2 = ExpandTrig(trig.Sin(copy.deepcopy(b)).eval(), False).eval()
+    return c1 * c2 - s1 * s2
+
+
 class ExpandTrig(Function1Arg):
     fname = "expand_trig"
     latex_fname = "expand_trig"
@@ -110,28 +129,30 @@ class ExpandTrig(Function1Arg):
                         b_val = num.Numeric(coeff_r - 1, "number") * copy.deepcopy(sym_uni)
 
                         if sin_id:
-                            # Expand using identity:
-                            # sin(a+b) = sin(a)cos(b)+cos(a)sin(b)
-                            s1 = trig.Sin(sym_uni).eval()
-                            c1 = trig.Cos(b_val).eval()
-                            c2 = trig.Cos(sym_uni).eval()
-                            s2 = ExpandTrig(trig.Sin(copy.deepcopy(b_val)).eval(), False).eval()
-                            tot += pmatch_res["B1"] * (s1*c1 + c2*s2)
+                            tot += pmatch_res["B1"] * sin_id_expand(sym_uni,b_val)
                             # Go onto next term
                             continue
                         else:
-                            # Expand using identity:
-                            # cos(a+b) = cos(a)cos(b)-sin(a)sin(b)
-                            c1 = trig.Cos(sym_uni).eval()
-                            c2 = ExpandTrig(trig.Cos(copy.deepcopy(b_val)).eval(), False).eval()
-                            s1 = trig.Sin(sym_uni).eval()
-                            s2 = ExpandTrig(trig.Sin(copy.deepcopy(b_val)).eval(), False).eval()
-                            tot += pmatch_res["B1"] * (c1 * c2 - s1 * s2)
+                            tot += pmatch_res["B1"] * cos_id_expand(sym_uni,b_val)
                             # Go onto next term
                             continue
+                else:
+                    # Expand term by term
+                    a_val = num.Numeric(copy.deepcopy(pmatch_res["A1"].val[0]),"sym_obj")
+                    b_val = copy.deepcopy(pmatch_res["A1"]) - a_val
+                    b_val.simplify()
+                    logger.debug("Expanding term by term; a: {} b: {}".format(
+                        a_val,b_val
+                    ))
+                    if sin_id:
+                        tot += pmatch_res["B1"] * sin_id_expand(
+                            a_val,b_val
+                        )
+                        continue
 
             tot += num.Numeric(sym,"sym_obj")
         if self.expand_result:
             return Expand(tot).eval()
         return tot
+
 
