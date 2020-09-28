@@ -6,6 +6,7 @@ from caspy.numeric.fraction import Fraction
 from caspy.functions.function import Function1Arg
 from caspy.functions import trigonometric as trig
 from caspy.numeric import numeric as num
+from caspy.printing.latex_numeric import latex_numeric_str as lns
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +16,9 @@ class Expand(Function1Arg):
     fname = "expand"
     latex_fname = "expand"
 
-    def __init__(self,x):
+    def __init__(self, x, recurse_into=True):
         self.arg = x
+        self.recurse_into = recurse_into
 
     def eval(self):
         logger.debug("Attempting to expand {}".format(self.arg))
@@ -40,8 +42,27 @@ class Expand(Function1Arg):
                                 take_recip = False
                                 iters = int(frac_pow.to_real()) - 1
 
-                            cur_val = copy.deepcopy(sym_name)
-                            mul_by = copy.deepcopy(sym_name)
+                            if self.recurse_into:
+                                new_sym_name = num.Numeric(0,"number")
+                                for sym_in_sym_name in copy.deepcopy(sym_name.val):
+                                    logger.critical("Checking recurse on {}".format(sym_in_sym_name))
+                                    need_to_recurse = False
+                                    for (a,b) in sym_in_sym_name.val:
+                                        if type(a) == num.Numeric:
+                                            need_to_recurse = True
+                                            break
+
+                                    if need_to_recurse:
+                                        logger.critical("RECURSE")
+                                        new_sym_name += Expand(
+                                            num.Numeric(sym_in_sym_name),True).eval()
+                                    else:
+                                        new_sym_name += num.Numeric(sym_in_sym_name)
+                            else:
+                                new_sym_name = sym_name
+
+                            cur_val = copy.deepcopy(new_sym_name)
+                            mul_by = copy.deepcopy(new_sym_name)
 
                             for i in range(0,iters):
                                 cur_val = cur_val.mul_expand(mul_by)
@@ -157,7 +178,10 @@ class ExpandTrig(Function1Arg):
 
             tot += num.Numeric(sym,"sym_obj")
         if self.expand_result:
-            return Expand(tot).eval()
+            logger.critical("Pre expanding {}".format(lns(tot)))
+            xyz = Expand(tot,True).eval()
+            logger.critical("Expanding result {}".format(lns(xyz)))
+            return xyz
         return tot
 
 

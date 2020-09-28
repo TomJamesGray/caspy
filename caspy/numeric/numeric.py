@@ -13,20 +13,24 @@ logger = logging.getLogger(__name__)
 class Numeric(Generic[Num]):
     """Represents a linear combination of numbers and symbols"""
 
-    def __init__(self, val, typ: str):
+    def __init__(self, val, typ: str = ""):
         """Initialises a numeric class with a single value"""
         self.val = []
-        if typ == "sym":
-            # val represents the letter of the symbol, such as x,y,..
-            self.val.append(Symbol(val, Fraction(1, 1)))
-        elif typ == "number":
-            # in this case the 1 represents that this value is just a number
-            if type(val) == Fraction:
-                self.val.append(Symbol(1, val))
-            else:
-                self.val.append(Symbol(1, Fraction(float(val), 1)))
-        elif typ == "sym_obj":
-            self.val.append(val)
+        if typ == "":
+            if type(val) == Symbol:
+                self.val.append(val)
+        else:
+            if typ == "sym":
+                # val represents the letter of the symbol, such as x,y,..
+                self.val.append(Symbol(val, Fraction(1, 1)))
+            elif typ == "number":
+                # in this case the 1 represents that this value is just a number
+                if type(val) == Fraction:
+                    self.val.append(Symbol(1, val))
+                else:
+                    self.val.append(Symbol(1, Fraction(float(val), 1)))
+            elif typ == "sym_obj":
+                self.val.append(val)
 
     def __repr__(self):
         return "<Numeric class {}>".format(self.val)
@@ -257,7 +261,6 @@ class Numeric(Generic[Num]):
         is not possible it raises an exception
         :return: float
         """
-        logger.warning("Frac eval on {}".format(self))
         ret = Fraction(0, 1)
         for sym in self.val:
             x = sym.sym_frac_eval()
