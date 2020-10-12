@@ -1,13 +1,14 @@
 import logging
 import caspy.pattern_match
 from caspy.functions.function import Function1Arg
-from caspy.helpers.helpers import lcm,gcd_l
+from caspy.helpers.helpers import lcm,gcd_l,get_divisors
 from caspy.numeric.numeric import Numeric
 from caspy.numeric.symbol import Symbol
 from caspy.numeric.fraction import Fraction
 from caspy.factorise import factoriseNum
 
 logger = logging.getLogger(__name__)
+
 
 def polyn_eval(polyn,x):
     val = 0
@@ -40,7 +41,7 @@ def kronecker(polyn):
     logger.debug("cont : {}".format(cont))
     logger.debug("v : {}".format(v_polyn))
     # Now have a polynomial in Z[x]
-    n = max(*v_polyn,key = lambda x: x[1])[1]
+    n = max(*v_polyn,key=lambda x: x[1])[1]
     logger.debug("n: {}".format(n))
     s = int(n/2)
 
@@ -56,13 +57,14 @@ def kronecker(polyn):
 
     f_factors = []
     for _,f_val in non_zeroes:
-        factors_abs = factoriseNum(abs(f_val))
+        divisors_abs = list(get_divisors(abs(f_val)))
         f_factors.append(
-            factors_abs + [-1 * fact for fact in factors_abs]
+            divisors_abs + [-1 * fact for fact in divisors_abs]
         )
     logger.debug("S_i: {}".format(f_factors))
 
     pass
+
 
 class KroneckerFactor(Function1Arg):
     fname = "factor"

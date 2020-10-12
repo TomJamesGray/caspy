@@ -1,6 +1,8 @@
 import itertools
+import collections
 from math import gcd
 from functools import reduce
+from caspy.factorise import factoriseNum
 
 
 def group_list_into_all_poss_pairs(lst):
@@ -32,11 +34,31 @@ def lcm(nums):
     """
     return reduce(lambda a, b: a * b // gcd(a, b), nums)
 
+
 def gcd_l(nums):
     """
     Returns the greatest common divisor of a list of ints
     """
     return reduce(gcd, nums)
 
+# Read from https://alexwlchan.net/2019/07/finding-divisors-with-python/
+
+
+def prod(iterable):
+    result = 1
+    for i in iterable:
+        result *= i
+    return result
+
 
 def get_divisors(num):
+    factors = list(factoriseNum(num))[1:]
+    pf_mults = collections.Counter(factors)
+
+    powers = [
+        [factor ** i for i in range(count+1)]
+        for factor, count in pf_mults.items()
+    ]
+
+    for power_combo in itertools.product(*powers):
+        yield prod(power_combo)
