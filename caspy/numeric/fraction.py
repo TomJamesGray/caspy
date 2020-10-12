@@ -126,3 +126,6 @@ class Fraction(Generic[Frac]):
             return True
         else:
             return False
+
+    def __int__(self) -> int:
+        return int(self.num/self.den)

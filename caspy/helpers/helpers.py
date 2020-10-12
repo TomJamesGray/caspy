@@ -1,5 +1,6 @@
 import itertools
-from copy import deepcopy
+from math import gcd
+from functools import reduce
 
 
 def group_list_into_all_poss_pairs(lst):
@@ -23,3 +24,19 @@ def group_list_into_all_poss_pairs(lst):
 
             yield a, b
         len_a += 1
+
+
+def lcm(nums):
+    """
+    Returns the lowest common multiple of a list of ints
+    """
+    return reduce(lambda a, b: a * b // gcd(a, b), nums)
+
+def gcd_l(nums):
+    """
+    Returns the greatest common divisor of a list of ints
+    """
+    return reduce(gcd, nums)
+
+
+def get_divisors(num):

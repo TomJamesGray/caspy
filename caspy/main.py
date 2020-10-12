@@ -44,7 +44,7 @@ logging_config = {
         "caspy.functions":{
             "handlers":["functions","cutelog"],
             "level":logging.DEBUG
-        },
+        }
     }
 }
 
