@@ -1,6 +1,6 @@
 import logging
 import caspy.numeric.numeric as num
-import caspy.numeric.symbol as sym
+import caspy.numeric.symbol
 import caspy.parsing
 from caspy.numeric.fraction import Fraction
 from caspy.printing import latex_numeric as ln
@@ -14,7 +14,7 @@ class Function:
             return self.fname == other.fname and self.arg == other.arg
 
     def eval(self):
-        return num.Numeric(sym.Symbol(self, Fraction(1, 1)), "sym_obj")
+        return num.Numeric(caspy.numeric.symbol.Symbol(self, Fraction(1, 1)), "sym_obj")
 
 
 class Function1Arg(Function):

@@ -4,7 +4,7 @@ from lark import Transformer
 from caspy.numeric.numeric import Numeric
 from caspy.helpers import lark_transformer
 from caspy.functions import exponentials,trigonometric,other,to_real
-from caspy.functions.cas import expand,integrate,differentiate
+from caspy.functions.cas import expand,integrate,differentiate,kronecker_factorise
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,8 @@ fns = {
     "re": lambda x: to_real.ToReal(x),
     "integrate": lambda *args: integrate.Integrate(*args),
     "diff": lambda *args: differentiate.Differentiate(*args),
-    "expand_trig": lambda x: expand.ExpandTrig(x)
+    "expand_trig": lambda x: expand.ExpandTrig(x),
+    "factor": lambda x: kronecker_factorise.KroneckerFactor(x)
 }
 
 # noinspection PyMethodMayBeStatic
