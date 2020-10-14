@@ -30,6 +30,15 @@ def np_polyn_to(polyn):
     return new_repr
 
 
+def close_to_all_ints(x):
+    for i in x:
+        # Just comparing to int(i) can cause issues with floats
+        # that are near but not exactly equal
+        if not np.isclose(i,int(i)):
+            return False
+    return True
+
+
 def kronecker(polyn):
     M,v_polyn = kronecker_frac_to_int(polyn)
     cont = gcd_l(v_polyn)
@@ -101,14 +110,14 @@ def kronecker_int(polyn):
         quotient,remainder = np.polydiv(v_polyn,q_polyn)
         if np.array_equal(remainder,np.array([0.])):
             # Ensure the quotient is just made up of integers
-            if False not in np.equal(np.mod(quotient,1),0):
+            if close_to_all_ints(quotient):
                 # We have found divisor
-                print("Found quotient: {}\nq_polyn: {}\nRHS: {}".format(quotient,q_polyn,rhs))
+                logger.debug("Found quotient: {}\nq_polyn: {}\nRHS: {}".format(quotient,q_polyn,rhs))
                 # Factor quotient and q_polyn again to see if the answer can be
                 # reduced further
                 quotient_factored = kronecker_int(list(quotient.astype(int)))
                 q_polyn_factored = kronecker_int(list(q_polyn.astype(int)))
-                print("Factored: {} {}".format(quotient_factored,q_polyn_factored))
+                logger.debug("Factored: {} {}".format(quotient_factored,q_polyn_factored))
                 return quotient_factored + q_polyn_factored
     # Couldn't factorise the polynomial
     return [polyn]
