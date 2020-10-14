@@ -2,6 +2,7 @@ import logging
 import itertools
 import numpy as np
 import caspy.pattern_match
+import caspy.parsing.parser
 from caspy.functions.function import Function1Arg
 from caspy.helpers.helpers import lcm,gcd_l,get_divisors
 from caspy.numeric.numeric import Numeric
@@ -26,6 +27,7 @@ def np_polyn_to(polyn):
         if coeff != 0:
             new_repr.append([Fraction(int(coeff),1),max_pow-index])
     return new_repr
+
 
 def kronecker(polyn):
     """
@@ -108,6 +110,7 @@ def kronecker(polyn):
     # Couldn't factorise the polynomial
     return [polyn]
 
+
 class KroneckerFactor(Function1Arg):
     fname = "factor"
     latex_fname = "factor"
@@ -136,5 +139,19 @@ class KroneckerFactor(Function1Arg):
                     logger.critical("FAIL")
 
         factored = kronecker(polyn)
+        if len(factored) > 1:
+            factors_str = []
+            for factor in factored:
+                parts = []
+                for coeff,power in factor:
+                    # TODO possibly refactor this so it doesn't make a string
+                    # to be parsed?
+                    parts.append("{}*{}^{}".format(
+                        coeff,self.wrt,power
+                    ))
+                factors_str.append("({})".format("+".join(parts)))
+            parser = caspy.parsing.parser.Parser()
+            return parser.parse("*".join(factors_str))
+
         logger.critical("Repr: {}".format(factored))
         return super().eval()
