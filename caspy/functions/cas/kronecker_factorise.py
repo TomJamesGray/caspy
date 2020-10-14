@@ -32,7 +32,8 @@ def np_polyn_to(polyn):
 
 def kronecker(polyn):
     M,v_polyn = kronecker_frac_to_int(polyn)
-    return kronecker_int(v_polyn)
+    cont = gcd_l(v_polyn)
+    return cont,M,kronecker_int(v_polyn)
 
 
 def kronecker_frac_to_int(polyn):
@@ -149,8 +150,8 @@ class KroneckerFactor(Function1Arg):
             polyn_to_factor[n - power] = coeff
 
         print("Factorising {}".format(polyn_to_factor))
-        factored = kronecker(polyn_to_factor)
-        if len(factored) > 1:
+        cont,m_val,factored = kronecker(polyn_to_factor)
+        if len(factored) > 0:
             factors_str = []
             for factor in factored:
                 parts = []
@@ -163,7 +164,9 @@ class KroneckerFactor(Function1Arg):
                     ))
                 factors_str.append("({})".format("+".join(parts)))
             parser = caspy.parsing.parser.Parser()
-            return parser.parse("*".join(factors_str))
+            return parser.parse("{}/{} * {}".format(
+                cont,m_val,"*".join(factors_str))
+            )
 
         logger.critical("Repr: {}".format(factored))
         return super().eval()
