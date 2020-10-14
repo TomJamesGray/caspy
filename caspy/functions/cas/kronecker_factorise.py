@@ -15,8 +15,9 @@ logger = logging.getLogger(__name__)
 
 def polyn_eval(polyn,x):
     val = 0
-    for coeff,power in polyn:
-        val += coeff * x ** power
+    n = len(polyn) - 1
+    for i,coeff in enumerate(polyn):
+        val += coeff * x ** (n-i)
     return val
 
 
@@ -30,33 +31,37 @@ def np_polyn_to(polyn):
 
 
 def kronecker(polyn):
-    """
-    Factorises a single variable polynomial with Kroneckers method.
-    The polynomial is represented by a list eg u=a_0 + a_1 * x + ... is
-    represented by [[a_0,0], [a_1,1], ...]
-    :return: Multiple lists representing the polynomial factors
-    """
-    n = max(*polyn,key=lambda x: x[1])[1]
-    if n <= 1:
-        # Don't try and factor linear term
-        return [polyn]
+    M,v_polyn = kronecker_frac_to_int(polyn)
+    return kronecker_int(v_polyn)
 
+
+def kronecker_frac_to_int(polyn):
     denominators = []
-    for coeff,_ in polyn:
-        denominators.append(coeff.den)
+    for coeff in polyn:
+        if coeff.num != 0:
+            denominators.append(coeff.den)
     M = lcm(denominators)
     logger.debug("Kronecker M: {}".format(M))
 
     v_polyn = []
-    coeffs = []
-    for coeff,power in polyn:
+    for coeff in polyn:
         new_coeff = int(coeff.to_real() * M)
-        v_polyn.append([new_coeff,int(power)])
-        coeffs.append(new_coeff)
+        v_polyn.append(new_coeff)
 
-    cont = gcd_l(coeffs)
-    logger.debug("cont : {}".format(cont))
+    return M, v_polyn
+
+
+def kronecker_int(polyn):
+    n = len(polyn) - 1
+    if n <= 1:
+        # Don't try and factor linear term
+        return [polyn]
+
+    v_polyn = polyn
+
     logger.debug("v : {}".format(v_polyn))
+    cont = gcd_l(v_polyn)
+    logger.debug("cont : {}".format(cont))
     # Now have a polynomial in Z[x]
     logger.debug("n: {}".format(n))
     s = int(n/2)
@@ -80,12 +85,7 @@ def kronecker(polyn):
         )
     logger.debug("S_i: {}".format(f_factors))
 
-    # TEMP while we use np.polydiv get a representation of v_polyn in the
-    # format numpy likes
     # TODO implement own polynomial division algorithm
-    coeffs_v_np = np.zeros(n+1)
-    for coeff,power in v_polyn:
-        coeffs_v_np[n-power] = coeff
 
     # Generate matrix with the chosen x values to solve the linear equations
     mat_rows = []
@@ -97,16 +97,18 @@ def kronecker(polyn):
 
     for rhs in itertools.product(*f_factors):
         q_polyn = np.flipud(inv_mat.dot(np.array(rhs)))
-        quotient,remainder = np.polydiv(coeffs_v_np,q_polyn)
+        quotient,remainder = np.polydiv(v_polyn,q_polyn)
         if np.array_equal(remainder,np.array([0.])):
-            # We have found divisor
-            print("Found quotient: {}\nq_polyn: {}\nRHS: {}".format(quotient,q_polyn,rhs))
-            # Factor quotient and q_polyn again to see if the answer can be
-            # reduced further
-            quotient_factored = kronecker(np_polyn_to(quotient))
-            q_polyn_factored = kronecker(np_polyn_to(q_polyn))
-            print("Factored: {} {}".format(quotient_factored,q_polyn_factored))
-            return quotient_factored + q_polyn_factored
+            # Ensure the quotient is just made up of integers
+            if False not in np.equal(np.mod(quotient,1),0):
+                # We have found divisor
+                print("Found quotient: {}\nq_polyn: {}\nRHS: {}".format(quotient,q_polyn,rhs))
+                # Factor quotient and q_polyn again to see if the answer can be
+                # reduced further
+                quotient_factored = kronecker_int(list(quotient.astype(int)))
+                q_polyn_factored = kronecker_int(list(q_polyn.astype(int)))
+                print("Factored: {} {}".format(quotient_factored,q_polyn_factored))
+                return quotient_factored + q_polyn_factored
     # Couldn't factorise the polynomial
     return [polyn]
 
@@ -138,16 +140,26 @@ class KroneckerFactor(Function1Arg):
                 except Exception:
                     logger.critical("FAIL")
 
-        factored = kronecker(polyn)
+        # Get degree of polynomial
+        n = max(polyn,key=lambda x:x[1])[1]
+        # Convert polynomial so it's stored like
+        # [coeff nth power, coeff n-1st power,...,constant term]
+        polyn_to_factor = [Fraction(0,1) for i in range(n+1)]
+        for coeff, power in polyn:
+            polyn_to_factor[n - power] = coeff
+
+        print("Factorising {}".format(polyn_to_factor))
+        factored = kronecker(polyn_to_factor)
         if len(factored) > 1:
             factors_str = []
             for factor in factored:
                 parts = []
-                for coeff,power in factor:
+                max_fact_pow = len(factor) - 1
+                for i,coeff in enumerate(factor):
                     # TODO possibly refactor this so it doesn't make a string
                     # to be parsed?
                     parts.append("{}*{}^{}".format(
-                        coeff,self.wrt,power
+                        coeff,self.wrt,max_fact_pow - i
                     ))
                 factors_str.append("({})".format("+".join(parts)))
             parser = caspy.parsing.parser.Parser()
