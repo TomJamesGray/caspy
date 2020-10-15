@@ -1,5 +1,6 @@
 import logging
 import itertools
+import copy
 import numpy as np
 import caspy.pattern_match
 import caspy.parsing.parser
@@ -132,6 +133,7 @@ class KroneckerFactor(Function1Arg):
         self.wrt = "x"
         # Store a representation of the polynomial as [[coeff1,power1],...]
         polyn = []
+        terms_used = []
         for i,sym in enumerate(self.arg.val):
             pmatch_res = caspy.pattern_match.pmatch_sym("A1*{}^N1".format(self.wrt),
                                                         {"N1":"const","A1":"const"},sym)
@@ -139,26 +141,29 @@ class KroneckerFactor(Function1Arg):
                 if pmatch_res["N1"].to_real() == int(pmatch_res["N1"]) and \
                         pmatch_res["A1"].is_int_frac():
                     polyn.append([pmatch_res["A1"], int(pmatch_res["N1"])])
+                    terms_used.append(i)
 
             elif sym.is_exclusive_numeric():
                 try:
                     c = sym.sym_frac_eval()
                     if c.is_int_frac():
                         polyn.append([c,0])
+                        terms_used.append(i)
                 except Exception:
                     logger.critical("FAIL")
 
-        # Get degree of polynomial
-        n = max(polyn,key=lambda x:x[1])[1]
-        # Convert polynomial so it's stored like
-        # [coeff nth power, coeff n-1st power,...,constant term]
-        polyn_to_factor = [Fraction(0,1) for i in range(n+1)]
-        for coeff, power in polyn:
-            polyn_to_factor[n - power] = coeff
+        if len(polyn) > 0:
+            # Get degree of polynomial
+            n = max(polyn,key=lambda x:x[1])[1]
+            # Convert polynomial so it's stored like
+            # [coeff nth power, coeff n-1st power,...,constant term]
+            polyn_to_factor = [Fraction(0,1) for i in range(n+1)]
+            for coeff, power in polyn:
+                polyn_to_factor[n - power] = coeff
 
-        print("Factorising {}".format(polyn_to_factor))
-        cont,m_val,factored = kronecker(polyn_to_factor)
-        if len(factored) > 0:
+            print("Factorising {}".format(polyn_to_factor))
+
+            cont,m_val,factored = kronecker(polyn_to_factor)
             factors_str = []
             for factor in factored:
                 parts = []
@@ -171,9 +176,14 @@ class KroneckerFactor(Function1Arg):
                     ))
                 factors_str.append("({})".format("+".join(parts)))
             parser = caspy.parsing.parser.Parser()
-            return parser.parse("{}/{} * {}".format(
+            output = parser.parse("{}/{} * {}".format(
                 cont,m_val,"*".join(factors_str))
             )
+        else:
+            output = Numeric(0)
+        for i,sym in enumerate(self.arg.val):
+            if i not in terms_used:
+                # Add on other terms to the output that we didn't try to factorise
+                output.val.append(copy.deepcopy(sym))
 
-        logger.critical("Repr: {}".format(factored))
-        return super().eval()
+        return output

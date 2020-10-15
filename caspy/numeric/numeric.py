@@ -19,6 +19,10 @@ class Numeric(Generic[Num]):
         if typ == "":
             if type(val) == Symbol:
                 self.val.append(val)
+            elif type(val) == Fraction:
+                self.val.append(Symbol(1, val))
+            elif type(val) in [float,int]:
+                self.val.append(Symbol(1, Fraction(float(val), 1)))
         else:
             if typ == "sym":
                 # val represents the letter of the symbol, such as x,y,..
