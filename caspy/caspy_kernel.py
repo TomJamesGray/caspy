@@ -1,3 +1,4 @@
+import traceback
 from ipykernel.kernelbase import Kernel
 from caspy.parsing import parser
 from caspy.printing import latex_numeric
@@ -18,7 +19,18 @@ class CaspyKernel(Kernel):
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
         parser_cls = parser.Parser()
-        num_result = parser_cls.parse(code)
+        try:
+            num_result = parser_cls.parse(code)
+        except Exception as e:
+            self.send_response(self.iopub_socket, 'stream', {"name": "stderr", "text": traceback.format_exc()})
+            return {
+                "status": "error",
+                "execution_count": self.execution_count,
+                "traceback": [],
+                "ename": "",
+                "evalue": str(e)
+            }
+
         if not silent:
             latex_str = latex_numeric.latex_numeric_str(num_result)
             self.send_response(self.iopub_socket,"display_data", {
