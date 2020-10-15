@@ -3,14 +3,14 @@ import logging
 import math
 from caspy.numeric.symbol import Symbol
 from caspy.numeric.fraction import Fraction, Frac
-from typing import TypeVar, Generic
+# from typing import TypeVar, Generic
 from caspy.functions import to_real
 
-Num = TypeVar("Num")
+# Num = TypeVar("Num")
 logger = logging.getLogger(__name__)
 
 
-class Numeric(Generic[Num]):
+class Numeric():
     """Represents a linear combination of numbers and symbols"""
 
     def __init__(self, val, typ: str = ""):
@@ -90,7 +90,7 @@ class Numeric(Generic[Num]):
 
         return False
 
-    def add(self, y: Num) -> Num:
+    def add(self, y):
         """
         Adds y to this number
         :param y: Another numeric class
@@ -128,7 +128,7 @@ class Numeric(Generic[Num]):
             self.val = new_val
         return self
 
-    def neg(self) -> Num:
+    def neg(self):
         """
         Negates this number
         :return: self
@@ -138,14 +138,14 @@ class Numeric(Generic[Num]):
 
         return self
 
-    def recip(self) -> Num:
+    def recip(self):
         if len(self.val) == 1:
             self.val[0] = self.val[0].recip()
             return self
         else:
             return self.pow(Numeric(-1, "number"))
 
-    def pow(self, x: Num) -> Num:
+    def pow(self, x):
         """
         Raises this number to the power x
         :param x: Numeric object
@@ -163,7 +163,7 @@ class Numeric(Generic[Num]):
             self.val[0].val[0][1] = x
             return self
 
-    def mul(self, x: Num) -> Num:
+    def mul(self, x):
         """
         Multiplies this number by x. If this number or x is made up
         of a linear combination of terms, eg (1+x) then we don't
@@ -182,7 +182,7 @@ class Numeric(Generic[Num]):
             self.val[0].mul(x.val[0])
         return self
 
-    def div(self, x: Num) -> Num:
+    def div(self, x):
         """
         Divides this number by x
         :param x: Numeric object
@@ -314,7 +314,7 @@ class Numeric(Generic[Num]):
                 return False
         return True
 
-    def mul_expand(self, x: Num):
+    def mul_expand(self, x):
         """
         Multiplies this object by another numeric object term by term. So
         (x+1)*(x+2) will be evaluated to x^2+3x+2

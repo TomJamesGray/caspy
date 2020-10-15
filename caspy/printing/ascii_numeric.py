@@ -1,8 +1,8 @@
-from caspy.numeric.numeric import Num,Numeric
+from caspy.numeric.numeric import Numeric
 from caspy.functions.function import Function1Arg
 
 
-def ascii_numeric_str(x: Num):
+def ascii_numeric_str(x):
     if type(x) != Numeric:
         return str(x)
     out = ""
