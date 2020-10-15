@@ -42,6 +42,7 @@ def latex_numeric_str(x):
                     out += "\\cdot"
                     need_dot = False
                 if type(sym_name) == num.Numeric:
+                    print("Recursing for {}".format(sym_name))
                     power = latex_numeric_str(sym_name)
                     if power != "" and power != "1":
                         out += "({})".format(power)

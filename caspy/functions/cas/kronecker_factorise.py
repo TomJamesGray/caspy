@@ -42,7 +42,9 @@ def close_to_all_ints(x):
 def kronecker(polyn):
     M,v_polyn = kronecker_frac_to_int(polyn)
     cont = gcd_l(v_polyn)
-    return cont,M,kronecker_int(v_polyn)
+    # Get primitive polynomial, ie remove common factors
+    v_polyn_pp = [x // cont for x in v_polyn]
+    return cont,M,kronecker_int(v_polyn_pp)
 
 
 def kronecker_frac_to_int(polyn):
@@ -67,11 +69,7 @@ def kronecker_int(polyn):
         # Don't try and factor linear term
         return [polyn]
 
-    v_polyn = polyn
-
-    logger.debug("v : {}".format(v_polyn))
-    cont = gcd_l(v_polyn)
-    logger.debug("cont : {}".format(cont))
+    logger.debug("v : {}".format(polyn))
     # Now have a polynomial in Z[x]
     logger.debug("n: {}".format(n))
     s = int(n/2)
@@ -79,7 +77,7 @@ def kronecker_int(polyn):
     non_zeroes = []
     x_i = 0
     while len(non_zeroes) <= s:
-        polyn_evaled = polyn_eval(v_polyn,x_i)
+        polyn_evaled = polyn_eval(polyn,x_i)
         if polyn_evaled != 0:
             non_zeroes.append([x_i,polyn_evaled])
         x_i += 1
@@ -107,7 +105,7 @@ def kronecker_int(polyn):
 
     for rhs in itertools.product(*f_factors):
         q_polyn = np.flipud(inv_mat.dot(np.array(rhs)))
-        quotient,remainder = np.polydiv(v_polyn,q_polyn)
+        quotient,remainder = np.polydiv(polyn,q_polyn)
         if np.array_equal(remainder,np.array([0.])):
             # Ensure the quotient is just made up of integers
             if close_to_all_ints(quotient):
