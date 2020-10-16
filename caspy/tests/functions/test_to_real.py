@@ -2,6 +2,7 @@ import math
 import hypothesis.strategies as st
 from caspy.tests.test_symbolic import p
 from hypothesis import given, settings
+from datetime import timedelta
 
 
 @given(st.floats(min_value=-100000, max_value=100000),
@@ -26,6 +27,8 @@ def test_to_real_cos(x):
     assert p.parse("re(cos({}))".format(x)) == p.parse("{}".format(math.cos(x)))
 
 
+# Default deadline is reached on travis, so increase it
+@settings(deadline=timedelta(milliseconds=500))
 @given(st.floats(min_value=-100000, max_value=100000))
 def test_to_real_tan(x):
     assert p.parse("re(tan({}))".format(x)) == p.parse("{}".format(math.tan(x)))
