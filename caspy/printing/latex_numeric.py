@@ -26,7 +26,6 @@ def latex_numeric_str(x):
             need_dot = True
             # Print the coefficient as a fraction only if necessary
             if sym.coeff.num == 0:
-                # Include the '+' so it doesn't get chopped off by return out[:-1]
                 out += "0"
                 continue
             elif sym.coeff.den == 1:
