@@ -8,26 +8,31 @@ def latex_numeric_str(x):
     if type(x) != num.Numeric:
         return str(x)
     out = ""
-    for sym in x.val:
+    for sym_pos,sym in enumerate(x.val):
         need_dot = False
         sym.simplify()
         if sym.val == [[-1,1]]:
             # Handles case when the symbol is just the number '-1' on it's own
-            out += "-1"
+            if sym_pos == 0:
+                out += "-1"
+            else:
+                out += "1"
+        elif sym.coeff.num == -1 and sym.coeff.den == 1:
+            if sym_pos == 0:
+                out += "-"
+                need_dot = False
+
         elif not (sym.coeff.num == 1 and sym.coeff.den == 1):
             need_dot = True
             # Print the coefficient as a fraction only if necessary
             if sym.coeff.num == 0:
                 # Include the '+' so it doesn't get chopped off by return out[:-1]
-                out += "0+"
+                out += "0"
                 continue
-            elif sym.coeff.num == -1 and sym.coeff.den == 1:
-                out += "-"
-                need_dot = False
             elif sym.coeff.den == 1:
-                out += "{}".format(to_int(sym.coeff.num))
+                out += "{}".format(abs(to_int(sym.coeff.num)))
             elif sym.coeff.den == -1:
-                out += "{}".format(to_int(sym.coeff.num * -1))
+                out += "{}".format(abs(to_int(sym.coeff.num * -1)))
             else:
                 out += "\\frac{{{}}}{{{}}}".format(to_int(sym.coeff.num), to_int(sym.coeff.den))
         elif sym.val == [[1,1]]:
@@ -55,6 +60,12 @@ def latex_numeric_str(x):
                     out += "^ {{{}}}".format(power)
             elif type(pow) == num.Numeric:
                 out += "^ {{{}}}".format(latex_numeric_str(pow))
+        if sym_pos + 1 < len(x.val):
+            # Check we aren't on the last term
+            if x.val[sym_pos + 1].coeff.to_real() < 0:
+                out += "-"
+            else:
+                out += "+"
 
-        out += "+"
-    return out[:-1]
+        # out += "+"
+    return out
