@@ -76,6 +76,10 @@ def kronecker_frac_to_int(polyn):
     return M, v_polyn
 
 
+def is_const_polyn(polyn):
+    return close_to_zero_vec(polyn[:-1])
+
+
 def kronecker_int(polyn):
     logger.debug("Int factorising: {}".format(polyn))
     n = len(polyn) - 1
@@ -115,23 +119,24 @@ def kronecker_int(polyn):
         mat_rows.append([
             x_val ** power for power in range(s + 1)
         ])
-    inv_mat_2 = invert_mat(mat_rows)
+    inv_mat = invert_mat(mat_rows)
 
     for rhs in itertools.product(*f_factors):
-        q_polyn_2 = mat_vec_prod(inv_mat_2,rhs)[::-1]
-        if not close_to_all_ints(q_polyn_2):
+        q_polyn = mat_vec_prod(inv_mat,rhs)[::-1]
+        # Check q is all integers and is not just a const
+        if not close_to_all_ints(q_polyn) or is_const_polyn(q_polyn):
             continue
-        quotient_2,remainder_2 = polyn_div(polyn,q_polyn_2)
+        quotient_2,remainder_2 = polyn_div(polyn,q_polyn)
         if close_to_zero_vec(remainder_2):
             # Ensure the quotient is just made up of integers
             if close_to_all_ints(quotient_2):
                 # We have found divisor
                 logger.debug(
-                    "Found quotient: {}\nq_polyn_2: {}\nRemainder: {}".format(quotient_2, q_polyn_2, remainder_2))
+                    "Found quotient: {}\nq_polyn_2: {}\nRemainder: {}".format(quotient_2, q_polyn, remainder_2))
                 # Factor quotient and q_polyn again to see if the answer can be
                 # reduced further
                 quotient_factored = kronecker_int([round(x) for x in quotient_2])
-                q_polyn_factored = kronecker_int([round(x) for x in q_polyn_2])
+                q_polyn_factored = kronecker_int([round(x) for x in q_polyn])
                 # quotient_factored = kronecker_int(list(quotient_2.astype(int)))
                 # q_polyn_factored = kronecker_int(list(q_polyn.astype(int)))
                 logger.debug("Factored: {} {}".format(quotient_factored,q_polyn_factored))

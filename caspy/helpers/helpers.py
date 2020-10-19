@@ -116,7 +116,6 @@ def reformat_polyn(x):
     was given in the argument initially
     """
     n = deg(x)
-    print("Reformat {}".format(x))
     new_polyn = [0 for _ in range(n+1)]
     for power,coeff in x:
         if power <= n:
