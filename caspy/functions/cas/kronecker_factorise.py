@@ -1,7 +1,6 @@
 import logging
 import itertools
 import copy
-import numpy as np
 import caspy.pattern_match
 import caspy.parsing.parser
 from caspy.helpers.helpers import polyn_div
@@ -37,8 +36,6 @@ def np_polyn_to(polyn):
 
 def close_to_all_ints(x):
     for i in x:
-        if np.isinf(i) or np.isnan(i):
-            return False
         # Just comparing to int(i) can cause issues with floats
         # that are near but not exactly equal
         if abs(i - round(i)) > MAX_FLOAT_ERROR:
@@ -48,8 +45,6 @@ def close_to_all_ints(x):
 
 def close_to_zero_vec(x):
     for i in x:
-        if np.isinf(i) or np.isnan(i):
-            return False
         # Just comparing to int(i) can cause issues with floats
         # that are near but not exactly equal
         if abs(i) > MAX_FLOAT_ERROR:
@@ -120,25 +115,17 @@ def kronecker_int(polyn):
         mat_rows.append([
             x_val ** power for power in range(s + 1)
         ])
-    inv_mat = np.linalg.inv(np.array(mat_rows))
     inv_mat_2 = invert_mat(mat_rows)
 
     for rhs in itertools.product(*f_factors):
-        q_polyn = np.flipud(inv_mat.dot(np.array(rhs)))
         q_polyn_2 = mat_vec_prod(inv_mat_2,rhs)[::-1]
-        # if not close_to_all_ints(q_polyn_2):
-            # continue
-        quotient,remainder = np.polydiv(polyn,q_polyn)
-        print("Div {} by {}".format(polyn,q_polyn_2))
+        if not close_to_all_ints(q_polyn_2):
+            continue
         quotient_2,remainder_2 = polyn_div(polyn,q_polyn_2)
-        # if not close_to_all_ints(quotient):
-        #     Quotient not very good
-            # continue
         if close_to_zero_vec(remainder_2):
             # Ensure the quotient is just made up of integers
             if close_to_all_ints(quotient_2):
                 # We have found divisor
-                logger.debug("Found quotient: {}\nq_polyn: {}\nRHS: {}\nRemainder: {}".format(quotient,q_polyn,rhs,remainder))
                 logger.debug(
                     "Found quotient: {}\nq_polyn_2: {}\nRemainder: {}".format(quotient_2, q_polyn_2, remainder_2))
                 # Factor quotient and q_polyn again to see if the answer can be
