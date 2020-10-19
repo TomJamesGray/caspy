@@ -62,3 +62,70 @@ def get_divisors(num):
 
     for power_combo in itertools.product(*powers):
         yield prod(power_combo)
+
+
+def leading_term(a):
+    max_pow = deg(a)
+    for power,coeff in a:
+        if power == max_pow:
+            return [power,coeff]
+
+
+def term_div(x,y):
+    """Divides polyn term x by term y"""
+    return [x[0] - y[0], x[1] / y[1]]
+
+
+def mul_polyn_by_term(x,y):
+    """Multiplies polynomial x by term y"""
+    return [
+        [power + y[0], coeff * y[1]] for power,coeff in x
+    ]
+
+
+def deg(x):
+    """Gets degree of polynomial x"""
+    max_pow = 0
+    for power,coeff in x:
+        if power > max_pow and coeff != 0:
+            max_pow = power
+    return max_pow
+
+
+def sub_polyns(x,y):
+    """Subtracts polynomial y from x"""
+    new_polyn = []
+    for power in range(0,max([deg(x),deg(y)])):
+        x_coeff = 0
+        for x_pow,coeff in x:
+            if x_pow == power:
+                x_coeff = coeff
+        y_coeff = 0
+        for y_pow, coeff in y:
+            if y_pow == power:
+                y_coeff = coeff
+
+        new_polyn.append([power,x_coeff - y_coeff])
+
+    return new_polyn
+
+
+def polyn_div(a,b):
+    """
+    Divides polynomial a by polynomial b, eg if a is x^2+2*x+3 it would be
+    represented as [1,2,3]
+    :param a: List representing polynomial
+    :param b: List representing polynomial
+    :return: List representing polynomial
+    """
+    a_polyn = [[i, x] for i, x in enumerate(a[::-1])]
+    b_polyn = [[i, x] for i, x in enumerate(b[::-1])]
+    quotient = []
+    cur_polyn = a_polyn
+
+    while deg(cur_polyn) >= deg(b_polyn):
+        quotient_term = term_div(leading_term(cur_polyn), leading_term(b_polyn))
+        to_subtract = mul_polyn_by_term(b_polyn, quotient_term)
+        cur_polyn = sub_polyns(cur_polyn, to_subtract)
+        quotient.append(quotient_term)
+        print("Cur polyn: {}\nto_sub:{}\nquotient:{}".format(cur_polyn,to_subtract,quotient))
