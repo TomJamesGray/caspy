@@ -2,9 +2,9 @@ import logging
 import itertools
 import copy
 import numpy as np
-import math
 import caspy.pattern_match
 import caspy.parsing.parser
+from caspy.helpers.helpers import polyn_div
 from caspy.matrix import mat_mul,invert_mat,mat_vec_prod
 from caspy.functions.function import Function1Arg
 from caspy.helpers.helpers import lcm,gcd_l,get_divisors
@@ -129,7 +129,8 @@ def kronecker_int(polyn):
         # if not close_to_all_ints(q_polyn_2):
             # continue
         quotient,remainder = np.polydiv(polyn,q_polyn)
-        quotient_2,remainder_2 = np.polydiv(polyn,q_polyn_2)
+        print("Div {} by {}".format(polyn,q_polyn_2))
+        quotient_2,remainder_2 = polyn_div(polyn,q_polyn_2)
         # if not close_to_all_ints(quotient):
         #     Quotient not very good
             # continue

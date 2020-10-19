@@ -110,6 +110,20 @@ def sub_polyns(x,y):
     return new_polyn
 
 
+def reformat_polyn(x):
+    """
+    Reformat polynomial from form used for polyn_div to the format it
+    was given in the argument initially
+    """
+    n = deg(x)
+    print("Reformat {}".format(x))
+    new_polyn = [0 for _ in range(n+1)]
+    for power,coeff in x:
+        if power <= n:
+            new_polyn[n-power] = coeff
+    return new_polyn
+
+
 def polyn_div(a,b):
     """
     Divides polynomial a by polynomial b, eg if a is x^2+2*x+3 it would be
@@ -128,4 +142,8 @@ def polyn_div(a,b):
         to_subtract = mul_polyn_by_term(b_polyn, quotient_term)
         cur_polyn = sub_polyns(cur_polyn, to_subtract)
         quotient.append(quotient_term)
-        print("Cur polyn: {}\nto_sub:{}\nquotient:{}".format(cur_polyn,to_subtract,quotient))
+        if deg(cur_polyn) == 0:
+            break
+        # print("Cur polyn: {}\nto_sub:{}\nquotient:{}".format(cur_polyn,to_subtract,quotient))
+
+    return reformat_polyn(quotient),reformat_polyn(cur_polyn)
