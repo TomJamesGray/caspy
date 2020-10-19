@@ -32,16 +32,26 @@ def col_swap(mat,c1,c2):
         row[c1], row[c2] = row[c2], row[c1]
     return mat
 
-
+# TODO dimension checking??
 def mat_mul(a,b):
     res = []
     for row_a in range(len(a)):
         row = []
-        for col_a in range(len(a[0])):
+        for col_a in range(len(b[0])):
             row.append(sum(
                 [a[row_a][j] * b[j][col_a] for j in range(len(a[0]))]
             ))
         res.append(row)
+    return res
+
+
+def mat_vec_prod(a,vec):
+    """Computes matrix (a) product with vector"""
+    res = []
+    for i in range(len(a)):
+        res.append(sum(
+            [a[i][j] * vec[j] for j in range(len(vec))]
+        ))
     return res
 
 
@@ -63,20 +73,17 @@ def invert_mat(mat):
     for gs_step in range(n):
         # Find the maximum element in the relevant sub matrix
         piv_elem,piv_row,piv_col = get_max_from_sub_mat(auged,gs_step,gs_step,n)
-        print("Pivoting on {} row {} col {}".format(piv_elem,piv_row,piv_col))
         # Perform pivoting
         auged = row_swap(auged,gs_step,piv_row)
         auged = col_swap(auged,gs_step,piv_col)
         # Store column permeutation matricies so we can re-order the final inverse
         permeutation_matricies.append(row_swap(gen_id_mat(n),gs_step,piv_col))
         # auged = col_swap(auged,gs_step + n,piv_col + n)
-        print("Pivoted mat {}".format(auged))
 
         for row_i in range(0, n):
             if row_i == gs_step:
                 continue
             sf = auged[row_i][gs_step] / auged[gs_step][gs_step]
-            print("SF {}".format(sf))
             for col_j in range(0, 2*n):
                 auged[row_i][col_j] = auged[row_i][col_j] - sf * auged[gs_step][col_j]
             # Add in a zero

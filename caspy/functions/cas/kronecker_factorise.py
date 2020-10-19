@@ -2,8 +2,10 @@ import logging
 import itertools
 import copy
 import numpy as np
+import math
 import caspy.pattern_match
 import caspy.parsing.parser
+from caspy.matrix import mat_mul,invert_mat,mat_vec_prod
 from caspy.functions.function import Function1Arg
 from caspy.helpers.helpers import lcm,gcd_l,get_divisors
 from caspy.numeric.numeric import Numeric
@@ -12,6 +14,8 @@ from caspy.numeric.fraction import Fraction
 from caspy.factorise import factoriseNum
 
 logger = logging.getLogger(__name__)
+
+MAX_FLOAT_ERROR = 1e-5
 
 
 def polyn_eval(polyn,x):
@@ -33,9 +37,22 @@ def np_polyn_to(polyn):
 
 def close_to_all_ints(x):
     for i in x:
+        if np.isinf(i) or np.isnan(i):
+            return False
         # Just comparing to int(i) can cause issues with floats
         # that are near but not exactly equal
-        if not np.isclose(i,int(i)):
+        if abs(i - round(i)) > MAX_FLOAT_ERROR:
+            return False
+    return True
+
+
+def close_to_zero_vec(x):
+    for i in x:
+        if np.isinf(i) or np.isnan(i):
+            return False
+        # Just comparing to int(i) can cause issues with floats
+        # that are near but not exactly equal
+        if abs(i) > MAX_FLOAT_ERROR:
             return False
     return True
 
@@ -65,6 +82,7 @@ def kronecker_frac_to_int(polyn):
 
 
 def kronecker_int(polyn):
+    logger.debug("Int factorising: {}".format(polyn))
     n = len(polyn) - 1
     if n <= 1:
         # Don't try and factor linear term
@@ -103,19 +121,31 @@ def kronecker_int(polyn):
             x_val ** power for power in range(s + 1)
         ])
     inv_mat = np.linalg.inv(np.array(mat_rows))
+    inv_mat_2 = invert_mat(mat_rows)
 
     for rhs in itertools.product(*f_factors):
         q_polyn = np.flipud(inv_mat.dot(np.array(rhs)))
+        q_polyn_2 = mat_vec_prod(inv_mat_2,rhs)[::-1]
+        # if not close_to_all_ints(q_polyn_2):
+            # continue
         quotient,remainder = np.polydiv(polyn,q_polyn)
-        if np.array_equal(remainder,np.array([0.])):
+        quotient_2,remainder_2 = np.polydiv(polyn,q_polyn_2)
+        # if not close_to_all_ints(quotient):
+        #     Quotient not very good
+            # continue
+        if close_to_zero_vec(remainder_2):
             # Ensure the quotient is just made up of integers
-            if close_to_all_ints(quotient):
+            if close_to_all_ints(quotient_2):
                 # We have found divisor
-                logger.debug("Found quotient: {}\nq_polyn: {}\nRHS: {}".format(quotient,q_polyn,rhs))
+                logger.debug("Found quotient: {}\nq_polyn: {}\nRHS: {}\nRemainder: {}".format(quotient,q_polyn,rhs,remainder))
+                logger.debug(
+                    "Found quotient: {}\nq_polyn_2: {}\nRemainder: {}".format(quotient_2, q_polyn_2, remainder_2))
                 # Factor quotient and q_polyn again to see if the answer can be
                 # reduced further
-                quotient_factored = kronecker_int(list(quotient.astype(int)))
-                q_polyn_factored = kronecker_int(list(q_polyn.astype(int)))
+                quotient_factored = kronecker_int([round(x) for x in quotient_2])
+                q_polyn_factored = kronecker_int([round(x) for x in q_polyn_2])
+                # quotient_factored = kronecker_int(list(quotient_2.astype(int)))
+                # q_polyn_factored = kronecker_int(list(q_polyn.astype(int)))
                 logger.debug("Factored: {} {}".format(quotient_factored,q_polyn_factored))
                 return quotient_factored + q_polyn_factored
     # Couldn't factorise the polynomial
