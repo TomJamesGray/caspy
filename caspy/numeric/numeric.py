@@ -239,13 +239,13 @@ class Numeric():
                 return False
         return True
 
-    def simplify(self):
+    def simplify(self, simp_pows=True):
         """
         Simplifies all symbol objects stored in self.val
         :return: self
         """
         for val in self.val:
-            val.simplify()
+            val.simplify(simp_pows)
         return self
 
     def is_exclusive_numeric(self) -> bool:

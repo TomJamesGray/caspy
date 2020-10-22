@@ -196,7 +196,7 @@ class Symbol:
         else:
             return False
 
-    def simplify(self):
+    def simplify(self, simp_pows=True):
         """
         Simplifies this symbol by looking for the simple numeric aspects eg
         [2,1] and [4,-1] in the value class represents 2 * 4^(-1) which can
@@ -214,6 +214,20 @@ class Symbol:
             # Deal with the case when the power is zero
             # By removing it we get rid of terms like x^0
             if type(self.val[i][1]) == num.Numeric:
+                if type(self.val[i][0]) == Fraction and \
+                        self.val[i][1].is_exclusive_numeric() and simp_pows:
+                    try:
+                        pow_val = self.val[i][1].frac_eval()
+                        if int(pow_val.to_real()) != pow_val.to_real():
+                            continue
+                        print("Doing {} to power {}".format(self.val[i][0], int(pow_val.to_real())))
+                        new_val = copy.deepcopy(self.val[i][0]) ** int(pow_val.to_real())
+                        # if new_val.is_int_frac():
+                        acc *= new_val
+                        to_remove.append(i)
+                    except ValueError:
+                        pass
+
                 if self.val[i][1].is_zero():
                     to_remove.append(i)
                     continue
