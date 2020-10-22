@@ -24,6 +24,8 @@ def latex_numeric_str(x):
 
         elif not (sym.coeff.num == 1 and sym.coeff.den == 1):
             need_dot = True
+            if sym_pos == 0 and sym.coeff.to_real() < 0:
+                out += "-"
             # Print the coefficient as a fraction only if necessary
             if sym.coeff.num == 0:
                 out += "0"
@@ -34,6 +36,7 @@ def latex_numeric_str(x):
                 out += "{}".format(abs(to_int(sym.coeff.num * -1)))
             else:
                 out += "\\frac{{{}}}{{{}}}".format(to_int(sym.coeff.num), to_int(sym.coeff.den))
+
         elif sym.val == [[1,1]]:
             # Handles case when the symbol is just the number '1' on it's own
             out += "{}".format(to_int(sym.coeff.num))
