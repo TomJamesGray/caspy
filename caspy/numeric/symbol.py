@@ -69,13 +69,14 @@ class Symbol:
         if type(power) == num.Numeric:
             logger.debug("{} to the power {}".format(self, power))
             for i in range(0, len(self.val)):
+                tmp_pow = copy.deepcopy(power)
                 if type(self.val[i][1]) == num.Numeric:
-                    self.val[i][1] = self.val[i][1].mul(power)
+                    self.val[i][1] = self.val[i][1].mul(tmp_pow)
                 elif self.val[i][0] != 1:
                     # Check that the first term isn't one. If it is then it's pointless
                     # raising it's power and will only confusing the formatting
                     # of the output
-                    self.val[i][1] = power.mul(num.Numeric(self.val[i][1], "number"))
+                    self.val[i][1] = tmp_pow.mul(num.Numeric(self.val[i][1], "number"))
             return self
 
     def mul(self, y):
