@@ -33,7 +33,7 @@ def test_x_sq():
 
 
 def test_repeat_exp():
-    assert latex_eval("2^(3^4)") == "2^{3^{4}}"
+    assert latex_eval("2^(3^2)") == "512"
 
 
 def test_polyn():
@@ -53,7 +53,7 @@ def test_exp_div():
 
 
 def test_numeric_exp_mul():
-    assert latex_eval("2^2 * 2^2") == "2^{4}"
+    assert latex_eval("2^2 * 2^2") == "16"
 
 
 def test_exp_sub():

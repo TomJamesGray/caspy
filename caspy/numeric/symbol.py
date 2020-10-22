@@ -220,7 +220,6 @@ class Symbol:
                         pow_val = self.val[i][1].frac_eval()
                         if int(pow_val.to_real()) != pow_val.to_real():
                             continue
-                        print("Doing {} to power {}".format(self.val[i][0], int(pow_val.to_real())))
                         new_val = copy.deepcopy(self.val[i][0]) ** int(pow_val.to_real())
                         # if new_val.is_int_frac():
                         acc *= new_val
