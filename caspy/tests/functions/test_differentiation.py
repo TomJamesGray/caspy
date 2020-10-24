@@ -26,3 +26,7 @@ def test_diff_cos():
 
 def test_diff_exp():
     assert p.parse("diff(e^(2*x))") == p.parse("2*e^(2*x)")
+
+
+def test_diff_product():
+    assert p.parse("diff(x*sin(x))") == p.parse("sin(x)+cos(x)*x")
