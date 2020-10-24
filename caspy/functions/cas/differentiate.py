@@ -7,6 +7,7 @@ import caspy.functions.trigonometric as trig
 import caspy.functions.cas.expand as expand
 from caspy.functions.function import Function
 from caspy.printing import latex_numeric as ln
+from caspy.helpers.helpers import group_list_into_all_poss_pairs
 
 logger = logging.getLogger(__name__)
 
@@ -151,6 +152,39 @@ class Differentiate(Function):
                     tot += term_val
                     diffed_values.append(i)
                     continue
+
+            if not self.root_diff:
+                continue
+            diffed_by_parts = False
+            # Try differentiation of products
+            for (a,b) in group_list_into_all_poss_pairs(deepcopy(sym.val)):
+                derivatives = []
+                non_derivatives = []
+                diff_prod_pair_fail = False
+                for part in [a,b]:
+                    # Generate numeric objects for it
+                    part_num = caspy.numeric.numeric.Numeric(0)
+                    part_num.val[0].val = deepcopy(part)
+                    part_diff_obj = Differentiate(part_num,self.wrt,False)
+                    part_derivative = part_diff_obj.eval()
+                    if part_diff_obj.fully_diffed:
+                        derivatives.append(part_derivative.simplify())
+                        non_derivatives.append(part_num)
+                    else:
+                        diff_prod_pair_fail = True
+                        break
+                if diff_prod_pair_fail:
+                    continue
+                # We have differentiaed the products
+                term_val = deepcopy(derivatives[0]) * deepcopy(non_derivatives[1]) + \
+                           deepcopy(derivatives[1]) * deepcopy(non_derivatives[0])
+                tot += term_val
+                diffed_values.append(i)
+                diffed_by_parts = True
+                break
+            if diffed_by_parts:
+                continue
+
 
         new_val = []
         # Remove integrated values from the arg property
