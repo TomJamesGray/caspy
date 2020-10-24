@@ -175,7 +175,9 @@ class KroneckerFactor(Function1Arg):
                 except Exception:
                     logger.critical("FAIL")
 
+        output_val = []
         if len(polyn) > 0:
+            empty_polyn = False
             # Get degree of polynomial
             n = max(polyn,key=lambda x:x[1])[1]
             # Convert polynomial so it's stored like
@@ -203,10 +205,15 @@ class KroneckerFactor(Function1Arg):
                 cont,m_val,"*".join(factors_str))
             )
         else:
+            empty_polyn = True
             output = Numeric(0)
         for i,sym in enumerate(self.arg.val):
             if i not in terms_used:
                 # Add on other terms to the output that we didn't try to factorise
-                output.val.append(copy.deepcopy(sym))
+                output_val.append(copy.deepcopy(sym))
+        if empty_polyn:
+            output.val = output_val
+        else:
+            output.val = output.val + output_val
 
         return output
