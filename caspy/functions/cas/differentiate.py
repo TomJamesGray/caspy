@@ -15,9 +15,10 @@ class Differentiate(Function):
     """Caspy function to differentiate a numeric object symbolically"""
     fname = "diff"
 
-    def __init__(self, arg, wrt="x"):
+    def __init__(self, arg, wrt="x", root_diff=True):
         self.arg = arg
         self.fully_diffed = False
+        self.root_diff = root_diff
         # Annoyingly the 'wrt' if provided will be a numeric object
         # so we need to extract the actual variable in question
         if type(wrt) == caspy.numeric.numeric.Numeric:
@@ -120,7 +121,7 @@ class Differentiate(Function):
             if pmatch_res != {}:
                 logger.debug("Differentiating ln term")
                 # Diff the argument
-                d_obj = Differentiate(deepcopy(pmatch_res["A2"]))
+                d_obj = Differentiate(deepcopy(pmatch_res["A2"]),self.wrt)
                 derivative = d_obj.eval()
                 if d_obj.fully_diffed:
                     derivative.simplify()
@@ -139,18 +140,14 @@ class Differentiate(Function):
                 logger.debug("Differentiating exponential term, pmatch result {}".format(pmatch_res))
                 # Currently pattern matching doesn't quite work correctly with matching
                 # things like e^(a*x+b) so we will have to pattern match the A2 term
-                exp_pow = expand.Expand(pmatch_res["A2"]).eval()
-                pat = pm.pat_construct("B1 * {} + B2".format(self.wrt),
-                                       {"B1": "const", "B2": "const"})
-                pmatch_res_pow, _ = pm.pmatch(pat, exp_pow)
-                logger.debug("Power pmatch result {}".format(pmatch_res_pow))
-                if pmatch_res_pow != {}:
-                    term_val = parser.parse(" {} * e ^ ({} * {} + {})".format(
-                        copy(pmatch_res["A1"]) * copy(pmatch_res_pow["B1"]),
-                        pmatch_res_pow["B1"],
-                        self.wrt,
-                        pmatch_res_pow.get("B2", 0)
-                    ))
+                exp_pow = expand.Expand(deepcopy(pmatch_res["A2"])).eval()
+                d_obj = Differentiate(exp_pow, self.wrt)
+                derivative = d_obj.eval()
+                if d_obj.fully_diffed:
+                    derivative.simplify()
+                    term_val = caspy.numeric.numeric.Numeric(copy(pmatch_res["A1"]))
+                    term_val.val[0].val.append(["e",pmatch_res["A2"]])
+                    term_val *= derivative
                     tot += term_val
                     diffed_values.append(i)
                     continue
