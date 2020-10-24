@@ -35,7 +35,8 @@ def latex_numeric_str(x):
             elif sym.coeff.den == -1:
                 out += "{}".format(abs(to_int(sym.coeff.num * -1)))
             else:
-                out += "\\frac{{{}}}{{{}}}".format(to_int(sym.coeff.num), to_int(sym.coeff.den))
+                out += "\\frac{{{}}}{{{}}}".format(
+                    abs(to_int(sym.coeff.num)), abs(to_int(sym.coeff.den)))
 
         elif sym.val == [[1,1]]:
             # Handles case when the symbol is just the number '1' on it's own
