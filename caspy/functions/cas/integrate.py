@@ -178,19 +178,23 @@ class Integrate(Function):
                 # things like e^(a*x+b) so we will have to pattern match the A2 term
                 exp_pow = expand.Expand(pmatch_res["A2"]).eval()
                 pat = pm.pat_construct("B1 * {} + B2".format(self.wrt),
-                                       {"B1": "const", "B2": "const"})
+                                       {"B1": "const", "B2": "rem"})
                 pmatch_res_pow, _ = pm.pmatch(pat,exp_pow)
                 logger.debug("Power pmatch result {}".format(pmatch_res_pow))
-                if pmatch_res_pow != {}:
-                    term_val = parser.parse(" {} * e ^ ({} * {} + {})".format(
-                        copy(pmatch_res["A1"])/copy(pmatch_res_pow["B1"]),
-                        pmatch_res_pow["B1"],
-                        self.wrt,
-                        pmatch_res_pow.get("B2",0)
-                    ))
-                    tot += term_val
-                    integrated_values.append(i)
-                    continue
+                if "B1" in pmatch_res_pow.keys():
+                    failed_int = False
+                    if "B2" in pmatch_res_pow.keys():
+                        if self.wrt in pmatch_res_pow["B2"].get_variables_in():
+                            logger.debug("Failed integration of exponential term")
+                            failed_int = True
+                    if not failed_int:
+                        term_val = caspy.numeric.numeric.Numeric(
+                            copy(pmatch_res["A1"]) / copy(pmatch_res_pow["B1"])
+                        )
+                        term_val.val[0].val.append(["e",deepcopy(pmatch_res["A2"])])
+                        tot += term_val
+                        integrated_values.append(i)
+                        continue
 
             # Try matching simple sin terms like sin(ax+b)
             pmatch_res = pm.pmatch_sym("a*sin(b*{}+c)".format(self.wrt),

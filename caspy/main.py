@@ -35,7 +35,7 @@ logging_config = {
         },
         "caspy.numeric":{
             "handlers":["numeric","cutelog"],
-            "level":logging.DEBUG
+            "level":logging.WARNING
         },
         "caspy.pattern_match":{
             "handlers":["functions","cutelog"],
