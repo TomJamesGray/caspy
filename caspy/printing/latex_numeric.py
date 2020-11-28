@@ -1,8 +1,11 @@
+import logging
 import caspy.numeric.numeric as num
 from caspy.functions import function as fn
 from caspy.numeric.fraction import to_int
 from caspy.numeric.fraction import Fraction
 
+
+logger = logging.getLogger(__name__)
 
 def latex_numeric_str(x):
     if type(x) != num.Numeric:
@@ -56,8 +59,13 @@ def latex_numeric_str(x):
                         out += "({})".format(power)
                 elif isinstance(sym_name, fn.Function):
                     out += sym_name.latex_format()
+                elif type(sym_name) == str:
+                    if sym_name == "pi":
+                        out += " \pi"
+                    else:
+                        out += " {}".format(sym_name)
                 else:
-                    out += " {}".format(sym_name)
+                    logger.error("Unrecongnized type of sym_name {}".format(sym_name))
                 power = latex_numeric_str(pow)
                 if power != "" and power != "1":
                     out += "^ {{{}}}".format(power)
