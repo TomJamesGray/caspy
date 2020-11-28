@@ -111,7 +111,6 @@ def kronecker_int(polyn):
         )
     logger.debug("S_i: {}".format(f_factors))
 
-    # TODO implement own polynomial division algorithm
 
     # Generate matrix with the chosen x values to solve the linear equations
     mat_rows = []
