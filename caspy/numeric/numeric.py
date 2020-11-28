@@ -171,7 +171,10 @@ class Numeric():
         :param x: Numeric object
         :return: self
         """
-        if len(self.val) > 1 or len(x.val) > 1:
+        if len(self.val) == 1 and len(x.val) > 1:
+            pre_x = copy.copy(x)
+            self.val[0].mul(Symbol(pre_x,Fraction(1,1)))
+        elif len(self.val) > 1 or len(x.val) > 1:
             pre_self = copy.copy(self)
             pre_x = copy.copy(x)
             # Redefine this numeric object as having just one symbol
