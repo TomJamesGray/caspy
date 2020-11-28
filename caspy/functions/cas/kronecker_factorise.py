@@ -125,17 +125,20 @@ def kronecker_int(polyn):
         # Check q is all integers and is not just a const
         if not close_to_all_ints(q_polyn) or is_const_polyn(q_polyn):
             continue
+        # Round q_polyn so we use nicer numbers for polyn div
+        q_polyn = [round(x) for x in q_polyn]
         quotient_2,remainder_2 = polyn_div(polyn,q_polyn)
         if close_to_zero_vec(remainder_2):
             # Ensure the quotient is just made up of integers
             if close_to_all_ints(quotient_2):
                 # We have found divisor
                 logger.debug(
-                    "Found quotient: {}\nq_polyn_2: {}\nRemainder: {}".format(quotient_2, q_polyn, remainder_2))
+                    "Found quotient: {}\nq_polyn_2: {}\nRemainder: {}\nrhs:{}".format(quotient_2, q_polyn,
+                                                                                      remainder_2,rhs))
                 # Factor quotient and q_polyn again to see if the answer can be
                 # reduced further
                 quotient_factored = kronecker_int([round(x) for x in quotient_2])
-                q_polyn_factored = kronecker_int([round(x) for x in q_polyn])
+                q_polyn_factored = kronecker_int(q_polyn)
                 # quotient_factored = kronecker_int(list(quotient_2.astype(int)))
                 # q_polyn_factored = kronecker_int(list(q_polyn.astype(int)))
                 logger.debug("Factored: {} {}".format(quotient_factored,q_polyn_factored))
