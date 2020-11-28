@@ -4,7 +4,7 @@ import copy
 import caspy.pattern_match
 import caspy.parsing.parser
 from caspy.helpers.helpers import polyn_div
-from caspy.matrix import mat_mul,invert_mat,mat_vec_prod
+from caspy.matrix import mat_mul,vandermonde_inv,mat_vec_prod
 from caspy.functions.function import Function1Arg
 from caspy.helpers.helpers import lcm,gcd_l,get_divisors
 from caspy.numeric.numeric import Numeric
@@ -118,7 +118,7 @@ def kronecker_int(polyn):
         mat_rows.append([
             x_val ** power for power in range(s + 1)
         ])
-    inv_mat = invert_mat(mat_rows)
+    inv_mat = vandermonde_inv(mat_rows)
 
     for rhs in itertools.product(*f_factors):
         q_polyn = mat_vec_prod(inv_mat,rhs)[::-1]
