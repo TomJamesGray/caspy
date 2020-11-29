@@ -9,4 +9,4 @@ def test_factor_one_var():
 
 
 def test_factor_eg_1():
-    assert kronecker_int([1,0,0,0,-16]) == [[-1,-2],[-1,2],[1,0,4]]
+    assert kronecker_int([1,0,0,0,-16]) == [[-1,0,-4],[1,2],[1],[-1,2]]
