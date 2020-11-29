@@ -172,7 +172,7 @@ class Numeric():
         :return: self
         """
         if len(self.val) == 1 and len(x.val) > 1:
-            pre_x = copy.copy(x)
+            pre_x = copy.deepcopy(x)
             self.val[0].mul(Symbol(pre_x,Fraction(1,1)))
         elif len(self.val) > 1 or len(x.val) > 1:
             pre_self = copy.copy(self)
@@ -193,7 +193,11 @@ class Numeric():
         """
         return self.__truediv__(x)
 
-    def __eq__(self, other):
+    def __eq__(self, other, check_commutative=True):
+        """
+        Tests equality. Check commutative flag is needed to allow it to easy ensure
+        a == b and b == a
+        """
         if type(other) == Numeric:
             # Simplify this object and the other value
             self.simplify()
@@ -205,6 +209,7 @@ class Numeric():
                     if sym_o.val == sym.val and sym_o.coeff == sym.coeff:
                         fnd = True
                 if not fnd:
+                    logger.debug("Sym {} not fnd".format(sym))
                     sym_not_fnd = True
                     break
             if sym_not_fnd:
@@ -214,12 +219,18 @@ class Numeric():
                     if math.isclose(a, b):
                         logger.debug("Values {} and {} close enough for "
                                      "equality".format(a, b))
-                        return True
+                        if check_commutative:
+                            return True and other.__eq__(self,False)
+                        else:
+                            return True
                     else:
                         return False
                 else:
                     return False
-            return True
+            if check_commutative:
+                return True and other.__eq__(self, False)
+            else:
+                return True
             # Try comparing the actual numerical values as there may
             # be multiple representations
 

@@ -4,6 +4,7 @@ import caspy.pattern_match
 import caspy.numeric.numeric as num
 import caspy.functions.function as funcs
 from caspy.numeric.fraction import Frac, Fraction
+from caspy.printing.latex_numeric import latex_numeric_str as lns
 
 logger = logging.getLogger(__name__)
 
@@ -30,13 +31,14 @@ class Symbol:
                 logger.debug("current sym val is [[1,1]] so ignore it completely")
                 self.val = other.val
             else:
-                logger.debug("Multiply {} by {}".format(self, other))
+                logger.debug("Multiply {} by {}".format(lns(num.Numeric(self)), lns(num.Numeric(other))))
 
                 for j in range(0, len(other.val)):
                     sym_added = False
                     for i in range(0, len(self.val)):
                         if self.val[i][0] == other.val[j][0] and self.val[i][0] != 1:
                             # Symbols match so increment the powers
+                            logger.critical("Sym match")
                             if type(self.val[i][1]) == num.Numeric:
                                 # Check it's numeric type, otherwise items like
                                 # 2*2^2 error
@@ -53,6 +55,7 @@ class Symbol:
                         self.val.append(other.val[j])
 
             # self.coeff *= other.coeff
+            logger.debug("Result of symbol mul {}".format(lns(num.Numeric(self))))
             return self
 
     def __truediv__(self, other):
@@ -203,7 +206,7 @@ class Symbol:
         be simplified to 1/2
         :return: none
         """
-        logger.debug("Simplifying symbol {}".format(self))
+        # logger.debug("Simplifying symbol {}".format(self))
         if self.is_zero():
             logger.debug("Value is zero so remove all other parts")
             self.val = [[Fraction(0, 1), 1]]

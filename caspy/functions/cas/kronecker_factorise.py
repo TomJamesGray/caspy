@@ -14,7 +14,7 @@ from caspy.factorise import factoriseNum
 
 logger = logging.getLogger(__name__)
 
-MAX_FLOAT_ERROR = 1e-5
+MAX_FLOAT_ERROR = 1e-9
 
 
 def polyn_eval(polyn,x):
@@ -193,6 +193,8 @@ class KroneckerFactor(Function1Arg):
             cont,m_val,factored = kronecker(polyn_to_factor)
             factors_str = []
             for factor in factored:
+                if factor == [1]:
+                    continue
                 parts = []
                 max_fact_pow = len(factor) - 1
                 for i,coeff in enumerate(factor):
