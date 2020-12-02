@@ -27,10 +27,11 @@ class Integrate(Function):
     fname = "integrate"
     latex_fname = "integrate"
 
-    def __init__(self, arg, wrt="x", root_integral=True):
+    def __init__(self, arg, wrt="x", root_integral=True,dont_expand=False):
         self.arg = arg
         self.fully_integrated = False
         self.root_integral = root_integral
+        self.dont_expand = dont_expand
         # Annoyingly the 'wrt' if provided will be a numeric object
         # so we need to extract the actual variable in question
         if type(wrt) == caspy.numeric.numeric.Numeric:
@@ -248,17 +249,20 @@ class Integrate(Function):
                     integrated_values.append(i)
                     continue
 
-            if self.root_integral:
+            if self.root_integral and not self.dont_expand:
                 # Try expanding the symbol then integrating
                 sym_numeric = caspy.numeric.numeric.Numeric(deepcopy(sym),"sym_obj")
                 expand_obj = expand.Expand(sym_numeric)
                 expanded = expand_obj.eval()
-                integ_exp = Integrate(expanded,self.wrt,False)
+                logger.critical("Expanded val: {}".format(ln.latex_numeric_str(expanded)))
+                integ_exp = Integrate(expanded,self.wrt,True,True)
                 new_integral = integ_exp.eval()
                 if integ_exp.fully_integrated:
                     integrated_values.append(i)
                     tot += new_integral
                     continue
+                else:
+                    logger.critical("Failed expanded int {}".format(ln.latex_numeric_str(new_integral)))
 
             if not self.root_integral:
                 continue
