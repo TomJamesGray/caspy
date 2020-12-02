@@ -1,6 +1,8 @@
 import copy
 import logging
 import math
+import caspy.functions.function as funcs
+from caspy.numeric import var_replacements
 from caspy.numeric.symbol import Symbol
 from caspy.numeric.fraction import Fraction, Frac
 # from typing import TypeVar, Generic
@@ -58,6 +60,8 @@ class Numeric():
             if other.is_zero():
                 logger.critical("Division by zero")
                 raise ZeroDivisionError("Trying to divide {} by zero".format(self))
+            if self == other:
+                return Numeric(1)
             return self.mul(other.recip())
 
     def __pow__(self, power, modulo=None):
@@ -305,10 +309,64 @@ class Numeric():
         :param y: Numeric object
         :return: Another numeric object if it has been successful, otherwise None
         """
-        new_val = Numeric(0, "number")
+        MAX_DIVS = 10
+        MAX_MULTS = 10
+        if self == x:
+            return y
+        vars_to_remove = x.get_variables_in()
+        sym_args_done = copy.deepcopy(self)
         for sym in self.val:
-            new_val += sym.try_replace_numeric_with_var(x, copy.deepcopy(y))
+            for (sym_fact_name, sym_fact_pow) in sym.val:
+                if isinstance(sym_fact_name, funcs.Function):
+                    # deal with the function argument
+                    result = sym_fact_name.arg.try_replace_numeric_with_var(x, copy.deepcopy(y))
+                    if result is not None:
+                        sym_fact_name.arg = result
+
+        if sym_args_done.get_variables_in().intersection(vars_to_remove) == set():
+            # Don't need to try multiplication or division on this as it is
+            # already done
+            return sym_args_done
+
+        # Try repeated divs
+        rep_divs = var_replacements.try_replace_numeric_with_var_divs(
+            copy.deepcopy(self),copy.deepcopy(x),copy.deepcopy(y))
+        if rep_divs is not None:
+            return rep_divs
+
+        # Try repeated multiplications
+        rep_mults = var_replacements.try_replace_numeric_with_var_mults(
+            copy.deepcopy(self), copy.deepcopy(x), copy.deepcopy(y))
+        if rep_mults is not None:
+            return rep_mults
+
+        # Try repeated divs+multiplications symbol by symbol
+        new_sym_list = []
+        for sym in self.val:
+            sym_try_divs = Numeric(copy.deepcopy(sym))
+            rep_divs = var_replacements.try_replace_numeric_with_var_divs(
+                sym_try_divs, copy.deepcopy(x), copy.deepcopy(y))
+            if rep_divs is not None:
+                # rep_divs.val probably just has length 1 but maybe not?!?!
+                [new_sym_list.append(x) for x in rep_divs.val]
+                continue
+
+            sym_try_mults = Numeric(copy.deepcopy(sym))
+            rep_mults = var_replacements.try_replace_numeric_with_var_divs(
+                sym_try_mults, copy.deepcopy(x), copy.deepcopy(y))
+            if rep_mults is not None:
+                # rep_mults.val probably just has length 1 but maybe not?!?!
+                [new_sym_list.append(x) for x in rep_mults.val]
+            else:
+                # This symbol still has variables it shouldn't have :(
+                return None
+
+        for sym in self.val:
+            tmp = sym.try_replace_numeric_with_var(x, copy.deepcopy(y))
+            new_val += tmp
         return new_val
+
+
 
     def get_variables_in(self):
         """
