@@ -47,3 +47,7 @@ def test_integrate_exp():
 
 def test_int_by_parts():
     assert p.parse("integrate(x*ln(x^2))") == p.parse("x^2 * ln(x^2)/2-x^2/2")
+
+
+def test_expand_then_by_parts():
+    assert p.parse("integrate((x+1)*sin(x))") == p.parse("integrate(expand((x+1)*sin(x)))")
