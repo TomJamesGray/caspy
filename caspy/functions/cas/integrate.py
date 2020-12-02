@@ -161,7 +161,7 @@ class Integrate(Function):
                 else:
                     # TODO maybe refactor Fraction class so it doesn't return self
                     # so we don't need to do a ridiculous amount of copying like this
-                    term_val = parser.parse("{} * {} ^ {}".format(
+                    term_val = parser.parse("{} * {} ^ ({})".format(
                         copy(pmatch_res["a"])/(copy(pmatch_res["n"])+1), self.wrt, copy(pmatch_res["n"]) + 1
                     ))
                 tot += term_val
@@ -228,7 +228,7 @@ class Integrate(Function):
             pmatch_res = pm.pmatch_sym("b*sin(a)", {"a": "rem","b":"coeff"}, sym)
             if pmatch_res != {}:
                 logger.debug("Integrating sin object with u sub, pmatch_res {}".format(pmatch_res))
-                numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
+                numeric_wrapper = caspy.numeric.numeric.Numeric(deepcopy(sym), "sym_obj")
                 u_subbed = self.u_sub_int(pmatch_res["a"],numeric_wrapper)
                 if u_subbed is not None:
                     logger.warning("U sub integral worked")
@@ -240,7 +240,7 @@ class Integrate(Function):
             pmatch_res = pm.pmatch_sym("b*cos(a)", {"a": "rem", "b": "coeff"}, sym)
             if pmatch_res != {}:
                 logger.debug("Integrating cos object with u sub, pmatch_res {}".format(pmatch_res))
-                numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
+                numeric_wrapper = caspy.numeric.numeric.Numeric(deepcopy(sym), "sym_obj")
                 u_subbed = self.u_sub_int(pmatch_res["a"], numeric_wrapper)
                 if u_subbed is not None:
                     logger.warning("U sub integral worked")

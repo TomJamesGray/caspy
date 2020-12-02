@@ -38,7 +38,6 @@ class Symbol:
                     for i in range(0, len(self.val)):
                         if self.val[i][0] == other.val[j][0] and self.val[i][0] != 1:
                             # Symbols match so increment the powers
-                            logger.critical("Sym match")
                             if type(self.val[i][1]) == num.Numeric:
                                 # Check it's numeric type, otherwise items like
                                 # 2*2^2 error
