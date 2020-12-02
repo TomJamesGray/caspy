@@ -342,7 +342,8 @@ class Numeric():
 
         # Try repeated divs+multiplications symbol by symbol
         new_sym_list = []
-        for sym in self.val:
+        failed_syms = []
+        for i,sym in enumerate(self.val):
             sym_try_divs = Numeric(copy.deepcopy(sym))
             rep_divs = var_replacements.try_replace_numeric_with_var_divs(
                 sym_try_divs, copy.deepcopy(x), copy.deepcopy(y))
@@ -358,8 +359,37 @@ class Numeric():
                 # rep_mults.val probably just has length 1 but maybe not?!?!
                 [new_sym_list.append(x) for x in rep_mults.val]
             else:
-                # This symbol still has variables it shouldn't have :(
-                return None
+                new_sym_val = []
+                for (sym_fact,sym_pow) in sym.val:
+                    if isinstance(sym_pow,Numeric):
+                        if sym_pow.get_variables_in().intersection(vars_to_remove) != set():
+                            # Try repeated divs on the power
+                            logger.info("Rep divs on power")
+                            rep_divs = var_replacements.try_replace_numeric_with_var_divs(
+                                copy.deepcopy(sym_pow),copy.deepcopy(x),copy.deepcopy(y)
+                            )
+                            if rep_divs is not None:
+                                logger.info("Pog")
+                                new_sym_val.append([sym_fact,rep_divs])
+                                continue
+                            # Try repeated multiplications on the power
+                            rep_mults = var_replacements.try_replace_numeric_with_var_mults(
+                                copy.deepcopy(sym_pow), copy.deepcopy(x), copy.deepcopy(y)
+                            )
+                            if rep_mults is not None:
+                                new_sym_val.append([sym_fact,rep_mults])
+                            else:
+                                # Exhausted ideas so give up
+                                return None
+                        else:
+                            new_sym_val.append([sym_fact,sym_pow])
+                    else:
+                        new_sym_val.append([sym_fact,sym_pow])
+                # Can add this symbol onto new_sym_list
+                tmp = Symbol(1,Fraction(1,1))
+                tmp.val = new_sym_val
+                new_sym_list.append(tmp)
+
         # Make a numeric object with new_sym_list as val
         new_val = Numeric(0)
         new_val.val = new_sym_list

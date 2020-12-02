@@ -24,3 +24,10 @@ def test_replace_numeric_with_var_func_arg():
     to_rep = p.parse("x^2+1")
     rep_with = p.parse("U1")
     assert val.try_replace_numeric_with_var(to_rep, rep_with) == p.parse("U1")
+
+
+def test_replace_numeric_powers():
+    val = p.parse("e^(x^2)")
+    to_rep = p.parse("x^2")
+    rep_with = p.parse("U1")
+    assert val.try_replace_numeric_with_var(to_rep, rep_with) == p.parse("e^(U1)")

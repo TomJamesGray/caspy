@@ -196,6 +196,17 @@ class Integrate(Function):
                         tot += term_val
                         integrated_values.append(i)
                         continue
+            # Try integrating exponential terms with u sub
+            pmatch_res = pm.pmatch_sym("B1*e^(A1)", {"A1": "rem","B1":"coeff"}, sym)
+            if pmatch_res != {}:
+                logger.debug("Integrating e^(...) object with u sub, pmatch_res {}".format(pmatch_res))
+                numeric_wrapper = caspy.numeric.numeric.Numeric(deepcopy(sym), "sym_obj")
+                u_subbed = self.u_sub_int(pmatch_res["A1"],numeric_wrapper)
+                if u_subbed is not None:
+                    logger.warning("U sub integral worked")
+                    tot += u_subbed
+                    integrated_values.append(i)
+                    continue
 
             # Try matching simple sin terms like sin(ax+b)
             pmatch_res = pm.pmatch_sym("a*sin(b*{}+c)".format(self.wrt),
