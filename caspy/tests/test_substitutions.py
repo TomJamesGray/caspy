@@ -3,7 +3,7 @@ from caspy.tests.test_symbolic import p
 
 
 def test_try_replace_numeric():
-    tst_sym = p.parse("x^4").val[0]
+    tst_sym = p.parse("x^4")
     replace = p.parse("x^2")
     var_obj = caspy.numeric.numeric.Numeric("u", "sym")
     replaced_obj = tst_sym.try_replace_numeric_with_var(replace, var_obj)

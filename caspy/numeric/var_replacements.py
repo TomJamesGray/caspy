@@ -21,9 +21,10 @@ def try_replace_numeric_with_var_divs(num_obj, x, y, MAX_DIVS=10):
     vars_to_remove = x.get_variables_in()
     if num_obj.get_variables_in().intersection(vars_to_remove) == set():
         return num_obj
+    logger.info("Starting divs val {}, x {}".format(lns(num_obj),lns(x)))
 
     for i in range(1, MAX_DIVS):
-        num_obj / copy.deepcopy(x)
+        num_obj = num_obj / copy.deepcopy(x)
         num_obj.simplify()
         logger.info("New sym num {} vars {} x {}".format(lns(num_obj), num_obj.get_variables_in(), x))
         if num_obj.get_variables_in().intersection(vars_to_remove) == set():
@@ -49,7 +50,7 @@ def try_replace_numeric_with_var_mults(num_obj, x, y, MAX_MULTS=10):
     if num_obj.get_variables_in().intersection(vars_to_remove) == set():
         return num_obj
     for i in range(1, MAX_MULTS):
-        num_obj * copy.deepcopy(x)
+        num_obj = num_obj * copy.deepcopy(x)
         num_obj.simplify()
         logger.info("New sym num2 {} vars {} x {}".format(lns(num_obj), num_obj.get_variables_in(), x))
         if num_obj.get_variables_in().intersection(vars_to_remove) == set():

@@ -360,13 +360,10 @@ class Numeric():
             else:
                 # This symbol still has variables it shouldn't have :(
                 return None
-
-        for sym in self.val:
-            tmp = sym.try_replace_numeric_with_var(x, copy.deepcopy(y))
-            new_val += tmp
+        # Make a numeric object with new_sym_list as val
+        new_val = Numeric(0)
+        new_val.val = new_sym_list
         return new_val
-
-
 
     def get_variables_in(self):
         """
