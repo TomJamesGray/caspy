@@ -363,21 +363,11 @@ class Numeric():
                 for (sym_fact,sym_pow) in sym.val:
                     if isinstance(sym_pow,Numeric):
                         if sym_pow.get_variables_in().intersection(vars_to_remove) != set():
-                            # Try repeated divs on the power
-                            logger.info("Rep divs on power")
-                            rep_divs = var_replacements.try_replace_numeric_with_var_divs(
-                                copy.deepcopy(sym_pow),copy.deepcopy(x),copy.deepcopy(y)
-                            )
-                            if rep_divs is not None:
-                                logger.info("Pog")
-                                new_sym_val.append([sym_fact,rep_divs])
-                                continue
-                            # Try repeated multiplications on the power
-                            rep_mults = var_replacements.try_replace_numeric_with_var_mults(
-                                copy.deepcopy(sym_pow), copy.deepcopy(x), copy.deepcopy(y)
-                            )
-                            if rep_mults is not None:
-                                new_sym_val.append([sym_fact,rep_mults])
+                            tmp_sym_pow = copy.deepcopy(sym_pow)
+                            repped = tmp_sym_pow.try_replace_numeric_with_var(
+                                copy.deepcopy(x),copy.deepcopy(y))
+                            if repped is not None:
+                                new_sym_val.append([sym_fact, repped])
                             else:
                                 # Exhausted ideas so give up
                                 return None
