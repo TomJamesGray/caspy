@@ -61,6 +61,8 @@ class Integrate(Function):
         :param integrand: numeric object to integrate
         :return: Numeric object
         """
+        if not self.root_integral:
+            return None
         diff_obj = diff.Differentiate(u,self.wrt)
         derivative = diff_obj.eval()
         if diff_obj.fully_diffed:
