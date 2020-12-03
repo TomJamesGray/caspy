@@ -15,13 +15,6 @@ from caspy.numeric.fraction import Fraction
 logger = logging.getLogger(__name__)
 
 
-def pmatch_sym(pat, pat_dict, sym):
-    pat = pm.pat_construct(pat, pat_dict)
-    numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
-    pmatch_res, _ = pm.pmatch(pat, numeric_wrapper)
-    return pmatch_res
-
-
 class Integrate(Function):
     """Caspy function to integrate a numeric object symbolically"""
     fname = "integrate"
@@ -32,6 +25,7 @@ class Integrate(Function):
         self.fully_integrated = False
         self.root_integral = root_integral
         self.dont_expand = dont_expand
+        self.parser = caspy.parsing.parser.Parser()
         # Annoyingly the 'wrt' if provided will be a numeric object
         # so we need to extract the actual variable in question
         if type(wrt) == caspy.numeric.numeric.Numeric:
@@ -154,17 +148,17 @@ class Integrate(Function):
 
             # Try matching x^n
             pmatch_res = pm.pmatch_sym("a*{}^n".format(self.wrt),
-                                    {"n":"const","a":"const"}, sym)
+                                    {"n":"const","a":"const"}, sym, self.parser)
             if pmatch_res != {}:
                 logger.debug("Integrating polynomial term {}, pmatch result {}".format(sym,pmatch_res))
                 if pmatch_res["n"] == -1:
-                    term_val = parser.parse("{} * ln({})".format(
+                    term_val = self.parser.parse("{} * ln({})".format(
                         copy(pmatch_res["a"]), self.wrt
                     ))
                 else:
                     # TODO maybe refactor Fraction class so it doesn't return self
                     # so we don't need to do a ridiculous amount of copying like this
-                    term_val = parser.parse("{} * {} ^ ({})".format(
+                    term_val = self.parser.parse("{} * {} ^ ({})".format(
                         copy(pmatch_res["a"])/(copy(pmatch_res["n"])+1), self.wrt, copy(pmatch_res["n"]) + 1
                     ))
                 tot += term_val
@@ -174,7 +168,7 @@ class Integrate(Function):
 
             # Try integrating exponential terms
             pmatch_res = pm.pmatch_sym("A1 * e^(A2)".format(self.wrt),
-                                    {"A1": "const", "A2": "rem"}, sym)
+                                    {"A1": "const", "A2": "rem"}, sym, self.parser)
             if pmatch_res != {}:
                 logger.debug("Integrating exponential term, pmatch result {}".format(pmatch_res))
                 # Currently pattern matching doesn't quite work correctly with matching
@@ -199,7 +193,7 @@ class Integrate(Function):
                         integrated_values.append(i)
                         continue
             # Try integrating exponential terms with u sub
-            pmatch_res = pm.pmatch_sym("B1*e^(A1)", {"A1": "rem","B1":"coeff"}, sym)
+            pmatch_res = pm.pmatch_sym("B1*e^(A1)", {"A1": "rem","B1":"coeff"}, sym, self.parser)
             if pmatch_res != {}:
                 logger.debug("Integrating e^(...) object with u sub, pmatch_res {}".format(pmatch_res))
                 numeric_wrapper = caspy.numeric.numeric.Numeric(deepcopy(sym), "sym_obj")
@@ -213,10 +207,10 @@ class Integrate(Function):
             # Try matching simple sin terms like sin(ax+b)
             pmatch_res = pm.pmatch_sym("a*sin(b*{}+c)".format(self.wrt),
                                     {"a": "const", "b": "const", "c": "const"},
-                                    sym)
+                                    sym, self.parser)
             if pmatch_res != {}:
                 logger.debug("Integrating simple linear sin term")
-                term_val = parser.parse("{} * cos({}*{}+{})".format(
+                term_val = self.parser.parse("{} * cos({}*{}+{})".format(
                     copy(pmatch_res["a"])*(-1)/copy(pmatch_res["b"]), pmatch_res["b"],
                     self.wrt, pmatch_res.get("c",0)
                 ))
@@ -227,10 +221,10 @@ class Integrate(Function):
             # Try matching simple sin terms like cos(ax+b)
             pmatch_res = pm.pmatch_sym("a*cos(b*{}+c)".format(self.wrt),
                                     {"a": "const", "b": "const", "c": "const"},
-                                    sym)
+                                    sym, self.parser)
             if pmatch_res != {}:
                 logger.debug("Integrating simple linear cos term")
-                term_val = parser.parse("{} * sin({}*{}+{})".format(
+                term_val = self.parser.parse("{} * sin({}*{}+{})".format(
                     copy(pmatch_res["a"]) / copy(pmatch_res["b"]), pmatch_res["b"],
                     self.wrt, pmatch_res.get("c", 0)
                 ))
@@ -239,7 +233,7 @@ class Integrate(Function):
                 continue
 
             # Try integrating sin(___) term with a 'u' substitution
-            pmatch_res = pm.pmatch_sym("b*sin(a)", {"a": "rem","b":"coeff"}, sym)
+            pmatch_res = pm.pmatch_sym("b*sin(a)", {"a": "rem","b":"coeff"}, sym, self.parser)
             if pmatch_res != {}:
                 logger.debug("Integrating sin object with u sub, pmatch_res {}".format(pmatch_res))
                 numeric_wrapper = caspy.numeric.numeric.Numeric(deepcopy(sym), "sym_obj")
@@ -251,7 +245,7 @@ class Integrate(Function):
                     continue
 
             # Try integrating cos(___) term with a 'u' substitution
-            pmatch_res = pm.pmatch_sym("b*cos(a)", {"a": "rem", "b": "coeff"}, sym)
+            pmatch_res = pm.pmatch_sym("b*cos(a)", {"a": "rem", "b": "coeff"}, sym, self.parser)
             if pmatch_res != {}:
                 logger.debug("Integrating cos object with u sub, pmatch_res {}".format(pmatch_res))
                 numeric_wrapper = caspy.numeric.numeric.Numeric(deepcopy(sym), "sym_obj")

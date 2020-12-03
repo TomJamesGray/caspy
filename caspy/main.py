@@ -1,6 +1,7 @@
 import logging
 import logging.config
 from lark.exceptions import VisitError
+from timeit import default_timer as timer
 from caspy.parsing import parser
 from caspy.printing.ascii_numeric import ascii_numeric_str
 from caspy.printing.latex_numeric import latex_numeric_str
@@ -61,7 +62,10 @@ def main():
     while True:
         line = input(">> ")
         try:
+            start = timer()
             out = parser_cls.parse(line)
+            end = timer()
+            print("Time elapsed: {}s".format(end-start))
         except ZeroDivisionError:
             print("Math Error: Division by zero")
             continue

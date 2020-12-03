@@ -1,11 +1,11 @@
-from caspy.parsing import parser
-from caspy.printing.latex_numeric import latex_numeric_str
+import caspy.parsing.parser
+import caspy.printing.latex_numeric
 
-p = parser.Parser(output="ASCII")
+p = caspy.parsing.parser.Parser(output="ASCII")
 
 
 def latex_eval(x):
-    return latex_numeric_str(p.parse(x)).replace(" ", "")
+    return  caspy.printing.latex_numeric.latex_numeric_str(p.parse(x)).replace(" ", "")
 
 
 def test_numeric_add():

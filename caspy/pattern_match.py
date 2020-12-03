@@ -63,7 +63,7 @@ def does_numeric_contain_placeholders(x) -> bool:
     return False
 
 
-def pmatch_sym(pat, pat_dict, sym):
+def pmatch_sym(pat, pat_dict, sym, parser=None):
     """
     Simple helper function to run pattern match on a symbol
     :param pat: Pattern string to be passed to pat_construct
@@ -71,7 +71,7 @@ def pmatch_sym(pat, pat_dict, sym):
     :param sym: The symbol object to have pmatch run on it
     :return:
     """
-    pat = pat_construct(pat, pat_dict)
+    pat = pat_construct(pat, pat_dict, parser)
     numeric_wrapper = caspy.numeric.numeric.Numeric(sym, "sym_obj")
     pmatch_res, _ = pmatch(pat, numeric_wrapper)
     return pmatch_res
@@ -260,7 +260,7 @@ def pmatch(pat, expr):
     return out, attempted_match_sum
 
 
-def pat_construct(pat: str, coeffs: dict):
+def pat_construct(pat: str, coeffs: dict, parser=None):
     """
     Constructs a pattern for use in pmatch
     :param pat: String containing an expression like "a*pi"
@@ -268,8 +268,10 @@ def pat_construct(pat: str, coeffs: dict):
     :return: Numeric object
     """
     # Evaluate the given pattern string
-    parser = caspy.parsing.parser.Parser()
+    if parser is None:
+        parser = caspy.parsing.parser.Parser()
     pat_eval = parser.parse(pat)
+
     # Replace the given coefficents
     for coeff in coeffs:
         if coeffs[coeff] == "const":
