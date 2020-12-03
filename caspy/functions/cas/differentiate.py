@@ -16,11 +16,12 @@ class Differentiate(Function):
     """Caspy function to differentiate a numeric object symbolically"""
     fname = "diff"
 
-    def __init__(self, arg, wrt="x", root_diff=True):
+    def __init__(self, arg, wrt="x", root_diff=True,dont_expand=False):
         self.arg = arg
         self.fully_diffed = False
         self.root_diff = root_diff
         self.parser = caspy.parsing.parser.Parser()
+        self.dont_expand = dont_expand
         # Annoyingly the 'wrt' if provided will be a numeric object
         # so we need to extract the actual variable in question
         if type(wrt) == caspy.numeric.numeric.Numeric:
@@ -153,6 +154,20 @@ class Differentiate(Function):
                     tot += term_val
                     diffed_values.append(i)
                     continue
+
+            if self.root_diff and not self.dont_expand:
+                sym_numeric = caspy.numeric.numeric.Numeric(deepcopy(sym), "sym_obj")
+                expand_obj = expand.Expand(sym_numeric)
+                expanded = expand_obj.eval()
+                logger.critical("Expanded val: {}".format(ln.latex_numeric_str(expanded)))
+                diff_exp = Differentiate(expanded, self.wrt, True, True)
+                new_integral = diff_exp.eval()
+                if diff_exp.fully_diffed:
+                    diffed_values.append(i)
+                    tot += new_integral
+                    continue
+                else:
+                    logger.critical("Failed expanded diff {}".format(ln.latex_numeric_str(new_integral)))
 
             if not self.root_diff:
                 continue
