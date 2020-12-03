@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 
 fns = {
     "ln": lambda x: exponentials.Ln(x),
-    "sin": lambda x: trigonometric.Sin(x),
-    "cos": lambda x: trigonometric.Cos(x),
-    "tan": lambda x: trigonometric.Tan(x),
+    "sin": lambda *x: trigonometric.Sin(*x),
+    "cos": lambda *x: trigonometric.Cos(*x),
+    "tan": lambda *x: trigonometric.Tan(*x),
     "sqrt": lambda x: other.Sqrt(x),
     "expand": lambda x: expand.Expand(x),
     "re": lambda x: to_real.ToReal(x),
@@ -22,6 +22,8 @@ fns = {
     "expand_trig": lambda x: expand.ExpandTrig(x),
     "factor": lambda x: kronecker_factorise.KroneckerFactor(x)
 }
+
+pass_parser_to = ["sin","cos","tan"]
 
 # noinspection PyMethodMayBeStatic
 @v_args(inline=True)
@@ -61,6 +63,11 @@ class SimplifyOutput(Transformer,lark_transformer.LarkTransformerHelper):
         for val in self.unpack_args(args):
             unpacked.append(val)
 
+        # if fname == "sin":
+        #     return trigonometric.Sin(unpacked[0],self.parser_cls).eval()
         if fname in fns:
+            if fname in pass_parser_to:
+                unpacked.append(self.parser_cls)
+                # func = fns[fname][0](*unpacked,self.parser_cls)
             func = fns[fname](*unpacked)
             return func.eval()

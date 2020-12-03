@@ -56,6 +56,12 @@ logger = logging.getLogger(__name__)
 defined_vars = {}
 
 
+def profile_me():
+    parser_cls = parser.Parser(output="ASCII")
+    parser_cls.parse("integrate(x*cos(ln(x)))")
+    return True
+
+
 def main():
     parser_cls = parser.Parser(output="ASCII")
 

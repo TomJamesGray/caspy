@@ -11,8 +11,11 @@ logger = logging.getLogger(__name__)
 
 
 class TrigFunc(Function1Arg):
-    def __init__(self):
-        self.parser = caspy.parsing.parser.Parser()
+    def __init__(self, parser=None):
+        if parser is None:
+            self.parser = caspy.parsing.parser.Parser()
+        else:
+            self.parser = parser
         super().__init__()
 
     def shift_to_2pi(self, x: Fraction):
@@ -39,7 +42,7 @@ class Sin(TrigFunc):
     fname = "sin"
     latex_fname = "\\sin"
 
-    def __init__(self, x):
+    def __init__(self, x, *args):
         self.pi_coeffs = [
             [Fraction(1, 2), "1"],
             [Fraction(1, 3), "sqrt(3)/2"],
@@ -52,7 +55,7 @@ class Sin(TrigFunc):
             [Fraction(0, 1), "0"]
         ]
         self.arg = x
-        super().__init__()
+        super().__init__(*args)
 
     def to_frac(self):
         if self.arg.is_exclusive_numeric():
@@ -63,7 +66,7 @@ class Sin(TrigFunc):
             ))
 
     def eval(self):
-        pat = caspy.pattern_match.pat_construct("a*pi", {"a": "const"})
+        pat = caspy.pattern_match.pat_construct("a*pi", {"a": "const"},self.parser)
         pmatch_res, _ = caspy.pattern_match.pmatch(pat, self.arg)
         if pmatch_res != {}:
             # Don't check against a_val as 0 == False
@@ -99,9 +102,9 @@ class Cos(TrigFunc):
     fname = "cos"
     latex_fname = "\\cos"
 
-    def __init__(self,x):
+    def __init__(self,x,*args):
         self.arg = x
-        super().__init__()
+        super().__init__(*args)
 
     def to_frac(self):
         if self.arg.is_exclusive_numeric():
@@ -133,9 +136,9 @@ class Tan(TrigFunc):
     fname = "tan"
     latex_fname = "\\tan"
 
-    def __init__(self, x):
+    def __init__(self, x,*args):
         self.arg = x
-        super().__init__()
+        super().__init__(*args)
 
     def to_frac(self):
         if self.arg.is_exclusive_numeric():

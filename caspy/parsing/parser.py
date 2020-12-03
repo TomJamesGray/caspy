@@ -52,6 +52,7 @@ class Parser:
         %ignore WS_INLINE
         """)
         self.simplifier_transformer = caspy.parsing.simplify_output.SimplifyOutput()
+        self.simplifier_transformer.parser_cls = self
 
     def parse(self, line: str):
         tree = self.parser.parse(line)
