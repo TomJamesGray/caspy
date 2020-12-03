@@ -1,7 +1,8 @@
 import logging
 from lark import v_args
 from lark import Transformer
-from caspy.numeric.numeric import Numeric
+import caspy.numeric.numeric
+# from caspy.numeric.numeric import Numeric
 from caspy.helpers import lark_transformer
 from caspy.functions import exponentials,trigonometric,other,to_real
 from caspy.functions.cas import expand,integrate,differentiate,kronecker_factorise
@@ -30,28 +31,28 @@ class SimplifyOutput(Transformer,lark_transformer.LarkTransformerHelper):
     before outputting
     """
 
-    def number(self, x: str) -> Numeric:
-        return Numeric(x, "number")
+    def number(self, x: str):
+        return caspy.numeric.numeric.Numeric(x, "number")
 
-    def sym(self, x) -> Numeric:
-        return Numeric(str(x), "sym")
+    def sym(self, x):
+        return caspy.numeric.numeric.Numeric(str(x), "sym")
 
-    def add(self, x: Numeric, y: Numeric) -> Numeric:
+    def add(self, x, y):
         return x.add(y)
 
-    def neg(self, x: Numeric) -> Numeric:
+    def neg(self, x):
         return x.neg()
 
-    def sub(self, x: Numeric, y: Numeric) -> Numeric:
+    def sub(self, x, y):
         return x.add(y.neg())
 
-    def mul(self, x: Numeric, y: Numeric) -> Numeric:
+    def mul(self, x, y):
         return x.mul(y)
 
-    def div(self, x: Numeric, y: Numeric) -> Numeric:
+    def div(self, x, y):
         return x.div(y)
 
-    def pow(self, x: Numeric, y: Numeric) -> Numeric:
+    def pow(self, x, y):
         return x.pow(y)
 
     def func_call(self, fname, *args):
