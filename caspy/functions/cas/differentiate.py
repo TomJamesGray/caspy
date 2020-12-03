@@ -20,6 +20,7 @@ class Differentiate(Function):
         self.arg = arg
         self.fully_diffed = False
         self.root_diff = root_diff
+        self.parser = caspy.parsing.parser.Parser()
         # Annoyingly the 'wrt' if provided will be a numeric object
         # so we need to extract the actual variable in question
         if type(wrt) == caspy.numeric.numeric.Numeric:
@@ -51,7 +52,7 @@ class Differentiate(Function):
         """
         logger.debug("Attempting to differentiate {} wrt {}".format(self.arg,
                                                                     self.wrt))
-        parser = caspy.parsing.parser.Parser()
+
         tot = caspy.numeric.numeric.Numeric(0, "number")
         diffed_values = []
         for i,sym in enumerate(self.arg.val):
@@ -63,9 +64,9 @@ class Differentiate(Function):
 
             # Try matching x^n
             pmatch_res = pm.pmatch_sym("a*{}^n".format(self.wrt),
-                                       {"n": "const", "a": "const"}, sym)
+                                       {"n": "const", "a": "const"}, sym, self.parser)
             if pmatch_res != {}:
-                term_val = parser.parse("{} * {} ^ ({})".format(
+                term_val = self.parser.parse("{} * {} ^ ({})".format(
                     copy(pmatch_res["a"]) * copy(pmatch_res["n"]),
                     self.wrt,
                     copy(pmatch_res["n"]) - 1
@@ -76,7 +77,7 @@ class Differentiate(Function):
 
             # Try diffing sin terms
             pmatch_res = pm.pmatch_sym("A1*sin(A2)",
-                                       {"A1": "const", "A2": "rem"}, sym)
+                                       {"A1": "const", "A2": "rem"}, sym, self.parser)
             if pmatch_res != {}:
                 logger.debug("Differentiating sin term")
                 # Diff the argument
@@ -97,7 +98,7 @@ class Differentiate(Function):
 
             # Try diffing cos terms
             pmatch_res = pm.pmatch_sym("A1*cos(A2)",
-                                       {"A1": "const", "A2": "rem"}, sym)
+                                       {"A1": "const", "A2": "rem"}, sym, self.parser)
             if pmatch_res != {}:
                 logger.debug("Differentiating cos term")
                 # Diff the argument
@@ -118,7 +119,7 @@ class Differentiate(Function):
 
             # Try diffing ln terms
             pmatch_res = pm.pmatch_sym("A1*ln(A2)",
-                                       {"A1": "const", "A2": "rem"}, sym)
+                                       {"A1": "const", "A2": "rem"}, sym, self.parser)
             if pmatch_res != {}:
                 logger.debug("Differentiating ln term")
                 # Diff the argument
@@ -136,7 +137,7 @@ class Differentiate(Function):
 
             # Try differentiating exponential terms
             pmatch_res = pm.pmatch_sym("A1 * e^(A2)".format(self.wrt),
-                                    {"A1": "const", "A2": "rem"}, sym)
+                                    {"A1": "const", "A2": "rem"}, sym, self.parser)
             if pmatch_res != {}:
                 logger.debug("Differentiating exponential term, pmatch result {}".format(pmatch_res))
                 # Currently pattern matching doesn't quite work correctly with matching
