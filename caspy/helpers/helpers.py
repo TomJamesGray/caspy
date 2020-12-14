@@ -52,18 +52,11 @@ def prod(iterable):
 
 
 def get_divisors(num):
-    # TODO REWRITE THIS FUNCTION
-    factors = list(factoriseNum(num))[1:]
-    pf_mults = collections.Counter(factors)
-
-    powers = [
-        [factor ** i for i in range(count+1)]
-        for factor, count in pf_mults.items()
-    ]
-
-    for power_combo in itertools.product(*powers):
-        yield prod(power_combo)
-
+    """Yields all positive divisors of num"""
+    num = abs(num)
+    for i in range(1,num+1):
+        if num % i == 0:
+            yield i
 
 def leading_term(a):
     max_pow = deg(a)
