@@ -24,7 +24,7 @@ class Sqrt(Function1Arg):
         if self.arg.is_exclusive_numeric():
             return Fraction(self.arg.frac_eval().to_real() ** 0.5, 1)
         else:
-            logger.error("Argument {} of sqrt isn't exclusive numeric".format(
+            logger.warning("Argument {} of sqrt isn't exclusive numeric".format(
                 self.arg
             ))
 

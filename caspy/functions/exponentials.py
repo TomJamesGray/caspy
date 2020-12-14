@@ -33,6 +33,6 @@ class Ln(Function1Arg):
         if self.arg.is_exclusive_numeric():
             return Fraction(math.log(self.arg.frac_eval().to_real()), 1)
         else:
-            logger.error("Argument {} of sqrt isn't exclusive numeric".format(
+            logger.warning("Argument {} of sqrt isn't exclusive numeric".format(
                 self.arg
             ))

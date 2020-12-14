@@ -27,7 +27,8 @@ class Differentiate(Function):
         if type(wrt) == caspy.numeric.numeric.Numeric:
             if len(wrt.val) > 1:
                 logger.critical("With respect to term contains "
-                                "multiple symbols")
+                                "multiple symbols, defaulting to x")
+                self.wrt = "x"
             else:
                 set_wrt = False
                 for (sym_fact_name, sym_fact_pow) in wrt.val[0].val:
@@ -159,7 +160,7 @@ class Differentiate(Function):
                 sym_numeric = caspy.numeric.numeric.Numeric(deepcopy(sym), "sym_obj")
                 expand_obj = expand.Expand(sym_numeric)
                 expanded = expand_obj.eval()
-                logger.critical("Expanded val: {}".format(ln.latex_numeric_str(expanded)))
+                logger.info("Expanded val: {}".format(ln.latex_numeric_str(expanded)))
                 diff_exp = Differentiate(expanded, self.wrt, True, True)
                 new_integral = diff_exp.eval()
                 if diff_exp.fully_diffed:
@@ -167,7 +168,7 @@ class Differentiate(Function):
                     tot += new_integral
                     continue
                 else:
-                    logger.critical("Failed expanded diff {}".format(ln.latex_numeric_str(new_integral)))
+                    logger.info("Failed expanded diff {}".format(ln.latex_numeric_str(new_integral)))
 
             if not self.root_diff:
                 continue

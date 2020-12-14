@@ -61,7 +61,7 @@ class Sin(TrigFunc):
         if self.arg.is_exclusive_numeric():
             return Fraction(math.sin(self.arg.frac_eval().to_real()), 1)
         else:
-            logger.error("Argument {} of sqrt isn't exclusive numeric".format(
+            logger.warning("Argument {} of sqrt isn't exclusive numeric".format(
                 self.arg
             ))
 
@@ -110,7 +110,7 @@ class Cos(TrigFunc):
         if self.arg.is_exclusive_numeric():
             return Fraction(math.cos(self.arg.frac_eval().to_real()), 1)
         else:
-            logger.error("Argument {} of sqrt isn't exclusive numeric".format(
+            logger.warning("Argument {} of sqrt isn't exclusive numeric".format(
                 self.arg
             ))
 
@@ -144,7 +144,7 @@ class Tan(TrigFunc):
         if self.arg.is_exclusive_numeric():
             return Fraction(math.tan(self.arg.frac_eval().to_real()), 1)
         else:
-            logger.error("Argument {} of sqrt isn't exclusive numeric".format(
+            logger.warning("Argument {} of sqrt isn't exclusive numeric".format(
                 self.arg
             ))
 

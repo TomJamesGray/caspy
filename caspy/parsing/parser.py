@@ -56,6 +56,6 @@ class Parser:
 
     def parse(self, line: str):
         tree = self.parser.parse(line)
-        logger.debug("Tree = \n{}\n--".format(tree.pretty()))
+        logger.info("Tree = \n{}\n--".format(tree.pretty()))
         simped = self.simplifier_transformer.transform(tree)
         return simped

@@ -175,7 +175,7 @@ class KroneckerFactor(Function1Arg):
                         polyn.append([c,0])
                         terms_used.append(i)
                 except Exception:
-                    logger.critical("FAIL")
+                    logger.critical("Failed exclusive numeric evaluation of symbol")
 
         output_val = []
         if len(polyn) > 0:
@@ -188,7 +188,7 @@ class KroneckerFactor(Function1Arg):
             for coeff, power in polyn:
                 polyn_to_factor[n - power] = coeff
 
-            print("Factorising {}".format(polyn_to_factor))
+            # print("Factorising {}".format(polyn_to_factor))
 
             cont,m_val,factored = kronecker(polyn_to_factor)
             factors_str = []

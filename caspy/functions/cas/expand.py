@@ -45,7 +45,7 @@ class Expand(Function1Arg):
                             if self.recurse_into:
                                 new_sym_name = num.Numeric(0,"number")
                                 for sym_in_sym_name in copy.deepcopy(sym_name.val):
-                                    logger.critical("Checking recurse on {}".format(sym_in_sym_name))
+                                    logger.info("Checking recurse on {}".format(sym_in_sym_name))
                                     need_to_recurse = False
                                     for (a,b) in sym_in_sym_name.val:
                                         if type(a) == num.Numeric:
@@ -53,7 +53,7 @@ class Expand(Function1Arg):
                                             break
 
                                     if need_to_recurse:
-                                        logger.critical("RECURSE")
+                                        logger.debug("Recursing for expand fn")
                                         new_sym_name += Expand(
                                             num.Numeric(sym_in_sym_name),True).eval()
                                     else:
@@ -178,9 +178,9 @@ class ExpandTrig(Function1Arg):
 
             tot += num.Numeric(sym,"sym_obj")
         if self.expand_result:
-            logger.critical("Pre expanding {}".format(lns(tot)))
+            logger.info("Pre expanding {}".format(lns(tot)))
             xyz = Expand(tot,True).eval()
-            logger.critical("Expanding result {}".format(lns(xyz)))
+            logger.info("Expanding result {}".format(lns(xyz)))
             return xyz
         return tot
 

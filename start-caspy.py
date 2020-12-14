@@ -1,5 +1,7 @@
-from caspy.main import main,profile_me
+import sys
+from caspy.main import main
+
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
     # profile_me()

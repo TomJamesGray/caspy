@@ -52,6 +52,7 @@ def prod(iterable):
 
 
 def get_divisors(num):
+    # TODO REWRITE THIS FUNCTION
     factors = list(factoriseNum(num))[1:]
     pf_mults = collections.Counter(factors)
 

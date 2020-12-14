@@ -107,6 +107,7 @@ def invert_mat(mat):
     return mat_mul(col_perm_mat,rhs_aug)
 
 def vandermonde_inv(mat):
+    # Uses technique from https://www.sciencedirect.com/science/article/abs/pii/S0096300305005576
     # Get the x_is
     x_is = []
     for row in mat:
