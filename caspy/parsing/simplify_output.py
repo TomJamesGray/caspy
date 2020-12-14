@@ -57,6 +57,10 @@ class SimplifyOutput(Transformer,lark_transformer.LarkTransformerHelper):
     def pow(self, x, y):
         return x.pow(y)
 
+    def sym_with_scalar(self,x,y):
+        return y.mul(self.number(x))
+
+
     def func_call(self, fname, *args):
         # Unpack arguments into a list
         unpacked = []

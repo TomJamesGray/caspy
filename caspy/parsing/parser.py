@@ -24,18 +24,20 @@ class Parser:
             | product "*" negation -> mul
             | product "/" negation -> div
         
-        ?negation:power
-            | "-" power -> neg
+        ?negation:power_pre
+            | "-" power_pre -> neg
+        
+        ?power_pre:power
+            | NUMBER power -> sym_with_scalar
         
         ?power:atom
             | power "^" atom -> pow
         
         ?atom: NAME "(" paramaters? ")" -> func_call
-            | "[" paramaters? "]" -> gen_arr
-            | NUMBER -> number
             | "(" sum ")"
             | /("([^"]|"")*")+/ -> string
             | NAME -> sym
+            | NUMBER -> number
         
         
         

@@ -106,6 +106,9 @@ def kronecker_int(polyn):
     f_factors = []
     for _,f_val in non_zeroes:
         divisors_abs = list(get_divisors(abs(f_val)))
+        # Algorithm seems to work faster by trying positive divisors then
+        # negative divisors rather than having positive and negative values
+        # next to each other, see factor(3*x^9+x^3+10*x^2)
         f_factors.append(
             divisors_abs + [-1 * fact for fact in divisors_abs]
         )
