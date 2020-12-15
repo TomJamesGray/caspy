@@ -65,9 +65,9 @@ def latex_numeric_str(x,form="latex"):
                     if form == "latex":
                         out += "\\cdot"
                     elif form == "unicode":
-                        out += " ·"
+                        out += " · "
                     elif form == "ascii":
-                        out += " *"
+                        out += " * "
                     need_dot = False
                 if type(sym_name) == num.Numeric:
                     # print("Recursing for {}".format(sym_name))
@@ -84,18 +84,18 @@ def latex_numeric_str(x,form="latex"):
                 elif type(sym_name) == str:
                     if sym_name == "pi" and form != "ascii":
                         if form == "latex":
-                            out += " \pi"
+                            out += "\pi"
                         elif form == "unicode":
-                            out += " π"
+                            out += "π"
                     else:
-                        out += " {}".format(sym_name)
+                        out += "{}".format(sym_name)
                 else:
                     # Handles cases like 2^x
                     out += "{}".format(sym_name)
                 power = latex_numeric_str(pow,form)
                 if power != "" and power != "1":
                     if form == "latex":
-                        out += "^ {{{}}}".format(power)
+                        out += "^{{{}}}".format(power)
                     elif form == "ascii":
                         out += "^({})".format(power)
                     elif form == "unicode":
@@ -124,9 +124,9 @@ def latex_numeric_str(x,form="latex"):
         if sym_pos + 1 < len(x.val):
             # Check we aren't on the last term
             if x.val[sym_pos + 1].coeff.to_real() < 0:
-                out += "-"
+                out += " - "
             else:
-                out += "+"
+                out += " + "
 
         # out += "+"
     return out

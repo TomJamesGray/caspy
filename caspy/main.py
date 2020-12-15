@@ -12,7 +12,7 @@ def main(args):
 
     a_parser = argparse.ArgumentParser(description="Caspy - A CAS developed in Python")
     a_parser.add_argument("--timer",action="store_true",default=False,
-                        help="Time execution of Caspy")
+                        help="Time execution of statements")
     a_parser.add_argument("--verbose",action="store_true",default=False,
                         help="Enable verbose logging")
     a_parser.add_argument("--debug",action="store_true",default=False,
