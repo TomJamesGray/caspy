@@ -80,7 +80,7 @@ def main(args):
     # parser_cls.parse("factor(3x^9+x^3+10x^2)")
     # return None
     if not args_results.ascii:
-        args_results.ascii = not args_results.latex
+        args_results.ascii = not (args_results.latex or args_results.unicode)
     while True:
         line = input(">> ")
         try:
@@ -98,4 +98,5 @@ def main(args):
             print(latex_numeric_str(out,"ascii"))
         if args_results.latex:
             print(latex_numeric_str(out,"latex"))
-
+        if args_results.unicode:
+            print(latex_numeric_str(out, "unicode"))

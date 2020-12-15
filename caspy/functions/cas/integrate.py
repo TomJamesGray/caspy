@@ -53,6 +53,10 @@ class Integrate(Function):
         return "{}({},{})".format(self.fname,ln.latex_numeric_str(self.arg,"ascii"),
                                   ln.latex_numeric_str(self.wrt,"ascii"))
 
+    def unicode_format(self):
+        return "∫({}) d{}".format(ln.latex_numeric_str(self.arg,"unicode"),
+                                  ln.latex_numeric_str(self.wrt,"unicode"))
+
     def u_sub_int(self, u, integrand):
         """
         Tries to integrate a symbol using a u substitution

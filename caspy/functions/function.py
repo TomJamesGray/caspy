@@ -16,13 +16,19 @@ class Function:
     def eval(self):
         return num.Numeric(caspy.numeric.symbol.Symbol(self, Fraction(1, 1)), "sym_obj")
 
+    def unicode_format(self):
+        return self.ascii_format()
+
 
 class Function1Arg(Function):
     def latex_format(self):
         return "{}({}) ".format(self.latex_fname, ln.latex_numeric_str(self.arg))
 
     def ascii_format(self):
-        return "{}({})".format(self.fname, ln.latex_numeric_str(self.arg))
+        return "{}({})".format(self.fname, ln.latex_numeric_str(self.arg,"ascii"))
+
+    def unicode_format(self):
+        return "{}({})".format(self.fname, ln.latex_numeric_str(self.arg,"unicode"))
 
     def __deepcopy__(self, memodict={}):
         new = type(self)(self.arg)

@@ -20,6 +20,9 @@ class Sqrt(Function1Arg):
     def latex_format(self):
         return "\\sqrt{{{}}}".format(ln.latex_numeric_str(self.arg))
 
+    def unicode_format(self):
+        return "√({})".format(ln.latex_numeric_str(self.arg,"unicode"))
+
     def to_frac(self):
         if self.arg.is_exclusive_numeric():
             return Fraction(self.arg.frac_eval().to_real() ** 0.5, 1)
