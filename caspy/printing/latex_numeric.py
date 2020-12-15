@@ -7,7 +7,13 @@ from caspy.numeric.fraction import Fraction
 
 logger = logging.getLogger(__name__)
 
-def latex_numeric_str(x):
+def latex_numeric_str(x,form="latex"):
+    """
+    Generates output string for x. Can give output in LaTeX or in ASCII
+    :param x: Numeric object
+    :param form: String, either `latex` or `ascii`
+    :return: string
+    """
     if type(x) != num.Numeric:
         return str(x)
     out = ""
@@ -38,8 +44,12 @@ def latex_numeric_str(x):
             elif sym.coeff.den == -1:
                 out += "{}".format(abs(to_int(sym.coeff.num * -1)))
             else:
-                out += "\\frac{{{}}}{{{}}}".format(
-                    abs(to_int(sym.coeff.num)), abs(to_int(sym.coeff.den)))
+                if form == "latex":
+                    out += "\\frac{{{}}}{{{}}}".format(
+                        abs(to_int(sym.coeff.num)), abs(to_int(sym.coeff.den)))
+                elif form =="ascii":
+                    out += "({}/{})".format(
+                        abs(to_int(sym.coeff.num)), abs(to_int(sym.coeff.den)))
 
         elif sym.val == [[1,1]]:
             # Handles case when the symbol is just the number '1' on it's own
@@ -50,27 +60,39 @@ def latex_numeric_str(x):
             i += 1
             if sym_name != 1 and i != sym.get_coeff_index():
                 if need_dot:
-                    out += "\\cdot"
+                    if form == "latex":
+                        out += "\\cdot"
+                    elif form == "ascii":
+                        out += "*"
                     need_dot = False
                 if type(sym_name) == num.Numeric:
                     # print("Recursing for {}".format(sym_name))
-                    power = latex_numeric_str(sym_name)
+                    power = latex_numeric_str(sym_name,form)
                     if power != "" and power != "1":
                         out += "({})".format(power)
                 elif isinstance(sym_name, fn.Function):
-                    out += sym_name.latex_format()
+                    if form == "latex":
+                        out += sym_name.latex_format()
+                    elif form == "ascii":
+                        out += sym_name.ascii_format()
                 elif type(sym_name) == str:
-                    if sym_name == "pi":
+                    if sym_name == "pi" and form != "ascii":
                         out += " \pi"
                     else:
                         out += " {}".format(sym_name)
                 else:
                     logger.warning("Unrecongnized type of sym_name {}".format(sym_name))
-                power = latex_numeric_str(pow)
+                power = latex_numeric_str(pow,form)
                 if power != "" and power != "1":
-                    out += "^ {{{}}}".format(power)
+                    if form == "latex":
+                        out += "^ {{{}}}".format(power)
+                    elif form == "ascii":
+                        out += "^({})".format(power)
             elif type(pow) == num.Numeric:
-                out += "^ {{{}}}".format(latex_numeric_str(pow))
+                if form == "latex":
+                    out += "^ {{{}}}".format(latex_numeric_str(pow,form))
+                elif form == "ascii":
+                    out += "^ ({})".format(latex_numeric_str(pow, form))
         if sym_pos + 1 < len(x.val):
             # Check we aren't on the last term
             if x.val[sym_pos + 1].coeff.to_real() < 0:

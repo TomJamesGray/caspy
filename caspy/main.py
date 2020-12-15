@@ -9,6 +9,7 @@ from caspy.printing.latex_numeric import latex_numeric_str
 
 
 def main(args):
+
     a_parser = argparse.ArgumentParser(description="Caspy - A CAS developed in Python")
     a_parser.add_argument("--timer",action="store_true",default=False,
                         help="Time execution of Caspy")
@@ -70,7 +71,8 @@ def main(args):
     logger = logging.getLogger(__name__)
 
     parser_cls = parser.Parser(output="ASCII")
-
+    # parser_cls.parse("factor(3x^9+x^3+10x^2)")
+    # return None
     while True:
         line = input(">> ")
         try:
@@ -83,8 +85,8 @@ def main(args):
             print("Math Error: Division by zero")
             continue
         # print("Parser output = {}".format(out))
-        # print("ASCII:")
-        # print(ascii_numeric_str(out))
+        print("ASCII:")
+        print(latex_numeric_str(out,"ascii"))
         # print("\nLaTeX:")
         tex = latex_numeric_str(out)
         print(tex)
