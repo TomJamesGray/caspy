@@ -1,6 +1,7 @@
 import logging
 import argparse
 import logging.config
+from argparse import RawTextHelpFormatter
 from lark.exceptions import VisitError
 from timeit import default_timer as timer
 from caspy.parsing import parser
@@ -10,7 +11,19 @@ from caspy.printing.latex_numeric import latex_numeric_str
 
 def main(args):
 
-    a_parser = argparse.ArgumentParser(description="Caspy - A CAS developed in Python")
+    a_parser = argparse.ArgumentParser(description="""
+Caspy - A CAS built in Python
+
+Available functions in the system:
+- integrate(f(x),x) : Integrate a function with respect to a variable x
+- diff(f(x),x) : Differentiates a function with respect to a variable x
+- factor(f(x)) : Factorises a polynomial g(x) using Kronecker's algorithm
+- expand_trig(...) : Expands a trigonometric expression, for instance
+                      sin(2x) is expanded as 2sin(x)cos(x)
+- expand(...) : Expands brackets in an expression 
+- re(...) : Returns floating point answer where possible, for instance
+            re(sqrt(2)) gives 1.4142...
+    """,formatter_class=RawTextHelpFormatter)
     a_parser.add_argument("--timer",action="store_true",default=False,
                         help="Time execution of statements")
     a_parser.add_argument("--verbose",action="store_true",default=False,

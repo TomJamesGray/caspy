@@ -63,7 +63,7 @@ def latex_numeric_str(x,form="latex"):
             if sym_name != 1 and i != sym.get_coeff_index():
                 if need_dot:
                     if form == "latex":
-                        out += "\\cdot"
+                        out += "\\cdot "
                     elif form == "unicode":
                         out += " · "
                     elif form == "ascii":
@@ -84,7 +84,7 @@ def latex_numeric_str(x,form="latex"):
                 elif type(sym_name) == str:
                     if sym_name == "pi" and form != "ascii":
                         if form == "latex":
-                            out += "\pi"
+                            out += "\pi "
                         elif form == "unicode":
                             out += "π"
                     else:

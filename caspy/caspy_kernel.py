@@ -19,25 +19,26 @@ class CaspyKernel(Kernel):
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
         parser_cls = parser.Parser()
-        try:
-            num_result = parser_cls.parse(code)
-        except Exception as e:
-            self.send_response(self.iopub_socket, 'stream', {"name": "stderr", "text": traceback.format_exc()})
-            return {
-                "status": "error",
-                "execution_count": self.execution_count,
-                "traceback": [],
-                "ename": "",
-                "evalue": str(e)
-            }
+        for line in code.split("\n"):
+            try:
+                num_result = parser_cls.parse(line)
+            except Exception as e:
+                self.send_response(self.iopub_socket, 'stream', {"name": "stderr", "text": traceback.format_exc()})
+                return {
+                    "status": "error",
+                    "execution_count": self.execution_count,
+                    "traceback": [],
+                    "ename": "",
+                    "evalue": str(e)
+                }
 
-        if not silent:
-            latex_str = latex_numeric.latex_numeric_str(num_result)
-            self.send_response(self.iopub_socket,"display_data", {
-                "data": {
-                    "text/latex": "${}$".format(latex_str),
-                    "text/plain": latex_str
-                }})
+            if not silent:
+                latex_str = latex_numeric.latex_numeric_str(num_result)
+                self.send_response(self.iopub_socket,"display_data", {
+                    "data": {
+                        "text/latex": "${}$".format(latex_str),
+                        "text/plain": latex_str
+                    }})
 
         return {"status": "ok",
                 "execution_count": self.execution_count,
