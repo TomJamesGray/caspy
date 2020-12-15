@@ -54,7 +54,6 @@ def latex_numeric_str(x,form="latex"):
         elif sym.val == [[1,1]]:
             # Handles case when the symbol is just the number '1' on it's own
             out += "{}".format(to_int(sym.coeff.num))
-
         i = -1
         for (sym_name,pow) in sym.val:
             i += 1
@@ -76,12 +75,13 @@ def latex_numeric_str(x,form="latex"):
                     elif form == "ascii":
                         out += sym_name.ascii_format()
                 elif type(sym_name) == str:
-                    if sym_name == "pi" and form != "ascii":
+                    if sym_name == "pi" and form == "latex":
                         out += " \pi"
                     else:
                         out += " {}".format(sym_name)
                 else:
-                    logger.warning("Unrecongnized type of sym_name {}".format(sym_name))
+                    # Handles cases like 2^x
+                    out += "{}".format(sym_name)
                 power = latex_numeric_str(pow,form)
                 if power != "" and power != "1":
                     if form == "latex":
