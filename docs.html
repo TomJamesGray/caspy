@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Tom Gray" />
+  <title>Caspy documentation</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      word-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Caspy documentation</h1>
+<p class="author">Tom Gray</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#caspy---a-python-cas">Caspy - A Python CAS</a>
+<ul>
+<li><a href="#functions-implemented">Functions implemented</a></li>
+<li><a href="#example-usage">Example usage</a>
+<ul>
+<li><a href="#integration">Integration</a></li>
+<li><a href="#differentiation">Differentiation</a></li>
+<li><a href="#factorisation">Factorisation</a></li>
+<li><a href="#conversion-to-floats">Conversion to floats</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="caspy---a-python-cas">Caspy - A Python CAS</h1>
+<p>Caspy is a CAS that has been developed using Lark parser and Python. Some of the key feautures are:</p>
+<ul>
+<li>Factorisation of univariate polynomials</li>
+<li>Integration and differentiation of symbollic variables</li>
+<li>Expansion of trigonometric expressions, eg expand <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>sin</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mi>x</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\sin(2x)</annotation></semantics></math> as <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>sin</mo><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>cos</mo><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">2\sin(x)\cos(x)</annotation></semantics></math></li>
+<li>Expansion of expressions in brackets</li>
+<li>Automatic simplification of fractions and roots</li>
+</ul>
+<h2 id="functions-implemented">Functions implemented</h2>
+<p>Available functions in the system:</p>
+<ul>
+<li><code>integrate(f(x),x)</code> : Integrate a function with respect to a variable x</li>
+<li><code>diff(f(x),x)</code> : Differentiates a function with respect to a variable x</li>
+<li><code>factor(f(x))</code> : Factorises a polynomial g(x) using Kronecker’s algorithm</li>
+<li><code>expand_trig(...)</code> : Expands a trigonometric expression, for instance sin(2x) is expanded as 2sin(x)cos(x)</li>
+<li><code>expand(...)</code> : Expands brackets in an expression</li>
+<li><code>re(...)</code> : Returns floating point answer where possible, for instance re(sqrt(2)) gives 1.4142…</li>
+</ul>
+<h2 id="example-usage">Example usage</h2>
+<h3 id="integration">Integration</h3>
+<p>To calculate the integral of <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∫</mo><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>+</mo><msup><mi>e</mi><mi>x</mi></msup><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup><mstyle mathvariant="normal"><mi>d</mi></mstyle><mi>x</mi></mrow><annotation encoding="application/x-tex">\int (x+e^x)^2 \mathrm{d}x</annotation></semantics></math> in Caspy we just need to use the <code>integrate(...)</code> function, as shown bellow</p>
+<pre><code>&gt;&gt; integrate((x+e^x)^2)
+(1/3) · x³ + 2 · e^(x)x - 2 · e^(x) + (1/2) · e^(2 · x)</code></pre>
+<p>If we wish to integrate with respect to some other variable, say <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>, we can give a second argument to the <code>integrate(...)</code> function, as shown bellow</p>
+<pre><code>&gt;&gt; integrate(x*sin(y),y)
+- cos(y)x</code></pre>
+<h3 id="differentiation">Differentiation</h3>
+<p>The differentiation function <code>diff(...)</code> works similarly to the integration function, in that the second, optional, argument specifies what we’re differentiating with respect to. For example to differentiate <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><msup><mi>y</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">xy^2</annotation></semantics></math> with respect to y we exectute the code shown bellow.</p>
+<pre><code>&gt;&gt; diff(x*y^2,y)
+2 · yx</code></pre>
+<h3 id="factorisation">Factorisation</h3>
+<p>The <code>factor(...)</code> function computes the irreducible factorisation of a polynomial in <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math> with rational coefficients. For instance to factor <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>x</mi><mn>8</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">x^8-1</annotation></semantics></math> we can run the code shown bellow.</p>
+<pre><code>&gt;&gt; factor(x^8-1)
+(-x⁴ - 1)(-x + 1)(x² + 1)(x + 1)</code></pre>
+<h3 id="conversion-to-floats">Conversion to floats</h3>
+<p>To maintain accuracy and readibility Caspy uses symbolic representations of expressions where possible. This means if we use Caspy to evaluate <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>sin</mo><mo stretchy="false" form="prefix">(</mo><mi>p</mi><mi>i</mi><mi>/</mi><mn>4</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\sin(pi/4)</annotation></semantics></math>, Caspy will return <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><msqrt><mn>2</mn></msqrt><mn>2</mn></mfrac><annotation encoding="application/x-tex">\frac{\sqrt{2}}{2}</annotation></semantics></math>. If we wish to get a floating point representation of this value we can use the <code>re(...)</code> function as shown bellow.</p>
+<pre><code>&gt;&gt; re(sin(pi/4))
+0.7071067811865476</code></pre>
+</body>
+</html>
