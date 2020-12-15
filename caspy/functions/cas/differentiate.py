@@ -47,6 +47,10 @@ class Differentiate(Function):
             self.wrt,ln.latex_numeric_str(self.arg)
         )
 
+    def ascii_format(self):
+        return "{}({},{})".format(self.fname,ln.latex_numeric_str(self.arg,"ascii"),
+                                  ln.latex_numeric_str(self.wrt,"ascii"))
+
     def eval(self):
         """
         Evaluates the derivative symbol by symbol

@@ -73,7 +73,7 @@ def latex_numeric_str(x,form="latex"):
                     if form == "latex":
                         out += sym_name.latex_format()
                     elif form == "ascii":
-                        out += sym_name.ascii_format()
+                        out += " {}".format(sym_name.ascii_format())
                 elif type(sym_name) == str:
                     if sym_name == "pi" and form == "latex":
                         out += " \pi"

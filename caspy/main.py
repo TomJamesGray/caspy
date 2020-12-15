@@ -17,6 +17,12 @@ def main(args):
                         help="Enable verbose logging")
     a_parser.add_argument("--debug",action="store_true",default=False,
                         help="Enable more verbose logging for debugging purposes")
+    a_parser.add_argument("--ascii",action="store_true",default=False,
+                          help="Output string using ASCII characters")
+    a_parser.add_argument("--latex",action="store_true",default=False,
+                          help="Output representation of string in LaTeX form")
+    a_parser.add_argument("--unicode", action="store_true", default=False,
+                          help="Output string using Unicode characters")
 
     args_results = a_parser.parse_args(args)
     log_level = logging.ERROR
@@ -73,6 +79,8 @@ def main(args):
     parser_cls = parser.Parser(output="ASCII")
     # parser_cls.parse("factor(3x^9+x^3+10x^2)")
     # return None
+    if not args_results.ascii:
+        args_results.ascii = not args_results.latex
     while True:
         line = input(">> ")
         try:
@@ -84,9 +92,10 @@ def main(args):
         except ZeroDivisionError:
             print("Math Error: Division by zero")
             continue
-        # print("Parser output = {}".format(out))
-        print("ASCII:")
-        print(latex_numeric_str(out,"ascii"))
-        # print("\nLaTeX:")
-        tex = latex_numeric_str(out)
-        print(tex)
+        if args_results.verbose or args_results.debug:
+            print("Parser output = {}".format(out))
+        if args_results.ascii:
+            print(latex_numeric_str(out,"ascii"))
+        if args_results.latex:
+            print(latex_numeric_str(out,"latex"))
+
