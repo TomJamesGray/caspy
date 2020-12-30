@@ -82,10 +82,11 @@ class Expand(Function1Arg):
                         sym_tot = sym_tot * (sym_name ** sym_pow)
                 else:
                     # Symbol name isn't numeric type, so could just be
-                    # 'x' or a number for example, so append it to the symbols
-                    # in the sym_tot value
+                    # 'x' or a number for example, so make it a symbol type and
+                    # multiply it onto all values in sym_term
+                    tmp_sym = caspy.numeric.symbol.Symbol(sym_name,Fraction(1,1))
                     for sym_term in sym_tot.val:
-                        sym_term.val.append([sym_name,sym_pow])
+                        sym_term.mul(copy.deepcopy(tmp_sym))
 
             tot += sym_tot
 
