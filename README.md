@@ -11,6 +11,8 @@ are:
 
 
 ## Dependencies
+Requires Python 3.7 or later.
+
 To just use the command line interface the only dependency is `lark-parser`, this can be installed with
 ```
 pip install lark-parser
