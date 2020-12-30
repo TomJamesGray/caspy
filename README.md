@@ -90,7 +90,7 @@ in x with rational coefficients. For instance to factor x^8-1 we can run the cod
 
 ### Conversion to floats
 To maintain accuracy and readibility Caspy uses symbolic representations of expressions where possible.
-This means if we use Caspy to evaluate $\sin(pi/4)$, Caspy will return √(2)/2. If we wish to get a floating point representation of this value we can use the `re(...)` function as shown bellow.
+This means if we use Caspy to evaluate sin(pi/4), Caspy will return √(2)/2. If we wish to get a floating point representation of this value we can use the `re(...)` function as shown bellow.
 ```
 >> re(sin(pi/4))
 0.7071067811865476
