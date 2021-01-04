@@ -58,7 +58,7 @@ Available functions in the system:
 ## Example usage
 
 ### Integration
-To calculate the integral of (x+e^x)^2 with respect to x in Caspy we just need to use the
+To calculate the integral of (x+e^x )^2 with respect to x in Caspy we just need to use the
 `integrate(...)` function, as shown bellow
 
 ```
