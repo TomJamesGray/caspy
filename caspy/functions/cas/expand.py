@@ -85,6 +85,7 @@ class Expand(Function1Arg):
                     # 'x' or a number for example, so make it a symbol type and
                     # multiply it onto all values in sym_term
                     tmp_sym = caspy.numeric.symbol.Symbol(sym_name,Fraction(1,1))
+                    tmp_sym.val[0][1] = sym_pow
                     for sym_term in sym_tot.val:
                         sym_term.mul(copy.deepcopy(tmp_sym))
 
